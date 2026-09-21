@@ -1,54 +1,296 @@
-<HTML>
-  <HEAD>
-  	<title>Tell your weather</title>
-  </HEAD>
-<h1>Choose time zone</h1>
-<p>You can choose the time zone of the weather forecast to be displayed on the four cards .</p>
-<p>If you chose the "NONE", the number of cards is reduced .</p>
-<form>
-<select name="1">
-<option value="1" selected>+3h</option>
-<option value="2">+6h</option>
-<option value="3">+9h</option>
-<option value="4">+12h</option>
-<option value="5">+15h</option>
-<option value="6">+18h</option>
-<option value="7">+21h</option>
-<option value="8">+1d</option>
-</select>
-<select name="2">
-<option value="3" selected>+9h</option>
-<option value="4">+12h</option>
-<option value="5">+15h</option>
-<option value="6">+18h</option>
-<option value="7">+21h</option>
-<option value="8">+1d</option>
-<option value="12">+36h</option>
-<option value="16">+2d</option>
-</select>
-<select name="3">
-<option value="4">+12h</option>
-<option value="5">+15h</option>
-<option value="6">+18h</option>
-<option value="7">+21h</option>
-<option value="8" selected>+1d</option>
-<option value="12">+36h</option>
-<option value="16">+2d</option>
-<option value="99">NONE</option>
-</select>
-<select name="4">
-<option value="4">+12h</option>
-<option value="5">+15h</option>
-<option value="6">+18h</option>
-<option value="7">+21h</option>
-<option value="8">+1d</option>
-<option value="12">+36h</option>
-<option value="16" selected>+2d</option>
-<option value="99">NONE</option>
-</select><br>
-<p><input type="submit" value="SAVE"></p>
-</form>
-  <BODY>
-  </BODY>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>つくったもの一覧｜pikaring</title>
+<meta name="description" content="pikaring がつくった、ブラウザだけで動く道具とゲームの一覧。インストールも登録も要らず、開けばすぐに使えます。">
+<meta name="theme-color" content="#16202f">
 
-</HTML>
+<link rel="canonical" href="https://pikaring.github.io/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="つくったもの一覧｜pikaring">
+<meta property="og:description" content="ブラウザだけで動く道具とゲーム。インストールも登録も要りません。">
+<meta property="og:url" content="https://pikaring.github.io/">
+<meta property="og:image" content="https://pikaring.github.io/assets/icon.png">
+
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-3FCFQY4W85"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-3FCFQY4W85');
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "つくったもの一覧｜pikaring",
+  "url": "https://pikaring.github.io/",
+  "description": "pikaring がつくった、ブラウザだけで動く道具とゲームの一覧。インストールも登録も要らず、開けばすぐに使えます。",
+  "inLanguage": "ja",
+  "author": {
+    "@type": "Person",
+    "name": "pikaring",
+    "url": "https://pikaring.github.io/"
+  },
+  "mainEntity": {
+    "@type": "ItemList",
+    "numberOfItems": 8,
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Tap on KOTOBA",
+        "url": "https://pikaring.github.io/tap-on-kotoba/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Tap on NEKO",
+        "url": "https://pikaring.github.io/tap-on-neko/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Cat on Escape",
+        "url": "https://pikaring.github.io/cat-on-escape/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 4,
+        "name": "Reach on SANMA",
+        "url": "https://pikaring.github.io/reach-on-sanma/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 5,
+        "name": "All in TEXAS",
+        "url": "https://pikaring.github.io/all-in-texas/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 6,
+        "name": "Ride on QC",
+        "url": "https://pikaring.github.io/ride-on-qc/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 7,
+        "name": "Eat on GPX",
+        "url": "https://pikaring.github.io/eat-on-gpx/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 8,
+        "name": "ROCK ON MJ",
+        "url": "https://pikaring.github.io/rock-on-mj/"
+      }
+    ]
+  }
+}
+</script>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">PIKARING / TOOLS &amp; GAMES</p>
+    <h1>ブラウザで、開けばすぐ。</h1>
+    <p class="lead">
+      インストールも、登録も、通信も要らない道具とゲームを置いています。
+      どれも無料で、ソースは GitHub で公開しています。
+    </p>
+  </div>
+</header>
+
+<main>
+
+  <!-- ===== あそぶ ===== -->
+  <section class="group">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">PLAY</p>
+        <h2>あそぶ</h2>
+      </div>
+
+      <!-- ▼ アプリを ふやす ときは この <a class="card"> … </a> を 1つ コピーして 中身を 変える -->
+      <div class="grid">
+
+        <a class="card" href="https://pikaring.github.io/tap-on-kotoba/">
+          <img class="card__icon" src="https://pikaring.github.io/tap-on-kotoba/assets/icon.png" alt="" width="64" height="64" loading="lazy">
+          <div class="card__body">
+            <h3>Tap on KOTOBA</h3>
+            <p>「一石□鳥」の□に入る字は。四字熟語・ことわざ・慣用句・難読漢字の全300問を、大きな文字とタップだけで。</p>
+            <p class="card__tags"><span class="tag">ブラウザ</span><span class="tag">スマホ・タブレット</span></p>
+          </div>
+        </a>
+
+        <a class="card" href="https://pikaring.github.io/tap-on-neko/">
+          <img class="card__icon" src="https://pikaring.github.io/tap-on-neko/assets/icon.png" alt="" width="64" height="64" loading="lazy">
+          <div class="card__body">
+            <h3>Tap on NEKO</h3>
+            <p>タップだけでできる、ねこのお世話とあたまの たいそう。ことば穴うめ・難読漢字・かげあての309問。制限時間もゲームオーバーもありません。</p>
+            <p class="card__tags"><span class="tag">ブラウザ</span><span class="tag">高齢の方にも</span></p>
+          </div>
+        </a>
+
+        <a class="card" href="https://pikaring.github.io/cat-on-escape/">
+          <img class="card__icon" src="https://pikaring.github.io/cat-on-escape/assets/icon.png" alt="" width="64" height="64" loading="lazy">
+          <div class="card__body">
+            <h3>Cat on Escape</h3>
+            <p>ねこの顔をすべらせて3匹そろえると、行列をつくって画面の右へ逃げていきます。4匹以上で ねこじゃらしなどの どうぐ。レベルが上がると いぬや おおかみ が じゃまをします。</p>
+            <p class="card__tags"><span class="tag">ブラウザ</span><span class="tag">スマホ</span></p>
+          </div>
+        </a>
+
+        <a class="card" href="https://pikaring.github.io/reach-on-sanma/">
+          <img class="card__icon" src="https://pikaring.github.io/reach-on-sanma/assets/icon.png" alt="" width="64" height="64" loading="lazy">
+          <div class="card__body">
+            <h3>Reach on SANMA</h3>
+            <p>登録もダウンロードも要らない三人麻雀。打ち筋の違うCPU5人と、3段階の強さ。北抜き・ツモ損あり。</p>
+            <p class="card__tags"><span class="tag">ブラウザ</span><span class="tag">スマホ</span></p>
+          </div>
+        </a>
+
+        <a class="card" href="https://pikaring.github.io/all-in-texas/">
+          <img class="card__icon" src="https://pikaring.github.io/all-in-texas/assets/icon.png" alt="" width="64" height="64" loading="lazy">
+          <div class="card__body">
+            <h3>All in TEXAS</h3>
+            <p>勝率・アウツ・必要勝率と、おすすめの一手が理由つきで見えるテキサスホールデム。初心者モードつき。</p>
+            <p class="card__tags"><span class="tag">ブラウザ</span><span class="tag">スマホ</span></p>
+          </div>
+        </a>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== つかう ===== -->
+  <section class="group group--alt">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">TOOLS</p>
+        <h2>つかう</h2>
+      </div>
+
+      <div class="grid">
+
+        <a class="card" href="https://pikaring.github.io/ride-on-qc/">
+          <img class="card__icon" src="https://pikaring.github.io/ride-on-qc/assets/icon.png" alt="" width="64" height="64" loading="lazy">
+          <div class="card__body">
+            <h3>Ride on QC</h3>
+            <p>ブルベのGPXとExcelキューシートから、曲がり角ごとの地図と通過時刻の風向きが入ったキューシートを作ります。</p>
+            <p class="card__tags"><span class="tag">ブラウザ</span><span class="tag">自転車</span></p>
+          </div>
+        </a>
+
+        <a class="card" href="https://pikaring.github.io/eat-on-gpx/">
+          <img class="card__icon" src="https://pikaring.github.io/eat-on-gpx/assets/icon.png" alt="" width="64" height="64" loading="lazy">
+          <div class="card__body">
+            <h3>Eat on GPX</h3>
+            <p>GPXを放り込むと、ルート沿いのコンビニ・食堂・カフェがスタートからの距離順に並びます。</p>
+            <p class="card__tags"><span class="tag">ブラウザ</span><span class="tag">自転車</span></p>
+          </div>
+        </a>
+
+        <a class="card" href="https://pikaring.github.io/rock-on-mj/">
+          <img class="card__icon" src="https://pikaring.github.io/rock-on-mj/assets/icon.png" alt="" width="64" height="64" loading="lazy">
+          <div class="card__body">
+            <h3>ROCK ON MJ</h3>
+            <p>Web会議の音声を録音して、そのまま文字起こし。通信せず、すべてPCの中だけで処理します。</p>
+            <p class="card__tags"><span class="tag">Windows</span><span class="tag">オフライン</span></p>
+          </div>
+        </a>
+
+      </div>
+    </div>
+  </section>
+
+</main>
+
+  <!-- ===== 開発の参考書（Amazon） ===== -->
+  <section class="group group--alt" id="books">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">BOOKS</p>
+        <h2>開発の参考書</h2>
+        <p>ここのツールは、Claude Code と生成AIで作っています。手元に置いて参考にしている本です。</p>
+      </div>
+
+      <div class="books">
+        <div class="book-group">
+          <h3>Claude Code</h3>
+          <ul>
+            <li>
+              <a href="https://www.amazon.co.jp/dp/4297153548?tag=redcomet-22" target="_blank" rel="sponsored noopener">実践Claude Code入門</a>
+              <span class="book__meta">西見公宏・吉田真吾・大嶋勇樹／技術評論社</span>
+              <span class="book__note">現場でどう使うか。AIに任せる範囲と、レビューの考え方。</span>
+            </li>
+            <li>
+              <a href="https://www.amazon.co.jp/dp/4839990204?tag=redcomet-22" target="_blank" rel="sponsored noopener">開発効率をアップする！ Claude Code 実用入門</a>
+              <span class="book__meta">大澤文孝／マイナビ出版</span>
+              <span class="book__note">基本操作から、設計・テストまで手を動かしながら。</span>
+            </li>
+            <li>
+              <a href="https://www.amazon.co.jp/dp/4297152754?tag=redcomet-22" target="_blank" rel="sponsored noopener">Claude CodeによるAI駆動開発入門</a>
+              <span class="book__meta">平川知秀／技術評論社</span>
+              <span class="book__note">動くWebアプリを作りながら、AI駆動開発の流れをつかむ。</span>
+            </li>
+          </ul>
+          <p class="book-more"><a href="https://www.amazon.co.jp/s?k=Claude+Code+%E6%9C%AC&tag=redcomet-22" target="_blank" rel="sponsored noopener">ほかの Claude Code の本を Amazonで探す</a></p>
+        </div>
+
+        <div class="book-group">
+          <h3>生成AIパスポート</h3>
+          <ul>
+            <li>
+              <a href="https://www.amazon.co.jp/dp/4800593913?tag=redcomet-22" target="_blank" rel="sponsored noopener">GUGA公認 生成AIパスポート テキスト＆問題集</a>
+              <span class="book__meta">生成AI活用普及協会（GUGA）／宝島社</span>
+              <span class="book__note">公式テキスト第4版対応。解説と演習・模擬問題まで1冊。</span>
+            </li>
+            <li>
+              <a href="https://www.amazon.co.jp/dp/4046078332?tag=redcomet-22" target="_blank" rel="sponsored noopener">マンガで合格! 生成AIパスポート テキスト&amp;問題集</a>
+              <span class="book__meta">GUGA 監修・若林杏樹／KADOKAWA</span>
+              <span class="book__note">マンガで用語から入りたいとき。最初の1冊に。</span>
+            </li>
+          </ul>
+          <p class="book-more"><a href="https://www.amazon.co.jp/s?k=%E7%94%9F%E6%88%90AI%E3%83%91%E3%82%B9%E3%83%9D%E3%83%BC%E3%83%88&tag=redcomet-22" target="_blank" rel="sponsored noopener">公式テキストや最新シラバス対応版を Amazonで探す</a></p>
+        </div>
+      </div>
+
+      <p class="books__note">試験のシラバスは改定されるので、購入前に対応版をご確認ください。</p>
+    </div>
+  </section>
+
+<footer class="foot">
+  <div class="wrap">
+    <p class="foot__note">どれも MIT License です。不具合や要望は GitHub の Issue へ。</p>
+    <p><a class="foot__link" href="https://github.com/pikaring">github.com/pikaring</a></p>
+    <p class="foot__counter">累計アクセス <b id="counter-value">―</b> 回</p>
+    <p class="foot__disclosure">当サイトはAmazonアソシエイト・プログラムに参加しており、掲載しているリンクから商品が買われると運営者に紹介料が入る場合があります。</p>
+  </div>
+</footer>
+
+<script>
+// アクセスカウンター（ほかのページと同じGAS。page名でサイトごとに別カウント）
+(function () {
+  var el = document.getElementById('counter-value');
+  if (!el) return;
+  var page = location.pathname.replace(/index\.html$/, '');
+  fetch('https://script.google.com/macros/s/AKfycbxkQLZXNAFXkT7zhIO0TmMDGU3A0TQ234Lf-yhw5J7lvFAjCi3KLNLRd_LKd_xlOxPd/exec?page=' + encodeURIComponent(page))
+    .then(function (r) { return r.json(); })
+    .then(function (d) { el.textContent = Number(d.count).toLocaleString('ja-JP'); })
+    .catch(function () { el.textContent = '―'; });
+})();
+</script>
+
+</body>
+</html>

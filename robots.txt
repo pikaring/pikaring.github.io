@@ -1,7 +1,7 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://pikaring.github.io/portal/sitemap.xml
+Sitemap: https://pikaring.github.io/sitemap.xml
 Sitemap: https://pikaring.github.io/tap-on-kotoba/sitemap.xml
 Sitemap: https://pikaring.github.io/tap-on-neko/sitemap.xml
 Sitemap: https://pikaring.github.io/cat-on-escape/sitemap.xml

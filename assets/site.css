@@ -1,0 +1,292 @@
+@charset "UTF-8";
+/* つくったもの一覧（ポータル）
+   いろ・かたち・書体は、各ツールの紹介ページ（assets/site.css）と そろえています。 */
+
+:root {
+  --amber:      #d08a26;
+  --amber-dark: #b2731a;
+  --ink:        #16202f;
+  --navy:       #1d2b45;
+  --body:       #4e5665;
+  --muted:      #858c98;
+  --paper:      #fbfaf8;
+  --cream:      #f1efe9;
+  --line:       #e4e1da;
+  --white:      #ffffff;
+  --radius:     20px;
+  --wrap:       1120px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--body);
+  font-family: Inter, "Noto Sans JP", "Yu Gothic", Meiryo, sans-serif;
+  font-size: 16px;
+  line-height: 1.85;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap {
+  max-width: var(--wrap);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 20px;
+  color: var(--amber-dark);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .17em;
+}
+
+.eyebrow::after {
+  content: "";
+  flex: 1 1 auto;
+  height: 1px;
+  background: var(--line);
+}
+
+/* ========== みだし ========== */
+.hero {
+  background: var(--ink);
+  color: var(--cream);
+  padding: 72px 0 64px;
+}
+
+.hero .eyebrow { color: var(--amber); }
+.hero .eyebrow::after { background: #2a3448; }
+
+.hero h1 {
+  margin: 0;
+  color: var(--white);
+  font-size: clamp(30px, 6vw, 52px);
+  line-height: 1.3;
+  letter-spacing: -.01em;
+}
+
+.lead {
+  max-width: 34em;
+  margin: 18px 0 0;
+  color: #b9c0cc;
+  font-size: clamp(15px, 2.4vw, 18px);
+}
+
+/* ========== グループ ========== */
+.group { padding: 64px 0; }
+.group--alt { background: var(--cream); }
+
+.sec-head { margin-bottom: 28px; }
+
+.sec-head h2 {
+  margin: 0;
+  color: var(--ink);
+  font-size: clamp(24px, 4.4vw, 34px);
+  line-height: 1.4;
+}
+
+/* ========== カード ========== */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 18px;
+}
+
+.card {
+  display: flex;
+  gap: 18px;
+  padding: 22px 20px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  color: var(--body);
+  text-decoration: none;
+  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+}
+
+.card:hover,
+.card:focus-visible {
+  transform: translateY(-2px);
+  border-color: #d8d3c8;
+  box-shadow: 0 12px 28px #16202f14;
+}
+
+.card:focus-visible { outline: 3px solid var(--amber); outline-offset: 3px; }
+
+.card__icon {
+  flex: 0 0 auto;
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  background: var(--cream);
+  object-fit: cover;
+}
+
+.card__body { min-width: 0; }
+
+.card h3 {
+  margin: 2px 0 6px;
+  color: var(--ink);
+  font-size: 20px;
+  line-height: 1.4;
+}
+
+.card p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.75;
+}
+
+.card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px !important;
+}
+
+.tag {
+  padding: 3px 10px;
+  background: var(--cream);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .02em;
+}
+
+/* ========== あしもと ========== */
+.foot {
+  padding: 48px 0 56px;
+  background: var(--ink);
+  color: #9aa3b2;
+  text-align: center;
+}
+
+.foot p { margin: 0; }
+.foot__note { font-size: 14px; }
+.foot__disclosure {
+  margin: 20px auto 0;
+  font-size: 13px;
+  line-height: 1.9;
+  color: #8b95a6;
+}
+
+.foot__counter {
+  margin-top: 14px;
+  font-size: 13px;
+  color: #8b95a6;
+  font-variant-numeric: tabular-nums;
+}
+
+.foot__counter b { font-weight: 600; color: #b8c1d1; }
+
+.foot__link {
+  display: inline-block;
+  margin-top: 10px;
+  color: var(--amber);
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  padding: 10px 4px;            /* 指で ふれやすい たかさ */
+}
+
+.foot__link:hover { text-decoration: underline; }
+
+/* ========== ちいさい 画面 ========== */
+@media (max-width: 560px) {
+  .hero { padding: 48px 0 44px; }
+  .group { padding: 44px 0; }
+  .grid { grid-template-columns: 1fr; }
+  .card { padding: 18px 16px; gap: 14px; }
+  .card__icon { width: 56px; height: 56px; border-radius: 14px; }
+  .card h3 { font-size: 19px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card { transition: none; }
+  .card:hover, .card:focus-visible { transform: none; }
+}
+
+
+/* ========== 開発の参考書 ========== */
+.books {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 18px;
+}
+
+.book-group {
+  padding: 22px 20px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.book-group h3 {
+  margin: 0 0 14px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--line);
+  color: var(--ink);
+  font-size: 17px;
+}
+
+.book-group ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.book-group li + li {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+.book-group li > a {
+  display: inline-block;
+  padding: 2px 0;
+  color: var(--amber-dark);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+  text-decoration: none;
+}
+
+.book-group li > a:hover { text-decoration: underline; }
+
+.book__meta,
+.book__note {
+  display: block;
+  font-size: 13.5px;
+  line-height: 1.7;
+}
+
+.book__meta { color: var(--muted); }
+.book__note { margin-top: 2px; }
+
+.book-more {
+  margin: 16px 0 0;
+  font-size: 13.5px;
+}
+
+.book-more a {
+  display: inline-block;
+  padding: 8px 0;               /* 指で ふれやすい たかさ */
+  color: var(--amber-dark);
+  text-decoration: none;
+}
+
+.book-more a:hover { text-decoration: underline; }
+
+.books__note {
+  margin: 18px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.8;
+}

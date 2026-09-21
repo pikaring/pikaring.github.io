@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="つくったもの一覧">
+  <rect width="64" height="64" rx="14" fill="#16202f"/>
+  <g fill="#d08a26">
+    <rect x="14" y="14" width="15" height="15" rx="4"/>
+    <rect x="35" y="14" width="15" height="15" rx="4"/>
+    <rect x="14" y="35" width="15" height="15" rx="4"/>
+    <rect x="35" y="35" width="15" height="15" rx="4" fill="#f1efe9"/>
+  </g>
+</svg>
