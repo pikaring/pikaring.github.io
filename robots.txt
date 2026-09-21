@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://pikaring.github.io/portal/sitemap.xml
+Sitemap: https://pikaring.github.io/tap-on-kotoba/sitemap.xml
+Sitemap: https://pikaring.github.io/tap-on-neko/sitemap.xml
+Sitemap: https://pikaring.github.io/cat-on-escape/sitemap.xml
+Sitemap: https://pikaring.github.io/reach-on-sanma/sitemap.xml
+Sitemap: https://pikaring.github.io/all-in-texas/sitemap.xml
+Sitemap: https://pikaring.github.io/ride-on-qc/sitemap.xml
+Sitemap: https://pikaring.github.io/eat-on-gpx/sitemap.xml
+Sitemap: https://pikaring.github.io/rock-on-mj/sitemap.xml
