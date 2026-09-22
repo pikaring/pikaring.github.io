@@ -10,3 +10,4 @@ Sitemap: https://pikaring.github.io/all-in-texas/sitemap.xml
 Sitemap: https://pikaring.github.io/ride-on-qc/sitemap.xml
 Sitemap: https://pikaring.github.io/eat-on-gpx/sitemap.xml
 Sitemap: https://pikaring.github.io/rock-on-mj/sitemap.xml
+Sitemap: https://pikaring.github.io/guns-germs-and-diamond/sitemap.xml
