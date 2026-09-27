@@ -5,6 +5,7 @@ Sitemap: https://pikaring.github.io/sitemap.xml
 Sitemap: https://pikaring.github.io/tap-on-kotoba/sitemap.xml
 Sitemap: https://pikaring.github.io/tap-on-neko/sitemap.xml
 Sitemap: https://pikaring.github.io/cat-on-escape/sitemap.xml
+Sitemap: https://pikaring.github.io/white-squid/sitemap.xml
 Sitemap: https://pikaring.github.io/reach-on-sanma/sitemap.xml
 Sitemap: https://pikaring.github.io/all-in-texas/sitemap.xml
 Sitemap: https://pikaring.github.io/ride-on-qc/sitemap.xml
