@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ja" data-lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ride on Quest 〜そして伝説のライダーへ〜｜スマートトレーナーで遊べるドット絵 RPG</title>
+<meta name="description" content="スマートトレーナーで遊べるドット絵の RPG。火の島の女王が、鬼王を倒す冒険者を求めています。ベータテスターは11月6日から募集予定。">
+<meta name="theme-color" content="#0b0911">
+<link rel="canonical" href="https://pikaring.github.io/ride-on-quest/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="pikaring">
+<meta property="og:title" content="Ride on Quest 〜そして伝説のライダーへ〜">
+<meta property="og:description" content="スマートトレーナーで遊べるドット絵の RPG。ベータテスターは11月6日から募集予定。 / A pixel-art RPG for smart trainers. Beta testers wanted from November 6.">
+<meta property="og:url" content="https://pikaring.github.io/ride-on-quest/">
+<meta property="og:image" content="https://pikaring.github.io/ride-on-quest/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@RideOnQuest">
+<meta name="twitter:title" content="Ride on Quest 〜そして伝説のライダーへ〜">
+<meta name="twitter:description" content="スマートトレーナーで遊べるドット絵の RPG。ベータテスターは11月6日から募集予定。">
+<meta name="twitter:image" content="https://pikaring.github.io/ride-on-quest/assets/og.png">
+<link rel="icon" href="assets/icon.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/icon.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "Ride on Quest 〜そして伝説のライダーへ〜",
+  "alternateName": "Ride on Quest",
+  "url": "https://pikaring.github.io/ride-on-quest/",
+  "image": "https://pikaring.github.io/ride-on-quest/assets/og.png",
+  "description": "スマートトレーナーで遊べるドット絵の RPG。",
+  "inLanguage": ["ja", "en"],
+  "genre": "RPG",
+  "gamePlatform": "Web browser (Chrome, Edge)",
+  "author": { "@type": "Person", "name": "pikaring", "url": "https://pikaring.github.io/" }
+}
+</script>
+<style>
+@font-face { font-family: "DotGothic16"; src: url("fonts/DotGothic16-Regular.ttf") format("truetype"); font-display: swap; }
+:root { --bg: #0b0911; --panel: #14121c; --line: #f2f2f2; --text: #f2f2f2; --dim: #b8b4c4; --gold: #f3dc8a; --accent: #ffd84a; }
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--text); font-family: "DotGothic16", "Hiragino Sans", "Yu Gothic", sans-serif; line-height: 1.8; font-size: 17px; }
+img { max-width: 100%; height: auto; }
+.pixel { image-rendering: pixelated; image-rendering: crisp-edges; }
+a { color: var(--accent); }
+.wrap { max-width: 960px; margin: 0 auto; padding: 0 16px; }
+/* 言語：data-lang に合わない方を隠す */
+html[data-lang="ja"] [lang="en"], html[data-lang="en"] [lang="ja"] { display: none !important; }
+.m0 { margin: 0; } .mt { margin: 14px 0 0; } .mt0 { margin-top: 0; } .cta[data-left] { justify-content: flex-start; }
+.langbar { display: flex; justify-content: flex-end; gap: 8px; padding: 12px 0 0; }
+.langbar button { font: inherit; font-size: 14px; color: var(--text); background: var(--panel); border: 2px solid var(--line); border-radius: 6px; padding: 2px 12px; cursor: pointer; }
+.langbar button[aria-pressed="true"] { color: var(--bg); background: var(--gold); border-color: var(--gold); }
+/* ゲームの窓：黒地に白いふち */
+.win { background: var(--panel); border: 3px solid var(--line); border-radius: 8px; box-shadow: 0 0 0 3px #000, 0 8px 24px #0008; padding: 18px 22px; }
+header.hero { text-align: center; padding: 8px 0 24px; }
+header.hero .banner { position: relative; border: 3px solid var(--line); border-radius: 8px; overflow: hidden; box-shadow: 0 0 0 3px #000; }
+header.hero .banner > img:first-child { display: block; width: 100%; }
+header.hero .logo { position: absolute; left: 3%; top: 6%; width: 38%; filter: drop-shadow(0 0 10px #000c) drop-shadow(0 2px 4px #000); }
+header.hero .sub { margin-top: 12px !important; }
+header.hero .sub { color: var(--gold); margin: 4px 0 12px; font-size: 18px; }
+header.hero h1 { font-size: 22px; font-weight: normal; margin: 0 0 6px; }
+.quote { margin: 18px auto 0; max-width: 680px; text-align: left; }
+.quote .who { color: var(--gold); }
+.cta { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 22px; }
+.btn { display: inline-block; text-decoration: none; color: var(--text); background: var(--panel); border: 3px solid var(--line); border-radius: 8px; padding: 10px 20px; font-size: 18px; }
+.btn.primary { color: var(--bg); background: var(--accent); border-color: var(--accent); }
+.btn small { display: block; font-size: 13px; opacity: .85; }
+.btn:hover, .btn:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+section { margin: 40px 0; }
+h2 { font-size: 22px; font-weight: normal; color: var(--gold); margin: 0 0 12px; }
+h2::before { content: "▶ "; color: var(--text); }
+ul.feat { margin: 0; padding-left: 1.2em; }
+ul.feat li { margin: 4px 0; }
+.heroes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 14px; text-align: center; }
+.heroes div { border: 2px solid var(--line); border-radius: 6px; padding: 8px 4px; background: #0008; }
+.heroes b { display: block; font-weight: normal; }
+.heroes span { color: var(--gold); font-size: 15px; }
+.shots { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+.shots figure { margin: 0; }
+.shots img { display: block; width: 100%; border: 3px solid var(--line); border-radius: 6px; }
+.shots figcaption { font-size: 15px; color: var(--dim); margin-top: 6px; }
+dl.beta { display: grid; grid-template-columns: max-content 1fr; gap: 4px 16px; margin: 0 0 6px; }
+dl.beta dt { color: var(--gold); }
+dl.beta dd { margin: 0; }
+footer { margin: 48px 0 24px; font-size: 14px; color: var(--dim); }
+footer p { margin: 4px 0; }
+@media (max-width: 640px) {
+  body { font-size: 16px; }
+  .heroes { grid-template-columns: repeat(2, 1fr); }
+  .shots { grid-template-columns: 1fr; }
+  dl.beta { grid-template-columns: 1fr; }
+  dl.beta dd { margin-bottom: 6px; }
+  .win { padding: 14px 16px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav class="langbar" aria-label="Language">
+    <button type="button" data-set-lang="ja" aria-pressed="true">日本語</button>
+    <button type="button" data-set-lang="en" aria-pressed="false">English</button>
+  </nav>
+
+  <header class="hero">
+    <div class="banner"><img class="pixel" src="assets/hero.jpg" alt="" width="1500" height="500"><img class="logo" src="assets/logo.webp" alt="Ride on Quest" width="900" height="431"></div>
+    <p class="sub" lang="ja">〜 そして伝説のライダーへ 〜</p>
+    <h1 lang="ja">スマートトレーナーで遊べる、ドット絵の RPG</h1>
+    <h1 lang="en">A pixel-art RPG you play on your smart trainer</h1>
+    <div class="win quote">
+      <div class="who" lang="ja">火の島の女王</div>
+      <div class="who" lang="en">The Queen of the Isle of Fire</div>
+      <p lang="ja" class="m0">＊「鬼王を倒す冒険者を求めます。そなたの脚を、貸してくれませんか。」</p>
+      <p lang="en" class="m0">* "I seek an adventurer to defeat the Ogre King. Will you lend me your legs?"</p>
+    </div>
+    <div class="cta">
+      <a class="btn primary" href="https://docs.google.com/forms/d/e/1FAIpQLSesn8MyuD_HDSREX8iMerGWnbWbmfXc_CgmDd35CicR69SSKA/viewform" target="_blank" rel="noopener">
+        <span lang="ja">ベータテスターに応募する<small>11月6日から募集</small></span>
+        <span lang="en">Apply to be a beta tester<small>Applications open November 6</small></span>
+      </a>
+      <a class="btn" href="https://x.com/RideOnQuest" target="_blank" rel="noopener">X @RideOnQuest</a>
+    </div>
+  </header>
+
+  <section>
+    <h2><span lang="ja">どんなゲーム？</span><span lang="en">What is it?</span></h2>
+    <div class="win">
+      <ul class="feat" lang="ja">
+        <li>スマートトレーナーのパワーで火の島を進み、坂は本物の勾配。ERG 対応で、ギアを変えなくても快適に走れる（勾配のモードも選べる）。</li>
+        <li>敵が現れたら、言われた回転数でペダルを回して戦う。合わせ続ければ会心の一撃。</li>
+        <li>最初に「女王の試練」（FTP テスト）で FTP を測り、戦闘の強さを FTP に合わせる。</li>
+        <li>記録は FIT で保存。Strava にも上げられる。</li>
+        <li>15分から遊べる。走るほど物語が進む。</li>
+      </ul>
+      <ul class="feat" lang="en">
+        <li>Your power moves you across the Isle of Fire, and the hills are real gradients. With ERG mode you never need to shift (a gradient mode is also available).</li>
+        <li>When an enemy appears, pedal at the cadence you're given. Hold it steady for a critical hit.</li>
+        <li>Measure your FTP first in the Queen's Trial; battles are scaled to your FTP.</li>
+        <li>Rides are saved as FIT files, ready for Strava.</li>
+        <li>Ride for as little as 15 minutes. The more you ride, the further the story goes.</li>
+      </ul>
+      <p lang="ja" class="mt">4人の主人公＝4つのトレーニングプラン</p>
+      <p lang="en" class="mt">Four heroes = four training plans</p>
+      <div class="heroes">
+        <div><b lang="ja">戦士</b><b lang="en">Warrior</b><span lang="ja">総合強化</span><span lang="en">All-Round Power</span></div>
+        <div><b lang="ja">魔法使い</b><b lang="en">Witch</b><span lang="ja">持続力</span><span lang="en">Endurance</span></div>
+        <div><b lang="ja">武闘家</b><b lang="en">Monk</b><span lang="ja">基礎づくり</span><span lang="en">Foundation</span></div>
+        <div><b lang="ja">僧侶</b><b lang="en">Priest</b><span lang="ja">長距離</span><span lang="en">Long Haul</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2><span lang="ja">スクリーンショット</span><span lang="en">Screenshots</span></h2>
+    <div class="shots">
+      <figure><img class="pixel" src="shots/01_title.jpg" alt="" width="1200" height="675" loading="lazy"><figcaption lang="ja">4人の主人公から選ぶ</figcaption><figcaption lang="en">Choose one of four heroes</figcaption></figure>
+      <figure><img class="pixel" src="shots/05_run_noon.jpg" alt="" width="1200" height="675" loading="lazy"><figcaption lang="ja">パワーで島を進む</figcaption><figcaption lang="en">Your power moves you across the island</figcaption></figure>
+      <figure><img class="pixel" src="shots/06_battle_drum.jpg" alt="" width="1200" height="675" loading="lazy"><figcaption lang="ja">言われた回転数でペダルを回して戦う</figcaption><figcaption lang="en">Pedal at the cadence you're given</figcaption></figure>
+      <figure><img class="pixel" src="shots/07_battle_crit.jpg" alt="" width="1200" height="675" loading="lazy"><figcaption lang="ja">合わせ続ければ会心の一撃</figcaption><figcaption lang="en">Hold it steady for a critical hit</figcaption></figure>
+      <figure><img class="pixel" src="shots/09_trial_pacemaker.jpg" alt="" width="1200" height="675" loading="lazy"><figcaption lang="ja">女王の試練で FTP を測る</figcaption><figcaption lang="en">Measure your FTP in the Queen's Trial</figcaption></figure>
+      <figure><img class="pixel" src="shots/08_villager_talk.jpg" alt="" width="1200" height="675" loading="lazy"><figcaption lang="ja">戦闘の合間には村人の話</figcaption><figcaption lang="en">Villagers talk between battles</figcaption></figure>
+      <figure><img class="pixel" src="shots/11_castle_night.jpg" alt="" width="1200" height="675" loading="lazy"><figcaption lang="ja">火口のそばの鬼王の城</figcaption><figcaption lang="en">The Ogre King's Castle by the crater</figcaption></figure>
+      <figure><img class="pixel" src="shots/12_summary.jpg" alt="" width="1200" height="675" loading="lazy"><figcaption lang="ja">走り終えたらトレーニングのまとめ。記録は FIT で</figcaption><figcaption lang="en">A training summary after every ride, saved as FIT</figcaption></figure>
+    </div>
+  </section>
+
+  <!-- 紹介動画（YouTube はまだ非公開。11/6 の公開のときにここへ足す）
+       日本語：https://www.youtube.com/embed/PpZZSBVs37s （lang="ja" の方に）
+       英語：https://www.youtube.com/embed/a9XTY4ZrTEY （lang="en" の方に）
+  -->
+
+  <section>
+    <h2><span lang="ja">ベータテスター募集</span><span lang="en">Beta testers wanted</span></h2>
+    <div class="win">
+      <p lang="ja" class="mt0">ベータテスターは11月6日から募集予定です。</p>
+      <p lang="en" class="mt0">Applications for beta testers open on November 6.</p>
+      <dl class="beta" lang="ja">
+        <dt>期間</dt><dd>2026年11月6日〜12月31日</dd>
+        <dt>人数</dt><dd>先着50人</dd>
+        <dt>遊び方</dt><dd>パソコンの Chrome か Edge で開くブラウザ版。インストールは要りません</dd>
+        <dt>トレーナー</dt><dd>トレーナーが無くても、つながずに試すモードで遊べます</dd>
+        <dt>言葉</dt><dd>英語でも遊べます</dd>
+      </dl>
+      <dl class="beta" lang="en">
+        <dt>Period</dt><dd>November 6 – December 31, 2026 (Japan time)</dd>
+        <dt>Testers</dt><dd>First 50 testers</dd>
+        <dt>How to play</dt><dd>Browser version for Chrome or Edge on a computer. Nothing to install</dd>
+        <dt>Trainer</dt><dd>You can try it without a trainer</dd>
+        <dt>Language</dt><dd>English and Japanese</dd>
+      </dl>
+      <p lang="ja">応募すると、遊ぶための URL がメールで届きます。</p>
+      <div class="cta" data-left>
+        <a class="btn primary" href="https://docs.google.com/forms/d/e/1FAIpQLSesn8MyuD_HDSREX8iMerGWnbWbmfXc_CgmDd35CicR69SSKA/viewform" target="_blank" rel="noopener">
+          <span lang="ja">応募フォーム<small>11月6日から募集</small></span>
+          <span lang="en">Application form<small>Opens November 6</small></span>
+        </a>
+        <a class="btn" href="https://x.com/RideOnQuest" target="_blank" rel="noopener">X @RideOnQuest</a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p lang="ja">BGM：甘茶の音楽工房／地形：国土地理院の標高タイルを加工／フォント：DotGothic16（SIL Open Font License 1.1。<a href="fonts/OFL.txt">ライセンス</a>）</p>
+    <p lang="en">Music: Amacha Ongaku Koubou (甘茶の音楽工房) / Terrain: based on elevation tiles from the Geospatial Information Authority of Japan (GSI) / Font: DotGothic16 (SIL Open Font License 1.1, <a href="fonts/OFL.txt">license</a>)</p>
+    <p><a href="https://pikaring.github.io/">pikaring</a></p>
+  </footer>
+</div>
+<script>
+  // 言語：保存した選択 → ブラウザの言語（日本語以外は英語）
+  (function () {
+    var root = document.documentElement, saved = null;
+    try { saved = localStorage.getItem('roq.lang'); } catch (e) {}
+    var lang = saved || ((navigator.language || 'ja').toLowerCase().indexOf('ja') === 0 ? 'ja' : 'en');
+    function set(l) {
+      root.setAttribute('data-lang', l); root.setAttribute('lang', l);
+      document.querySelectorAll('[data-set-lang]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-set-lang') === l)); });
+      document.title = l === 'ja' ? 'Ride on Quest 〜そして伝説のライダーへ〜｜スマートトレーナーで遊べるドット絵 RPG' : 'Ride on Quest | A pixel-art RPG for smart trainers';
+    }
+    document.querySelectorAll('[data-set-lang]').forEach(function (b) {
+      b.addEventListener('click', function () { var l = b.getAttribute('data-set-lang'); try { localStorage.setItem('roq.lang', l); } catch (e) {} set(l); });
+    });
+    set(lang);
+  })();
+</script>
+</body>
+</html>
