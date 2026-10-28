@@ -76,6 +76,7 @@ ul.feat { margin: 0; padding-left: 1.2em; }
 ul.feat li { margin: 4px 0; }
 .heroes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 14px; text-align: center; }
 .heroes div { border: 2px solid var(--line); border-radius: 6px; padding: 8px 4px; background: #0008; }
+.heroes img { display: block; height: 128px; width: auto; margin: 2px auto 6px; }
 .heroes b { display: block; font-weight: normal; }
 .heroes span { color: var(--gold); font-size: 15px; }
 .shots { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
@@ -90,6 +91,7 @@ footer p { margin: 4px 0; }
 @media (max-width: 640px) {
   body { font-size: 16px; }
   .heroes { grid-template-columns: repeat(2, 1fr); }
+  .heroes img { height: 96px; }
   .shots { grid-template-columns: 1fr; }
   dl.beta { grid-template-columns: 1fr; }
   dl.beta dd { margin-bottom: 6px; }
@@ -129,25 +131,35 @@ footer p { margin: 4px 0; }
     <div class="win">
       <ul class="feat" lang="ja">
         <li>スマートトレーナーのパワーで火の島を進み、坂は本物の勾配。ERG 対応で、ギアを変えなくても快適に走れる（勾配のモードも選べる）。</li>
-        <li>敵が現れたら、言われた回転数でペダルを回して戦う。合わせ続ければ会心の一撃。</li>
-        <li>最初に「女王の試練」（FTP テスト）で FTP を測り、戦闘の強さを FTP に合わせる。</li>
+        <li>敵が現れたら、言われた回転数でペダルを回して戦う。ドラムの色で今の回転が分かる（遅い＝青・合う＝緑・速い＝橙）。合わせ続ければ必殺技、もっと合わせれば会心の一撃。</li>
+        <li>敵も村人も、海岸・森・火口の地域ごと。矢や火の玉を飛ばしてくる敵もいる。戦闘の合間には、道端の村人が話しかけてくる。</li>
+        <li>最初に「女王の試練」（FTP テスト）で FTP を測り、戦闘の強さを FTP に合わせる。試練では、ほかの主人公たちがペースメーカーとして並んで走る。</li>
+        <li>ゴーストと走る。自分の記録や、ほかのプレイヤーの記録（共有）が一緒に走り、向こうから来るゴーストとすれ違う。道では旅人にも出会う。</li>
+        <li>走るうちに、朝・昼・夕方・夜と空が変わる。</li>
         <li>記録は FIT で保存。Strava にも上げられる。</li>
         <li>15分から遊べる。走るほど物語が進む。</li>
       </ul>
       <ul class="feat" lang="en">
         <li>Your power moves you across the Isle of Fire, and the hills are real gradients. With ERG mode you never need to shift (a gradient mode is also available).</li>
-        <li>When an enemy appears, pedal at the cadence you're given. Hold it steady for a critical hit.</li>
-        <li>Measure your FTP first in the Queen's Trial; battles are scaled to your FTP.</li>
+        <li>When an enemy appears, pedal at the cadence you're given. The drum's color shows your cadence (too slow = blue, on target = green, too fast = orange). Hold it for a special move, and hold it steadier for a critical hit.</li>
+        <li>Enemies and villagers differ by region: coast, forest and crater. Some enemies shoot arrows and fireballs. Between battles, villagers by the road talk to you.</li>
+        <li>Measure your FTP first in the Queen's Trial; battles are scaled to your FTP. In the Trial, the other heroes ride beside you as pacemakers.</li>
+        <li>Ride with ghosts: your own past rides and other players' shared rides ride with you, and ghosts coming the other way pass you on the road. You'll meet travelers, too.</li>
+        <li>The sky turns from morning to noon, evening and night as you ride.</li>
         <li>Rides are saved as FIT files, ready for Strava.</li>
         <li>Ride for as little as 15 minutes. The more you ride, the further the story goes.</li>
       </ul>
-      <p lang="ja" class="mt">4人の主人公＝4つのトレーニングプラン</p>
-      <p lang="en" class="mt">Four heroes = four training plans</p>
+      <p lang="ja" class="mt">8人の主人公＝8つのトレーニングプラン。その日のメニューで選ぶ</p>
+      <p lang="en" class="mt">Eight heroes = eight training plans. Pick one for today's workout</p>
       <div class="heroes">
-        <div><b lang="ja">戦士</b><b lang="en">Warrior</b><span lang="ja">総合強化</span><span lang="en">All-Round Power</span></div>
-        <div><b lang="ja">魔法使い</b><b lang="en">Witch</b><span lang="ja">持続力</span><span lang="en">Endurance</span></div>
-        <div><b lang="ja">武闘家</b><b lang="en">Monk</b><span lang="ja">基礎づくり</span><span lang="en">Foundation</span></div>
-        <div><b lang="ja">僧侶</b><b lang="en">Priest</b><span lang="ja">長距離</span><span lang="en">Long Haul</span></div>
+        <div><img class="pixel" src="heroes/warrior.png" alt="" width="34" height="64"><b lang="ja">戦士</b><b lang="en">Warrior</b><span lang="ja">総合強化</span><span lang="en">All-Round Power</span></div>
+        <div><img class="pixel" src="heroes/wizard.png" alt="" width="33" height="64"><b lang="ja">魔法使い</b><b lang="en">Witch</b><span lang="ja">持続力</span><span lang="en">Endurance</span></div>
+        <div><img class="pixel" src="heroes/monk.png" alt="" width="28" height="64"><b lang="ja">武闘家</b><b lang="en">Monk</b><span lang="ja">基礎づくり</span><span lang="en">Foundation</span></div>
+        <div><img class="pixel" src="heroes/priest.png" alt="" width="32" height="64"><b lang="ja">僧侶</b><b lang="en">Priest</b><span lang="ja">長距離</span><span lang="en">Long Haul</span></div>
+        <div><img class="pixel" src="heroes/valkyrie.png" alt="" width="39" height="64"><b lang="ja">ワルキューレ</b><b lang="en">Valkyrie</b><span lang="ja">VO2max</span><span lang="en">VO2 Max</span></div>
+        <div><img class="pixel" src="heroes/elf.png" alt="" width="48" height="64"><b lang="ja">エルフ</b><b lang="en">Elf</b><span lang="ja">スプリント</span><span lang="en">Sprint</span></div>
+        <div><img class="pixel" src="heroes/samurai.png" alt="" width="30" height="64"><b lang="ja">侍</b><b lang="en">Samurai</b><span lang="ja">スイートスポット</span><span lang="en">Sweet Spot</span></div>
+        <div><img class="pixel" src="heroes/mercenary.png" alt="" width="39" height="64"><b lang="ja">傭兵</b><b lang="en">Sellsword</b><span lang="ja">登坂</span><span lang="en">Climbing</span></div>
       </div>
     </div>
   </section>
@@ -155,14 +167,14 @@ footer p { margin: 4px 0; }
   <section>
     <h2><span lang="ja">スクリーンショット</span><span lang="en">Screenshots</span></h2>
     <div class="shots">
-      <figure><img class="pixel" src="shots/01_title.jpg" alt="" width="1200" height="675" loading="lazy"><figcaption lang="ja">4人の主人公から選ぶ</figcaption><figcaption lang="en">Choose one of four heroes</figcaption></figure>
-      <figure><img class="pixel" src="shots/05_run_noon.jpg" alt="" width="1200" height="675" loading="lazy"><figcaption lang="ja">パワーで島を進む</figcaption><figcaption lang="en">Your power moves you across the island</figcaption></figure>
-      <figure><img class="pixel" src="shots/06_battle_drum.jpg" alt="" width="1200" height="675" loading="lazy"><figcaption lang="ja">言われた回転数でペダルを回して戦う</figcaption><figcaption lang="en">Pedal at the cadence you're given</figcaption></figure>
-      <figure><img class="pixel" src="shots/07_battle_crit.jpg" alt="" width="1200" height="675" loading="lazy"><figcaption lang="ja">合わせ続ければ会心の一撃</figcaption><figcaption lang="en">Hold it steady for a critical hit</figcaption></figure>
-      <figure><img class="pixel" src="shots/09_trial_pacemaker.jpg" alt="" width="1200" height="675" loading="lazy"><figcaption lang="ja">女王の試練で FTP を測る</figcaption><figcaption lang="en">Measure your FTP in the Queen's Trial</figcaption></figure>
-      <figure><img class="pixel" src="shots/08_villager_talk.jpg" alt="" width="1200" height="675" loading="lazy"><figcaption lang="ja">戦闘の合間には村人の話</figcaption><figcaption lang="en">Villagers talk between battles</figcaption></figure>
-      <figure><img class="pixel" src="shots/11_castle_night.jpg" alt="" width="1200" height="675" loading="lazy"><figcaption lang="ja">火口のそばの鬼王の城</figcaption><figcaption lang="en">The Ogre King's Castle by the crater</figcaption></figure>
-      <figure><img class="pixel" src="shots/12_summary.jpg" alt="" width="1200" height="675" loading="lazy"><figcaption lang="ja">走り終えたらトレーニングのまとめ。記録は FIT で</figcaption><figcaption lang="en">A training summary after every ride, saved as FIT</figcaption></figure>
+      <figure><img class="pixel" lang="ja" src="shots/ja/01_heroes.webp" alt="" width="1280" height="720" loading="lazy"><img class="pixel" lang="en" src="shots/en/01_heroes.webp" alt="" width="1280" height="720" loading="lazy"><figcaption lang="ja">8人の主人公から、その日のトレーニングで選ぶ</figcaption><figcaption lang="en">Choose one of eight heroes for today's workout</figcaption></figure>
+      <figure><img class="pixel" lang="ja" src="shots/ja/02_ghost.webp" alt="" width="1280" height="720" loading="lazy"><img class="pixel" lang="en" src="shots/en/02_ghost.webp" alt="" width="1280" height="720" loading="lazy"><figcaption lang="ja">ゴーストと走る。向こうから来るゴーストとすれ違う</figcaption><figcaption lang="en">Ride with ghosts, and pass the ones coming the other way</figcaption></figure>
+      <figure><img class="pixel" lang="ja" src="shots/ja/03_drum.webp" alt="" width="1280" height="720" loading="lazy"><img class="pixel" lang="en" src="shots/en/03_drum.webp" alt="" width="1280" height="720" loading="lazy"><figcaption lang="ja">言われた回転数で回す。合っているとドラムが緑に</figcaption><figcaption lang="en">Pedal at the given cadence. The drum turns green when you're on target</figcaption></figure>
+      <figure><img class="pixel" lang="ja" src="shots/ja/04_shot.webp" alt="" width="1280" height="720" loading="lazy"><img class="pixel" lang="en" src="shots/en/04_shot.webp" alt="" width="1280" height="720" loading="lazy"><figcaption lang="ja">矢や火の玉を飛ばしてくる敵も。合わせていれば弾き返す</figcaption><figcaption lang="en">Some enemies shoot. Stay on cadence to deflect them</figcaption></figure>
+      <figure><img class="pixel" lang="ja" src="shots/ja/05_trial.webp" alt="" width="1280" height="720" loading="lazy"><img class="pixel" lang="en" src="shots/en/05_trial.webp" alt="" width="1280" height="720" loading="lazy"><figcaption lang="ja">女王の試練で FTP を測る。ほかの主人公がペースメーカー</figcaption><figcaption lang="en">Measure your FTP in the Queen's Trial, with other heroes as pacemakers</figcaption></figure>
+      <figure><img class="pixel" lang="ja" src="shots/ja/06_talk.webp" alt="" width="1280" height="720" loading="lazy"><img class="pixel" lang="en" src="shots/en/06_talk.webp" alt="" width="1280" height="720" loading="lazy"><figcaption lang="ja">戦闘の合間には、その地域の村人の話</figcaption><figcaption lang="en">Between battles, villagers of each region talk to you</figcaption></figure>
+      <figure><img class="pixel" lang="ja" src="shots/ja/07_lighthouse.webp" alt="" width="1280" height="720" loading="lazy"><img class="pixel" lang="en" src="shots/en/07_lighthouse.webp" alt="" width="1280" height="720" loading="lazy"><figcaption lang="ja">走るうちに空が変わる。夜は灯台に灯がともる</figcaption><figcaption lang="en">The sky changes as you ride. At night, the lighthouse is lit</figcaption></figure>
+      <figure><img class="pixel" lang="ja" src="shots/ja/08_summary.webp" alt="" width="1280" height="720" loading="lazy"><img class="pixel" lang="en" src="shots/en/08_summary.webp" alt="" width="1280" height="720" loading="lazy"><figcaption lang="ja">走り終えたらトレーニングのまとめ。記録は FIT で</figcaption><figcaption lang="en">A training summary after every ride, saved as FIT</figcaption></figure>
     </div>
   </section>
 
