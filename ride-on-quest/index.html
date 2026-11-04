@@ -4,13 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Ride on Quest 〜そして伝説のライダーへ〜｜スマートトレーナーで遊べるドット絵 RPG</title>
-<meta name="description" content="スマートトレーナーで遊べるドット絵の RPG。火の島の女王が、鬼王を倒す冒険者を求めています。ベータテスター募集中（遊べるのは11月6日から）。">
+<meta name="description" content="いつもの ERG 練習が、そのまま RPG の冒険になる。スマートトレーナーで遊べるドット絵の RPG。火の島の女王が、鬼王を倒す冒険者を求めています。ベータテスター募集中（遊べるのは11月6日から）。">
 <meta name="theme-color" content="#0b0911">
 <link rel="canonical" href="https://pikaring.github.io/ride-on-quest/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="pikaring">
 <meta property="og:title" content="Ride on Quest 〜そして伝説のライダーへ〜">
-<meta property="og:description" content="スマートトレーナーで遊べるドット絵の RPG。ベータテスター募集中（遊べるのは11月6日から）。 / A pixel-art RPG for smart trainers. Beta testers wanted now (play from November 6).">
+<meta property="og:description" content="いつもの ERG 練習が、そのまま RPG の冒険になる。スマートトレーナーで遊べるドット絵の RPG。ベータテスター募集中（遊べるのは11月6日から）。 / Your usual ERG workout, turned into an RPG adventure. A pixel-art RPG for smart trainers. Beta testers wanted now (play from November 6).">
 <meta property="og:url" content="https://pikaring.github.io/ride-on-quest/">
 <meta property="og:image" content="https://pikaring.github.io/ride-on-quest/assets/og.png">
 <meta property="og:image:width" content="1200">
@@ -18,7 +18,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@RideOnQuest">
 <meta name="twitter:title" content="Ride on Quest 〜そして伝説のライダーへ〜">
-<meta name="twitter:description" content="スマートトレーナーで遊べるドット絵の RPG。ベータテスター募集中（遊べるのは11月6日から）。">
+<meta name="twitter:description" content="いつもの ERG 練習が、そのまま RPG の冒険になる。スマートトレーナーで遊べるドット絵の RPG。ベータテスター募集中（遊べるのは11月6日から）。">
 <meta name="twitter:image" content="https://pikaring.github.io/ride-on-quest/assets/og.png">
 <link rel="icon" href="assets/icon.png" type="image/png">
 <link rel="apple-touch-icon" href="assets/icon.png">
@@ -72,6 +72,9 @@ header.hero h1 { font-size: 22px; font-weight: normal; margin: 0 0 6px; }
 section { margin: 40px 0; }
 h2 { font-size: 22px; font-weight: normal; color: var(--gold); margin: 0 0 12px; }
 h2::before { content: "▶ "; color: var(--text); }
+.intro p { margin: 0 0 6px; }
+.intro .lead { color: var(--gold); font-size: 20px; margin-bottom: 10px; }
+.intro h3 { font-size: 18px; font-weight: normal; color: var(--gold); margin: 20px 0 4px; }
 ul.feat { margin: 0; padding-left: 1.2em; }
 ul.feat li { margin: 4px 0; }
 .heroes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 14px; text-align: center; }
@@ -90,6 +93,7 @@ footer { margin: 48px 0 24px; font-size: 14px; color: var(--dim); }
 footer p { margin: 4px 0; }
 @media (max-width: 640px) {
   body { font-size: 16px; }
+  .intro .lead { font-size: 18px; }
   .heroes { grid-template-columns: repeat(2, 1fr); }
   .heroes img { height: 96px; }
   .shots { grid-template-columns: 1fr; }
@@ -128,29 +132,22 @@ footer p { margin: 4px 0; }
 
   <section>
     <h2><span lang="ja">どんなゲーム？</span><span lang="en">What is it?</span></h2>
-    <div class="win">
-      <ul class="feat" lang="ja">
-        <li>スマートトレーナーのパワーで火の島を進み、坂は本物の勾配。ERG 対応で、ギアを変えなくても快適に走れる（勾配のモードも選べる）。</li>
-        <li>敵が現れたら、言われた回転数でペダルを回して戦う。ドラムの色で今の回転が分かる（遅い＝青・合う＝緑・速い＝橙）。合わせ続ければ必殺技、もっと合わせれば会心の一撃。</li>
-        <li>敵も村人も、海岸・森・火口の地域ごと。矢や火の玉を飛ばしてくる敵もいる。戦闘の合間には、道端の村人が話しかけてくる。</li>
-        <li>最初に「女王の試練」（FTP テスト）で FTP を測り、戦闘の強さを FTP に合わせる。試練では、ほかの主人公たちがペースメーカーとして並んで走る。</li>
-        <li>ゴーストと走る。自分の記録や、ほかのプレイヤーの記録（共有）が一緒に走り、向こうから来るゴーストとすれ違う。道では旅人にも出会う。</li>
-        <li>走るうちに、朝・昼・夕方・夜と空が変わる。</li>
-        <li>記録は FIT で保存。Strava にも上げられる。</li>
-        <li>15分から遊べる。走るほど物語が進む。</li>
-      </ul>
-      <ul class="feat" lang="en">
-        <li>Your power moves you across the Isle of Fire, and the hills are real gradients. With ERG mode you never need to shift (a gradient mode is also available).</li>
-        <li>When an enemy appears, pedal at the cadence you're given. The drum's color shows your cadence (too slow = blue, on target = green, too fast = orange). Hold it for a special move, and hold it steadier for a critical hit.</li>
-        <li>Enemies and villagers differ by region: coast, forest and crater. Some enemies shoot arrows and fireballs. Between battles, villagers by the road talk to you.</li>
-        <li>Measure your FTP first in the Queen's Trial; battles are scaled to your FTP. In the Trial, the other heroes ride beside you as pacemakers.</li>
-        <li>Ride with ghosts: your own past rides and other players' shared rides ride with you, and ghosts coming the other way pass you on the road. You'll meet travelers, too.</li>
-        <li>The sky turns from morning to noon, evening and night as you ride.</li>
-        <li>Rides are saved as FIT files, ready for Strava.</li>
-        <li>Ride for as little as 15 minutes. The more you ride, the further the story goes.</li>
-      </ul>
-      <p lang="ja" class="mt">8人の主人公＝8つのトレーニングプラン。その日のメニューで選ぶ</p>
-      <p lang="en" class="mt">Eight heroes = eight training plans. Pick one for today's workout</p>
+    <div class="win intro">
+      <p class="lead" lang="ja">いつもの ERG 練習が、そのまま RPG の冒険になる。</p>
+      <p class="lead" lang="en">Your usual ERG workout, turned into an RPG adventure.</p>
+      <p lang="ja">Ride on Quest は、スマートトレーナーで走って遊ぶ、懐かしいドット絵の RPG です。</p>
+      <p lang="en">Ride on Quest is a retro pixel-art RPG you play by riding your smart trainer.</p>
+
+      <h3 lang="ja">■ ペダルで戦う</h3>
+      <h3 lang="en">■ Fight with your pedals</h3>
+      <p lang="ja">敵が現れたら、言われた回転数に合わせてペダルを回す。ドラムの色で今の回転が分かる（遅い＝青・合う＝緑・速い＝橙）。<br>合わせ続ければ必殺技、もっと合わせれば会心の一撃。3本とも会心なら、金の星の大技。<br>鬼王は途中で本気を出す。</p>
+      <p lang="en">When an enemy appears, pedal at the cadence you're given. The drum's color shows your cadence (too slow = blue, on target = green, too fast = orange).<br>Hold it for a special move, hold it steadier for a critical hit. Land three critical hits in a row for a golden-star finisher.<br>The Ogre King gets serious halfway through.</p>
+
+      <h3 lang="ja">■ 練習が、そのまま冒険</h3>
+      <h3 lang="en">■ Your workout is the adventure</h3>
+      <p lang="ja">8人の主人公は、8つのトレーニングプラン。その日のメニューで主人公を選ぶ。<br>戦士（総合強化）・魔法使い（持続力）・武闘家（基礎づくり）・僧侶（長距離）・ワルキューレ（VO2max）・エルフ（スプリント）・侍（スイートスポット）・傭兵（登坂）。<br>戦闘は ERG で走るインターバル。ギアを変えなくてよい。15分から遊べる。</p>
+      <p lang="en">Eight heroes = eight training plans. Pick the hero that fits today's workout:<br>Warrior (All-Round Power), Witch (Endurance), Monk (Foundation), Priest (Long Haul), Valkyrie (VO2 Max), Elf (Sprint), Samurai (Sweet Spot), Sellsword (Climbing).<br>Battles are interval workouts in ERG mode. No shifting needed. Ride from 15 minutes.</p>
+
       <div class="heroes">
         <div><img class="pixel" src="heroes/warrior.png" alt="" width="34" height="64"><b lang="ja">戦士</b><b lang="en">Warrior</b><span lang="ja">総合強化</span><span lang="en">All-Round Power</span></div>
         <div><img class="pixel" src="heroes/wizard.png" alt="" width="33" height="64"><b lang="ja">魔法使い</b><b lang="en">Witch</b><span lang="ja">持続力</span><span lang="en">Endurance</span></div>
@@ -161,6 +158,26 @@ footer p { margin: 4px 0; }
         <div><img class="pixel" src="heroes/samurai.png" alt="" width="30" height="64"><b lang="ja">侍</b><b lang="en">Samurai</b><span lang="ja">スイートスポット</span><span lang="en">Sweet Spot</span></div>
         <div><img class="pixel" src="heroes/mercenary.png" alt="" width="39" height="64"><b lang="ja">傭兵</b><b lang="en">Sellsword</b><span lang="ja">登坂</span><span lang="en">Climbing</span></div>
       </div>
+
+      <h3 lang="ja">■ FTP を測って、強さを合わせる</h3>
+      <h3 lang="en">■ Measure your FTP, and the game matches it</h3>
+      <p lang="ja">女王の試練（FTP テスト）で FTP を測る。ほかの主人公たちがペースメーカーとして並んで走る。<br>敵の強さは、あなたの FTP に合わせる。</p>
+      <p lang="en">Measure your FTP in the Queen's Trial, with the other heroes riding beside you as pacemakers.<br>Enemies are scaled to your FTP.</p>
+
+      <h3 lang="ja">■ 火の島</h3>
+      <h3 lang="en">■ The Isle of Fire</h3>
+      <p lang="ja">本物の火山の島（北海道の渡島大島がもと）を走る。坂は本物の勾配。<br>海岸・森・火口で、敵も村人もちがう。走るうちに、朝・昼・夕方・夜と空が変わる。</p>
+      <p lang="en">Ride a real volcanic island (based on Oshima-Ōshima, Hokkaido). The hills are real gradients.<br>Enemies and villagers differ on the coast, in the forest and at the crater. The sky turns from morning to noon, evening and night as you ride.</p>
+
+      <h3 lang="ja">■ ほかにも</h3>
+      <h3 lang="en">■ Also</h3>
+      <p lang="ja">ゴースト（自分の記録・ほかのプレイヤーの記録）と走る、レースをする。記録は FIT で保存し、Strava にも上げられる。英語と日本語。</p>
+      <p lang="en">Ride and race with ghosts (your own rides and other players'). Rides are saved as FIT files, ready for Strava. English and Japanese.</p>
+
+      <h3 lang="ja">■ 必要なもの</h3>
+      <h3 lang="en">■ Requirements</h3>
+      <p lang="ja">FTMS（ERG）に対応した Bluetooth のスマートトレーナー。心拍ベルトとパワーメーターは、なくても遊べる。トレーナーが無くても、つながずに試すモードで遊べる。<br>Mac・Windows。重い GPU は要らない。ブラウザで軽快に動く。<br>買い切り、サブスクリプションなし。</p>
+      <p lang="en">A Bluetooth smart trainer with FTMS (ERG). A heart rate strap and a power meter are optional. You can also try it without a trainer.<br>Mac and Windows. No high-end GPU needed; it runs smoothly in a browser.<br>One-time purchase, no subscription.</p>
     </div>
   </section>
 
