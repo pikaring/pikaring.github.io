@@ -1,0 +1,23 @@
+@font-face { font-family: "DotGothic16"; src: url("../fonts/DotGothic16-Regular.ttf") format("truetype"); font-display: swap; }
+:root { --bg: #0b0911; --panel: #14121c; --line: #f2f2f2; --text: #f2f2f2; --gold: #f3dc8a; --accent: #ffd84a; --dim: #b8b4c4; }
+* { box-sizing: border-box; }
+html[data-lang="ja"] [lang="en"], html[data-lang="en"] [lang="ja"] { display: none !important; }
+body { margin: 0; background: var(--bg); color: var(--text); font-family: "DotGothic16", "Hiragino Sans", "Yu Gothic", sans-serif; line-height: 1.8; font-size: 16px; }
+a { color: var(--accent); overflow-wrap: anywhere; }
+.wrap { max-width: 820px; margin: 0 auto; padding: 16px 16px 48px; }
+.langbar { display: flex; justify-content: flex-end; gap: 8px; }
+.langbar button { background: var(--panel); color: var(--text); border: 2px solid var(--line); border-radius: 6px; padding: 4px 10px; font: inherit; cursor: pointer; }
+.langbar button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
+.gnav { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: 12px 0 18px; font-size: 14px; }
+.gnav b { color: var(--gold); font-weight: normal; }
+.win { background: var(--panel); border: 3px solid var(--line); border-radius: 8px; box-shadow: 0 0 0 3px #000; padding: 18px 22px; margin: 0 0 24px; }
+h1 { font-size: 22px; font-weight: normal; color: var(--gold); margin: 0 0 12px; }
+h2 { font-size: 18px; font-weight: normal; color: var(--gold); margin: 20px 0 4px; }
+ul, ol { margin: 0; padding-left: 1.4em; }
+p { margin: 0 0 8px; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; margin: 8px 0; }
+th, td { border: 1px solid #555; padding: 6px 8px; text-align: left; vertical-align: top; }
+th { color: var(--gold); font-weight: normal; }
+.cta { text-align: center; }
+.btn { display: inline-block; text-decoration: none; color: var(--bg); background: var(--accent); border-radius: 8px; padding: 10px 20px; font-size: 18px; }
+footer { margin-top: 32px; font-size: 14px; color: var(--dim); }

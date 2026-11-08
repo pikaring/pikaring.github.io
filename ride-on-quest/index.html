@@ -91,6 +91,10 @@ ul.feat li { margin: 4px 0; }
 dl.beta { display: grid; grid-template-columns: max-content 1fr; gap: 4px 16px; margin: 0 0 6px; }
 dl.beta dt { color: var(--gold); }
 dl.beta dd { margin: 0; }
+.faq dt { color: var(--gold); margin-top: 10px; }
+.faq dd { margin: 0 0 4px; }
+.guides { margin: 0; padding-left: 1.2em; }
+.guides li { margin: 4px 0; }
 html[data-phase="beta"] .after-beta, html:not([data-phase="beta"]) .during-beta { display: none !important; }
 .gear { margin-top: 18px; padding-top: 10px; border-top: 2px dashed var(--line); }
 .gear[hidden], footer p[hidden] { display: none; }
@@ -127,7 +131,7 @@ footer p { margin: 4px 0; }
       <p lang="ja" class="m0">＊「鬼王を倒す冒険者を求めます。そなたの脚を、貸してくれませんか。」</p>
       <p lang="en" class="m0">* "I seek an adventurer to defeat the Ogre King. Will you lend me your legs?"</p>
     </div>
-    <div class="cta">
+    <div class="cta" id="play">
       <a class="btn primary during-beta" href="https://docs.google.com/forms/d/e/1FAIpQLSesn8MyuD_HDSREX8iMerGWnbWbmfXc_CgmDd35CicR69SSKA/viewform" target="_blank" rel="noopener">
         <span lang="ja">ベータテスターに応募する（無料）<small>URL をメールでお送りします</small></span>
         <span lang="en">Apply for the beta (free)<small>We email you the link</small></span>
@@ -186,8 +190,8 @@ footer p { margin: 4px 0; }
 
       <h3 lang="ja">■ 必要なもの</h3>
       <h3 lang="en">■ Requirements</h3>
-      <p lang="ja">FTMS（ERG）に対応した Bluetooth のスマートトレーナー。心拍ベルトとパワーメーターは、なくても遊べる。トレーナーが無くても、つながずに試すモードで遊べる。<br>Mac・Windows。重い GPU は要らない。ブラウザで軽快に動く。<br>iPhone・iPad は Bluefy（無料のブラウザ）で遊べる（iPhone でつながり、ERG の負荷がかかるのを確かめた。iPad は確かめ中）。スマホは縦でも横でも。Android の Chrome でも遊べる見込み（確かめ中）。<br>買い切り、サブスクリプションなし。</p>
-      <p lang="en">A Bluetooth smart trainer with FTMS (ERG). A heart rate strap and a power meter are optional. You can also try it without a trainer.<br>Mac and Windows. No high-end GPU needed; it runs smoothly in a browser.<br>On iPhone / iPad, play with Bluefy, a free browser (confirmed on iPhone: it connects and ERG works; iPad still being tested). Phones work in portrait or landscape. Chrome on Android should work too (still being tested).<br>One-time purchase, no subscription.</p>
+      <p lang="ja">FTMS（ERG）に対応した Bluetooth のスマートトレーナー。心拍ベルトとパワーメーターは、なくても遊べる。トレーナーが無くても、つながずに試すモードで遊べる。<br>Mac・Windows。重い GPU は要らない。ブラウザで軽快に動く。<br>iPhone・iPad は <a href="https://apps.apple.com/app/id1492822055" target="_blank" rel="noopener">Bluefy</a>（無料のブラウザ）で遊べる（iPhone でつながり、ERG の負荷がかかるのを確かめた。iPad は確かめ中）。スマホは縦でも横でも。Android の Chrome でも遊べる見込み（確かめ中）。<br>買い切り、サブスクリプションなし。</p>
+      <p lang="en">A Bluetooth smart trainer with FTMS (ERG). A heart rate strap and a power meter are optional. You can also try it without a trainer.<br>Mac and Windows. No high-end GPU needed; it runs smoothly in a browser.<br>On iPhone / iPad, play with <a href="https://apps.apple.com/app/id1492822055" target="_blank" rel="noopener">Bluefy</a>, a free browser (confirmed on iPhone: it connects and ERG works; iPad still being tested). Phones work in portrait or landscape. Chrome on Android should work too (still being tested).<br>One-time purchase, no subscription.</p>
       <!-- Amazon のリンク（日本語だけ。amazon.js〔tools/build_site_amazon.js が作る〕にリンクがあるときだけ出す。文字のリンクと、すぐ下に開示の一文） -->
       <div class="gear" id="gear" lang="ja" hidden><h3 class="gear-head"></h3><p class="gear-links"></p><p class="gear-note"></p></div>
     </div>
@@ -220,14 +224,14 @@ footer p { margin: 4px 0; }
       <dl class="beta" lang="ja">
         <dt>期間</dt><dd>2026年11月6日〜12月31日</dd>
         <dt>人数</dt><dd>先着50人</dd>
-        <dt>遊び方</dt><dd>パソコンの Chrome か Edge で開くブラウザ版。インストールは要りません。iPhone・iPad は Bluefy（無料のブラウザ）で遊べます（スマホは縦でも横でも）</dd>
+        <dt>遊び方</dt><dd>パソコンの Chrome か Edge で開くブラウザ版。インストールは要りません。iPhone・iPad は <a href="https://apps.apple.com/app/id1492822055" target="_blank" rel="noopener">Bluefy</a>（無料のブラウザ）で遊べます（スマホは縦でも横でも）</dd>
         <dt>トレーナー</dt><dd>トレーナーが無くても、つながずに試すモードで遊べます</dd>
         <dt>言葉</dt><dd>英語でも遊べます</dd>
       </dl>
       <dl class="beta" lang="en">
         <dt>Period</dt><dd>November 6 – December 31, 2026 (Japan time)</dd>
         <dt>Testers</dt><dd>First 50 testers</dd>
-        <dt>How to play</dt><dd>Browser version for Chrome or Edge on a computer. Nothing to install. On iPhone / iPad, use Bluefy, a free browser (portrait or landscape)</dd>
+        <dt>How to play</dt><dd>Browser version for Chrome or Edge on a computer. Nothing to install. On iPhone / iPad, use <a href="https://apps.apple.com/app/id1492822055" target="_blank" rel="noopener">Bluefy</a>, a free browser (portrait or landscape)</dd>
         <dt>Trainer</dt><dd>You can try it without a trainer</dd>
         <dt>Language</dt><dd>English and Japanese</dd>
       </dl>
@@ -242,7 +246,45 @@ footer p { margin: 4px 0; }
     </div>
   </section>
 
+  <section id="faq">
+    <h2><span lang="ja">よくある質問</span><span lang="en">FAQ</span></h2>
+    <div class="win">
+      <dl class="faq" lang="ja">
+        <dt>トレーナーが無くても遊べますか？</dt><dd>遊べます。上の帯の「つながずに試す」で、画面のつまみをパワーと回転数の代わりにして走れます。</dd>
+        <dt>どのトレーナーが使えますか？</dt><dd>FTMS（ERG）に対応した Bluetooth のスマートトレーナーです。くわしくは<a href="guide/connect.html">トレーナーのつなぎ方</a>。</dd>
+        <dt>ギアは変えるのですか？</dt><dd>旅ははじめから ERG なので、ギアを変えなくても負荷はゲームが決めます。ERG を切って、島の勾配で走ることもできます（<a href="guide/erg.html">ERG とは</a>）。</dd>
+        <dt>どのくらいの時間で遊べますか？</dt><dd>15 分から。鬼王は、その主人公で合わせて 55 分走ったところで現れます。</dd>
+        <dt>心拍は何に使いますか？</dt><dd>表示とまとめだけです。操作に使うのはパワーと回転数だけです。</dd>
+        <dt>iPhone・iPad・Android では？</dt><dd>iPhone・iPad は <a href="https://apps.apple.com/app/id1492822055" target="_blank" rel="noopener">Bluefy</a>（無料のブラウザ）で遊べます。Safari と iPhone の Chrome は Bluetooth につなげません。Android の Chrome でも遊べる見込みです（確かめ中）。</dd>
+        <dt>記録はどこに残りますか？</dt><dd>この端末の中です。FIT で保存して Strava に上げられます。サーバーに送るものは<a href="privacy-game.html">プライバシーポリシー</a>に書いています。</dd>
+      </dl>
+      <dl class="faq" lang="en">
+        <dt>Can I play without a trainer?</dt><dd>Yes. Use "Try without trainer" in the top bar, and the on-screen sliders stand in for power and cadence.</dd>
+        <dt>Which trainers work?</dt><dd>Bluetooth smart trainers with FTMS (ERG). See <a href="guide/connect.html">Connecting your trainer</a>.</dd>
+        <dt>Do I need to shift gears?</dt><dd>Rides start in ERG, so the game sets the resistance and you don't need to shift. You can also turn ERG off and ride the island's gradients (<a href="guide/erg.html">What is ERG?</a>).</dd>
+        <dt>How long is a ride?</dt><dd>From 15 minutes. The Ogre King appears once you have ridden 55 minutes in total with that hero.</dd>
+        <dt>What is heart rate used for?</dt><dd>Display and the summary only. The game is controlled by power and cadence alone.</dd>
+        <dt>iPhone, iPad, Android?</dt><dd>On iPhone / iPad, use <a href="https://apps.apple.com/app/id1492822055" target="_blank" rel="noopener">Bluefy</a>, a free browser. Safari and Chrome on iPhone cannot connect to Bluetooth. Chrome on Android should work too (still being tested).</dd>
+        <dt>Where are my rides kept?</dt><dd>On your device. Save them as FIT files and upload to Strava. What is sent to the server is described in the <a href="privacy-game.html">privacy policy</a>.</dd>
+      </dl>
+    </div>
+  </section>
+
+  <section id="guide">
+    <h2><span lang="ja">読み物</span><span lang="en">Guides</span></h2>
+    <div class="win">
+      <ul class="guides">
+        <li><a href="guide/erg.html"><span lang="ja">ERG とは</span><span lang="en">What is ERG?</span></a><span lang="ja">：トレーナーが目標のワットを保つモードと、回転が落ちたときのゲームの手当て</span><span lang="en">: the mode where the trainer holds your target watts, and how the game eases off when your cadence drops</span></li>
+        <li><a href="guide/ftp.html"><span lang="ja">FTP の測り方（女王の試練）</span><span lang="en">Measuring your FTP (the Queen's Trial)</span></a><span lang="ja">：ランプテストの進み方と、FTP の決まり方</span><span lang="en">: how the ramp test goes, and how your FTP is set</span></li>
+        <li><a href="guide/plans.html"><span lang="ja">8 人の主人公と 8 つのプラン</span><span lang="en">Eight heroes, eight training plans</span></a><span lang="ja">：その日のメニューで主人公を選ぶ</span><span lang="en">: pick the hero for today's workout</span></li>
+        <li><a href="guide/battle.html"><span lang="ja">戦闘のしくみ</span><span lang="en">How battles work</span></a><span lang="ja">：ドラム・合致率・必殺技と会心</span><span lang="en">: the drum, match rate, special moves and critical hits</span></li>
+        <li><a href="guide/connect.html"><span lang="ja">トレーナーのつなぎ方</span><span lang="en">Connecting your trainer</span></a><span lang="ja">：パソコン・iPhone（Bluefy）・Android</span><span lang="en">: computer, iPhone (Bluefy) and Android</span></li>
+      </ul>
+    </div>
+  </section>
+
   <footer>
+    <p><a href="privacy-game.html"><span lang="ja">プライバシーポリシー</span><span lang="en">Privacy policy</span></a>　<span lang="ja">問い合わせ：</span><span lang="en">Contact: </span><a href="https://x.com/RideOnQuest">X @RideOnQuest</a></p>
     <p lang="ja">BGM：甘茶の音楽工房／地形：国土地理院の標高タイルを加工／フォント：DotGothic16（SIL Open Font License 1.1。<a href="fonts/OFL.txt">ライセンス</a>）</p>
     <p lang="en">Music: Amacha Ongaku Koubou (甘茶の音楽工房) / Terrain: based on elevation tiles from the Geospatial Information Authority of Japan (GSI) / Font: DotGothic16 (SIL Open Font License 1.1, <a href="fonts/OFL.txt">license</a>)</p>
     <p lang="ja" id="gear-foot" hidden></p>
