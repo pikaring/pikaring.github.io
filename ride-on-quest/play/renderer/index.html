@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta name="google-adsense-account" content="ca-pub-6156358253198578">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: blob: https://www.googletagmanager.com https://*.google-analytics.com; style-src 'self'; script-src 'self' https://www.googletagmanager.com; media-src 'self'; connect-src 'self' https://api.itch.io https://www.googletagmanager.com https://*.google-analytics.com https://*.google.com https://ride-on-quest-ghosts.pikaring-0e1.workers.dev http://localhost:* http://127.0.0.1:*; frame-src 'self'">
+<title>Ride on Quest 〜そして伝説のライダーへ〜</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="phone.css">
+<link rel="stylesheet" href="monetize.css">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-3FCFQY4W85"></script>
+<script src="ga.js" data-id="G-3FCFQY4W85"></script>
+</head>
+<body>
+<header id="bar">
+  <h1>Ride on Quest</h1>
+  <div class="mini"><b id="m-power">0</b><small>W</small></div>
+  <div class="mini"><b id="m-cad">0</b><small>rpm</small></div>
+  <div class="mini"><b id="m-grade">0.0</b><small id="m-grade-u">%</small></div>
+  <div class="mini dim"><b id="m-speed">0.0</b><small id="m-speed-u">km/h</small></div>
+  <div data-i18n="bar.conn" id="conn" class="conn">未接続</div>
+  <div class="grow"></div>
+  <div id="now-playing" class="conn" hidden></div>
+  <button data-i18n="bar.pause" id="b-pause" hidden>一時停止</button>
+  <button data-i18n="bar.connect" id="b-connect">🔗 つなぐ</button>
+  <button data-i18n="bar.hr" id="b-hr">♥ 心拍ベルト</button>
+  <button data-i18n="bar.pm" id="b-pm">⚡ パワーメーター</button>
+  <button data-i18n="bar.sim" id="b-sim">🎚 つながずに試す</button>
+  <button data-i18n="bar.settings" id="b-settings">⚙ 設定</button>
+</header>
+<!-- つなげないブラウザ（iPad・iPhone の Safari・Chrome、Firefox など）の案内。ブラウザ版だけ web.js が出す（Electron では出さない） -->
+<div id="web-note" hidden><span id="web-note-text">このブラウザはトレーナーにつなげません（つながずに試すモードは遊べます）。パソコンの Chrome・Edge、Android の Chrome、iPhone・iPad の Bluefy（無料のブラウザ）でつなげます。</span><button id="web-note-x" data-i18n-title="web.close" title="閉じる">×</button></div>
+
+<div id="stage"><main id="screen"></main><div id="hud" hidden></div></div>
+
+<section id="sim" class="sim">
+  <label><span data-i18n="sim.power">パワー</span> <input id="sim-p" type="range" min="0" max="500" step="5" value="120"> <output id="sim-pv">120 W</output></label>
+  <label><span data-i18n="sim.cad">回転数</span> <input id="sim-c" type="range" min="0" max="140" step="1" value="85"> <output id="sim-cv">85 rpm</output></label>
+  <span data-i18n="sim.hint" class="hint">スライダーで指定したパワーとケイデンスのまま走ります（キーは使いません）。ERG の間は、パワーが目標に自動で合います</span>
+</section>
+
+<div id="settings" class="modal" hidden>
+  <div class="box">
+    <h2 data-i18n="set.title">設定</h2>
+    <label><span data-i18n="set.lang">言語</span> <select id="lang"><option value="ja">日本語</option><option value="en">English</option></select></label>
+    <label><span data-i18n="set.units">単位</span> <select id="units"><option data-i18n="set.units.metric" value="metric">km・m・kg</option><option data-i18n="set.units.imperial" value="imperial">mi・ft・lb</option></select></label>
+    <label><span data-i18n="set.mass">体重（あなたの体重。自転車の分は自動で足します）</span> <input id="mass" type="number" min="25" max="330" step="1" value="75"> <span id="mass-u">kg</span></label>
+    <label><span data-i18n="set.name">名前（ゴーストの頭の上に出ます）</span> <input id="player-name" type="text" maxlength="8" placeholder="旅人" data-i18n-ph="set.namePh" size="10"></label>
+    <h2 data-i18n="set.share">ゴーストの共有</h2>
+    <label><span data-i18n="set.shareUrl">サーバーの URL</span> <input id="share-url" type="text" placeholder="空なら共有しない" data-i18n-ph="set.shareUrlPh" size="34" spellcheck="false"></label>
+    <label><input id="share-auto" type="checkbox" checked> <span data-i18n="set.shareAuto">走り終えたら自動で上げる</span></label>
+    <p data-i18n="set.shareHint" class="hint">走った道の記録（名前・主人公・コース・道の位置）を、同じサーバーを使う人どうしで見せ合います。ゴーストの共有では、パワーと心拍は送りません。冒険記と月のレポートを作るときだけ、その数値を送ります。冒険記と月のレポートの A では、送った数値はサーバーに残しません。月のレポートの B を選んだ人は、1 回分のまとめをサーバーに残します。URL が空なら何も送りません。</p>
+    <button data-i18n="set.shareRevoke" id="share-revoke">自分が上げた記録をすべて取り消す</button> <span id="share-note" class="hint"></span>
+    <h2 data-i18n="set.report">月のレポート（試作）</h2>
+    <label><span data-i18n="set.reportMode">走りの数値の置き場所</span> <select id="report-mode"><option data-i18n="set.reportLocal" value="local">このパソコンだけ（A）</option><option data-i18n="set.reportServer" value="server">サーバーにも残す（B）</option></select></label>
+    <p data-i18n="set.reportHint" class="hint">走りごとのパワーの最高値・ゾーンの時間・心拍のまとめから、1か月の手紙を Claude が書きます（上の「サーバーの URL」を使います）。A は数値をこのパソコンだけに残し、レポートを作るときだけ、月のまとめを送ります。B は走るたびに数値をサーバーにも残します（別のパソコンでも作れます）。1秒ごとの記録は、どちらも送りません。</p>
+    <label><span data-i18n="set.reportMonth">月</span> <select id="report-month"><option data-i18n="set.reportThis" value="this">今月</option><option data-i18n="set.reportLast" value="last">先月</option></select></label>
+    <button data-i18n="set.reportMake" id="report-make">レポートを作る</button> <button data-i18n="set.reportForget" id="report-forget">サーバーに残した数値を消す（B）</button> <span id="report-note" class="hint"></span>
+    <pre id="report-out" class="report-out" hidden></pre>
+    <button data-i18n="set.cal" id="b-cal">トレーナーを校正（スピンダウン）</button>
+    <label>FTP <input id="ftp" type="number" min="50" max="500" step="1" value="150"> W</label>
+    <label><span data-i18n="set.hrMax">最大心拍数（心拍のゾーンに使う）</span> <input id="hr-max" type="number" min="120" max="230" step="1" value="185"> bpm</label>
+    <p data-i18n="set.ergHint" class="hint">旅（戦闘・フィールド・ミッション）はいつも ERG で、ギアを変えなくてよい。フリーライドは、勾配を送って坂に合わせてギアを変えるか、ERG（FTP の何%か）で走るかを、コースを選ぶ画面で選べます。</p>    <label><span data-i18n="set.difficulty">難易度</span> <select id="difficulty"><option data-i18n="set.diff.easy" value="easy">やさしい（必要なパワー×0.9）</option><option data-i18n="set.diff.normal" value="normal" selected>ふつう</option><option data-i18n="set.diff.hard" value="hard">きびしい（×1.1）</option></select></label>
+    <label><span data-i18n="set.weekGoal">週の目標</span> <select id="week-goal"><option data-i18n="set.goal.none" value="">なし</option><option data-i18n="set.goal.c2" value="c2">週2回</option><option data-i18n="set.goal.c3" value="c3">週3回</option><option data-i18n="set.goal.c4" value="c4">週4回</option><option data-i18n="set.goal.c5" value="c5">週5回</option><option data-i18n="set.goal.c6" value="c6">週6回</option><option data-i18n="set.goal.c7" value="c7">週7回</option><option data-i18n="set.goal.m120" value="m120">週120分</option><option data-i18n="set.goal.m180" value="m180">週180分</option><option data-i18n="set.goal.m240" value="m240">週240分</option><option data-i18n="set.goal.m300" value="m300">週300分</option></select></label>
+    <p data-i18n="set.ftpHint" class="hint">戦闘で出し続けるパワーは FTP の何%かで決まります。FTP は女王の試練（FTP テスト）で測れます。</p>
+    <label><input id="erg-on" type="checkbox" checked> <span data-i18n="set.ergOn">旅で ERG を使う（オフなら、ギアで走る。走っている途中も E キーか一時停止の窓で切り替え）</span></label>
+    <label><span data-i18n="set.effect">勾配の効き（フリーライド・ERG オフ）</span> <input id="effect" type="range" min="0" max="100" step="10" value="50"> <output id="effect-v">50 %</output></label>
+    <p data-i18n="set.effectHint" class="hint">島の坂の勾配を、トレーナーにどれだけ送るか。速さと標高は本物の勾配で計算します（Zwift の「トレーナーの難易度」と同じ考え方）。</p>
+    <label><span data-i18n="set.dots">3D のドット感（フリーライド）</span> <select id="dots"><option data-i18n="set.dots.0" value="0">なし</option><option data-i18n="set.dots.540" value="540">弱め（高さ540ドットで描く）</option><option data-i18n="set.dots.360" value="360">強め（360ドット）</option></select></label>
+    <label><span data-i18n="set.gfx">画面の重さ</span> <select id="gfx"><option data-i18n="set.gfx.normal" value="normal">ふつう</option><option data-i18n="set.gfx.light" value="light">軽い（タブレット向け。3D を細かく描かない）</option></select></label>
+    <label><input id="bgm-on" type="checkbox" checked> <span data-i18n="set.bgm">BGM　音量</span> <input id="bgm-vol" type="range" min="0" max="100" step="5" value="70"> <output id="bgm-vol-v">70 %</output></label>
+    <p data-i18n="set.bgmOtherApp" class="hint">ほかのアプリ（Spotify・ミュージックなど）の音楽を聞きながら遊ぶときは、BGM をオフに。止まるときは効果音もオフに。</p>
+    <label><input id="sfx-on" type="checkbox" checked> <span data-i18n="set.sfx">効果音　音量</span> <input id="sfx-vol" type="range" min="0" max="100" step="5" value="80"> <output id="sfx-vol-v">80 %</output></label>
+    <label><input id="sfx-type" type="checkbox" checked> <span data-i18n="set.sfxType">会話の文字の音</span></label>
+    <label><input id="sfx-cue" type="checkbox" checked> <span data-i18n="set.sfxCue">合致率の合図の音</span></label>
+    <label><input id="photos" type="checkbox" checked> <span data-i18n="set.photos">道中の写真を撮る（走っている間に3枚。まとめのときに保存）</span></label>
+    <h2 data-i18n="set.loadTest">負荷を送る（動作確認。主人公を選ぶ画面でだけ効く）</h2>
+    <label><span data-i18n="set.grade">勾配</span> <input id="grade" type="range" min="-5" max="15" step="0.5" value="0"> <output id="grade-v">0.0 %</output></label>
+    <p class="hint" id="grade-note"></p>
+    <p class="hint"><span data-i18n="set.hrShow">心拍（表示だけ）：</span><b id="m-hr">--</b> bpm</p>
+    <h2 data-i18n="set.backup">記録の書き出し・読み込み</h2>
+    <p data-i18n="set.backupHint" class="hint">設定・キャラクターのレベル・プレイヤーのレベル・FTP・週の記録・旅の記録・物語の進み・自分のゴースト・共有の合言葉を、1つのファイルにまとめます。ブラウザのデータを消す前や、アプリ版とブラウザ版の間で移すときに。</p>
+    <button data-i18n="set.backupExport" id="backup-export">記録を書き出す</button> <button data-i18n="set.backupImport" id="backup-import">記録を読み込む</button> <span id="backup-note" class="hint"></span>
+    <input id="backup-file" type="file" accept=".json,application/json" hidden>
+    <h2 data-i18n="set.btlog">Bluetooth の記録（不具合を調べる）</h2>
+    <p data-i18n="set.btlogHint" class="hint">トレーナー・心拍ベルト・パワーメーターから届いた値と、送った負荷を、ページを開いてからずっと記録しています。走ったあとにここで保存し、そのファイルを送ってください。</p>
+    <button data-i18n="set.btlogSave" id="btlog-save">Bluetooth の記録を保存</button> <span id="btlog-note" class="hint"></span>
+    <h2 data-i18n="set.credits">出典・クレジット</h2>
+    <ul class="credits hint">
+      <li data-i18n="cr.director">総監督：PikaCycling</li>
+      <li data-i18n="cr.music">音楽：甘茶の音楽工房（https://amachamusic.chagasi.com/）</li>
+      <li data-i18n="cr.terrain">地形：国土地理院の標高タイルを加工して作成</li>
+      <li data-i18n="cr.font">文字：DotGothic16（SIL Open Font License 1.1）</li>
+      <li data-i18n="cr.three">3D：three.js（MIT License）</li>
+      <li data-i18n="cr.trainer">トレーナーの接続と物理：tanken-ride（MIT License）から移植</li>
+      <li data-i18n="cr.fit">FIT の書き出し：fit-file-parser（MIT License）</li>
+      <li data-i18n="cr.art">絵：生成 AI（Grok・Gemini）で作成</li>
+      <li data-i18n="cr.program">プログラム：生成 AI（Claude Code）で作成</li>
+      <li id="build-tag" hidden></li>
+    </ul>
+    <button data-i18n="set.close" id="settings-close">閉じる</button>
+  </div>
+</div>
+
+<div id="lang-pick" class="modal" hidden>
+  <div class="box lang-box">
+    <h2>ことばを えらんでください / Choose your language</h2>
+    <div class="lang-choices"><button data-lang="ja">日本語</button><button data-lang="en">English</button></div>
+    <p class="hint">あとから設定で変えられます。 / You can change it later in Settings.</p>
+    <button id="lang-ok">けってい / OK</button>
+  </div>
+</div>
+
+<div id="pause" class="modal" hidden>
+  <div class="box">
+    <h2 data-i18n="pause.title">一時停止中</h2>
+    <p data-i18n="pause.hint" class="hint">負荷は 0% にしています。Esc でも再開できます。</p>
+    <button data-i18n="pause.resume" id="b-resume">再開する</button>
+    <button data-i18n="pause.quit" id="b-quit">旅をやめる（記録を見る）</button>
+    <button id="b-erg" hidden></button>
+    <button id="b-course" hidden></button>
+    <button data-i18n="pause.cal" id="b-pause-cal">トレーナーを校正（スピンダウン）</button>
+    <button id="b-hour"></button>
+    <button id="b-hero3d"></button>
+  </div>
+</div>
+
+<div id="cal" class="modal" hidden>
+  <div class="box">
+    <h2 data-i18n="cal.title">トレーナーの校正（スピンダウン）</h2>
+    <p id="cal-msg"></p>
+    <p id="cal-speed" class="cal-speed" hidden></p>
+    <div class="cal-btns"><button id="cal-go" data-i18n="cal.go">始める</button> <button id="cal-close" data-i18n="cal.close">閉じる</button></div>
+  </div>
+</div>
+<div id="picker" class="modal" hidden>
+  <div class="box">
+    <h2 data-i18n="picker.trainer" id="picker-title">トレーナーを選ぶ</h2>
+    <p data-i18n="picker.trainerHint" class="hint" id="picker-hint">ペダルを少し回すと見つかりやすくなります。</p>
+    <ul id="picker-list"></ul>
+    <div class="picker-btns"><button data-i18n="picker.go" id="picker-go" hidden>つなぐ</button> <button data-i18n="picker.rescan" id="picker-rescan" hidden>もう一度探す</button> <button data-i18n="picker.cancel" id="picker-cancel">やめる</button></div>
+  </div>
+</div>
+
+<script src="i18n/i18n.js"></script>
+<script src="i18n/ja.js"></script>
+<script src="i18n/en.js"></script>
+<script src="i18n/names.en.js"></script>
+<script src="vendor/three.min.js"></script>
+<script src="../assets/map/map-data.js"></script>
+<script src="trainer/protocol.js"></script>
+<script src="trainer/phys.js"></script>
+<script src="trainer/trainer.js"></script>
+<script src="game/units.js"></script>
+<script src="game/data.js"></script>
+<script src="game/battle.js"></script>
+<script src="game/talks.js"></script>
+<script src="i18n/talks.en.js"></script>
+<script src="game/npclines.js"></script>
+<script src="i18n/npclines.en.js"></script>
+<script src="game/npctalk.js"></script>
+<script src="game/course.js"></script>
+<script src="game/trial.js"></script>
+<script src="game/training.js"></script>
+<script src="game/storyfacts.js"></script>
+<script src="game/monthly.js"></script>
+<script src="game/progress.js"></script>
+<script src="game/ergguard.js"></script>
+<script src="game/habit.js"></script>
+<script src="game/fitness.js"></script>
+<script src="game/badges.js"></script>
+<script src="game/gait.js"></script>
+<script src="game/roadnet.js"></script>
+<script src="game/landmarks.js"></script>
+<script src="game/ride.js"></script>
+<script src="game/tod.js"></script>
+<script src="game/groundclass.js"></script>
+<script src="game/ghost.js"></script>
+<script src="game/herocolors.js"></script>
+<script src="game/travellers.js"></script>
+<script src="game/encounters.js"></script>
+<script src="game/pacerlines.js"></script>
+<script src="i18n/pacerlines.en.js"></script>
+<script src="game/pacemaker.js"></script>
+<script src="game/race.js"></script>
+<script src="game/sharecfg.js"></script>
+<script src="vendor/fit-encoder.js"></script>
+<script src="platform/fitfile.js"></script>
+<script src="platform/sharecore.js"></script>
+<script src="platform/backup.js"></script>
+<script src="platform/snapshot.js"></script>
+<script src="platform/zip.js"></script>
+<script src="platform/electron.js"></script>
+<script src="platform/web.js"></script>
+<script src="i18n/names.js"></script>
+<script src="ui/common.js"></script>
+<script src="../assets/enemy/manifest.js"></script>
+<script src="../assets/hero/manifest.js"></script>
+<script src="../assets/items/manifest.js"></script>
+<script src="../assets/npc/manifest.js"></script>
+<script src="../assets/landmark/manifest.js"></script>
+<script src="ui/sprites.js"></script>
+<script src="ui/roadside.js"></script>
+<script src="ui/battle-view.js"></script>
+<script src="ui/field-view.js"></script>
+<script src="ui/trial-view.js"></script>
+<script src="ui/summary-view.js"></script>
+<script src="ui/landmark-view.js"></script>
+<script src="ui/sky.js"></script>
+<script src="ui/features-view.js"></script>
+<script src="ui/sealife.js"></script>
+<script src="ui/hero3d.js"></script>
+<script src="ui/hero3d_canon.js"></script>
+<script src="ui/hero3d_wizard.js"></script>
+<script src="ui/hero3d_specs.js"></script>
+<script src="ui/hero3d_spec.js"></script>
+<script src="ui/hero3d_monk.js"></script>
+<script src="ui/hero3d_priest.js"></script>
+<script src="ui/hero3d_valkyrie.js"></script>
+<script src="ui/hero3d_elf.js"></script>
+<script src="ui/hero3d_mercenary.js"></script>
+<script src="ui/hero3d_samurai.js"></script>
+<script src="ui/view3d.js"></script>
+<script src="ui/world.js"></script>
+<script src="ui/hud.js"></script>
+<script src="ui/turn-view.js"></script>
+<script src="ui/ride-view.js"></script>
+<script src="ui/extra-view.js"></script>
+<script src="audio/sequencer.js"></script>
+<script src="audio/scenes.js"></script>
+<script src="audio/songs.js"></script>
+<script src="audio/synth.js"></script>
+<script src="../assets/audio/manifest.js"></script>
+<script src="audio/recordings.js"></script>
+<script src="game/area.js"></script>
+<script src="audio/music.js"></script>
+<script src="audio/sfx.js"></script>
+<script src="build-info.js"></script>
+<script src="monetize-config.js"></script>
+<script src="itch.js"></script>
+<script src="adsize.js"></script>
+<script src="monetize.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

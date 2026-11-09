@@ -1,0 +1,261 @@
+/* スマホの大きさ（2026-11-07 iPhone の Bluefy でつながった。ユーザー「小さい画面用のレイアウトを作って」。docs/impl-web.md §13）。
+   縦向き（幅 600px 以下）と横向き（高さ 500px 以下）だけに効く。パソコン・iPad・Android のタブレットの見た目は変えない。
+   縦向きは字と HUD を幅（cqw）基準にして上から順に並べ、横向きは今の高さ（cqh）基準のまま、小さくなりすぎる字に下限をつけて重なる所だけ詰める。 */
+
+/* ---- iPhone の字の自動の拡大を止める（2026-11-08 試走 ユーザー「ゲーム画面とまとめでダウンロードされるスクリーンショットが違うよね」「フォントも違うしね」）。
+   iOS は横向きなどで字を勝手に大きくすることがあり、そのときは画面の字と、道中の写真（snapshot.js が計算した字の大きさで描く）の字が違って見える ---- */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+
+/* ---- 指で押す画面：2 回押し・ピンチで拡大しない（2026-11-07 ユーザー「ダブルクリックすると画面が拡大しちゃう」）。指でずらすのはそのまま ---- */
+@media (pointer: coarse) {
+  html, body, button, .win, .modal { touch-action: manipulation; }
+  #stage { touch-action: pan-x pan-y; }
+}
+
+/* ---- スマホの横向き：画面の端（ホームバー・切り欠き）から押す物を離す（2026-11-07 ユーザー「画面下を触ると画面を切り替えようとする」。
+   ホームバーの動きそのものは Web のページからは止められない見込み）。
+   a5115658 では body に余白を取ったが、Bluefy で画面が左に寄り、右に灰色の空きが出た（窓口の差し戻し）。今は、画面はいっぱいに描き、
+   上の帯・スライダーの帯・ゲームの画面の端の物（FTP・地図・左右の列・速度計・話の窓・戻る）だけを --sl・--sr・--sb の分だけ縁から離す。
+   値は env(safe-area-inset-*)。viewport-fit=cover は付けない（ブラウザが自分で縁を避けるので、ふつうは 0） ---- */
+:root { --sl: env(safe-area-inset-left, 0px); --sr: env(safe-area-inset-right, 0px); --sb: env(safe-area-inset-bottom, 0px); }
+html { background: #000; }
+@media (max-height: 500px) and (min-width: 601px) {
+  html #bar { padding-left: calc(6px + var(--sl)); padding-right: calc(6px + var(--sr)); }
+  html .sim { padding-left: calc(8px + var(--sl)); padding-right: calc(8px + var(--sr)); padding-bottom: calc(2px + var(--sb)); }
+  /* スライダーの帯が無いときは、ゲームの画面の下が縁になる */
+  body:not(:has(.sim.on)) #stage { --edge-b: var(--sb); }
+  #stage { --edge-b: 0px; }
+  .topleft { margin-left: var(--sl); }
+  .hud-col.left { margin-left: var(--sl); }
+  .minimap, .hud-col.right, .hud-speed, .fnext, .hud-note { margin-right: var(--sr); }
+  .hud-speed, .hud-note { margin-bottom: var(--edge-b); }
+  .talk, .pacer-talk { margin-bottom: var(--edge-b); }
+  html .select { padding-left: calc(10px + var(--sl)); padding-right: calc(10px + var(--sr)); padding-bottom: calc(6px + var(--edge-b)); }
+}
+
+/* ---- 共通：上の帯。走っている間は「一時停止」「つなぐ」「設定」だけ。それ以外の時は折り返して並べる ---- */
+@media (max-width: 600px), (max-height: 500px) {
+  /* 「だれと旅に出る」の窓の間は、走行データ・FTP・地図・速度計を隠す（窓の上に重なって、カードやボタンが押せなかった。2026-11-08 試走 指摘 7） */
+  #stage:has(.hero-pick) .hud-col, #stage:has(.hero-pick) .hud-speed, #stage:has(.hero-pick) .topleft, #stage:has(.hero-pick) .minimap, #stage:has(.hero-pick) .place, #stage:has(.hero-pick) .hud-note { visibility: hidden; }
+  #bar { flex-wrap: wrap; gap: 4px 6px; padding: 4px 6px; }
+  #bar h1, #bar .mini, #bar #now-playing, #bar .grow { display: none; }
+  #bar .conn { flex: 1 1 0; min-width: 0; font-size: 11px; }
+  #bar button { font-size: 12px; padding: 4px 8px; }
+  #bar:has(#b-pause:not([hidden])) :is(#b-hr, #b-pm) { display: none; }
+  /* 「つながずに試す」は、トレーナーにつながっている間（#conn.ok）だけ隠す。未接続のまま旅に出ても、上の帯から 1 回で試すモードに入れる */
+  #bar:has(#b-pause:not([hidden])):has(#conn.ok) #b-sim { display: none; }
+  /* つながずに試すのパネル（試すときだけ） */
+  .sim { gap: 2px 12px; padding: 2px 8px; }
+  .sim .hint { display: none; }
+  .sim input[type=range] { width: 26vw; }
+  #web-note { font-size: 12px; padding: 4px 8px; }
+  #screen .build-tag { display: none; }
+  /* まとめ：数値は折り返し、グラフは縦に積む */
+  .report { padding: 10px; }
+  .tiles, .tiles:has(> :nth-child(9)) { grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); }
+  .charts, .charts:has(.fit-box) { grid-template-columns: 1fr; }
+}
+
+/* ---- 縦向きの上の帯：1 行に収める。つないだ様子の文は隠し、つながったら「つなぐ」の縁を緑に。「つながずに試す」は「試す」に ---- */
+@media (max-width: 600px) {
+  html #bar { flex-wrap: nowrap; gap: 4px; padding: 4px; }
+  #bar .conn { display: none; }
+  #bar button { font-size: 12px; padding: 4px 7px; white-space: nowrap; }
+  #bar:has(#conn.ok) #b-connect { border-color: var(--ok); color: var(--ok); }
+  #bar #b-sim { font-size: 0; }
+  #bar #b-sim::after { content: '🎚 試す'; font-size: 12px; }
+  html:not([lang="ja"]) #bar #b-sim::after { content: '🎚 Try'; }
+}
+
+/* ---- 縦向き（2026-11-07 ユーザー「縦画面でもだいたい遊べるね。好きに選択させたほうがいいかも。」：縦でも横でも遊べる）。
+   幅（cqw）を基準に、上から順に重ならないよう並べる：FTP（戦闘ではスキップも下に折り返す）・地図 → 旅の案内の窓 → 走行データの 2 段（横並び）→ 地名。
+   下は、左に話の窓、右に速度計。戦闘はドラムを下に横いっぱい。 ---- */
+@media (max-width: 600px) {
+  #stage { --fs-l: 5.6cqw; --fs-m: 4.2cqw; --fs-s: 3.4cqw; }
+  /* 左上：FTP の ◀ ▶。戦闘の「スキップ」は地図にかからないよう下に折り返す */
+  .topleft { left: 2%; top: 1%; right: calc(4% + 24cqw); gap: 1.4cqw; flex-wrap: wrap; }
+  .ftpbox { gap: 1.4cqw; padding: .6cqw 1.4cqw; }
+  .ftpbox .ftp-v { min-width: 18cqw; gap: 1cqw; }
+  #stage .topbtn { padding: .6cqw 2cqw; }
+  /* 地図は右上に小さく */
+  .minimap { top: 1%; right: 2%; width: 24cqw; }
+  /* 旅の案内の窓：FTP の下、地図の左（.field.on-world .fnext より強く） */
+  /* 旅の案内の窓（ウォームアップ あと… ・星・すぐ戦う）：FTP の下に小さく（2026-11-07 ユーザー「ウォームアップの窓も小さくしたい」） */
+  #stage .fnext { top: calc(1% + 15cqw); left: 2%; right: auto; width: auto; max-width: calc(94% - 24cqw); min-width: 0; padding: .8cqw 1.6cqw; }
+  #stage .fnext .next { white-space: nowrap; font-size: 3.4cqw; }
+  #stage .fnext .stars { font-size: 3.4cqw; margin-top: 0; }
+  #stage .fnext .skip { margin-top: .6cqw; font-size: 3.2cqw; padding: 0 2cqw; min-height: 44px; width: auto; }
+  #stage .fnext .mission { font-size: 3.2cqw; margin-top: .6cqw; }
+  /* 走行データ：左の列（残り時間・高度・勾配・総距離）は案内の窓の下、右の列（ケイデンス・パワー・ERG）は地図の下に、縦に並べる */
+  .hud-col { gap: 1.4cqw; }
+  .hud-col.left { left: 2%; top: calc(1% + 40cqw); }
+  .hud-col.right { right: 2.5%; top: calc(1% + 26cqw); align-items: flex-end; text-align: right; }
+  .hud-item .k { font-size: 3.2cqw; }
+  .hud-item .v b { font-size: 7cqw; }
+  .hud-item .v small { font-size: 2.8cqw; margin-left: .4cqw; }
+  .hud-tgt { font-size: 3.2cqw; }
+  /* 地名：左右の列のあいだ、真ん中。長い名前は折り返す */
+  .place { top: calc(1% + 42cqw); left: 32%; right: 30%; transform: none; text-align: center; white-space: normal; font-size: 4.6cqw; letter-spacing: .02em; }
+  /* 下：右に速度計、左に話の窓（速度計にかからない幅） */
+  .hud-speed { right: 2%; bottom: 1.5%; width: 30cqw; height: 30cqw; }
+  .hud-speed b { font-size: 9cqw; margin-top: 2cqw; }
+  .hud-speed small { font-size: 3cqw; }
+  .hud-note { right: 2.5%; left: 30%; max-width: none; bottom: calc(3% + 30cqw); }
+  .talk { left: 2%; right: calc(4% + 30cqw); width: auto; transform: none; bottom: 1.5%; padding: 2cqw 2.6cqw; }
+  .talk .text { min-height: 0; }
+  /* 話す人の顔は、話の窓の中の左に小さく（2026-11-08 試走 指摘 2・判断 30a ユーザー「セリフの主人公の顔が、総距離に被っているので、喋ってる時の顔の出し方を考えた方がいいね。」）。
+     窓の上に出すと左の列（総距離など）にかかるため。話していない人（暗くした村人）の顔は出さない */
+  .talk .talk-face, .talk .talk-hero { height: 12cqw !important; width: auto; left: 2cqw; right: auto; top: 2cqw; bottom: auto; margin: 0; }
+  .talk .talk-face.quiet { display: none; }
+  .talk:has(> .talk-face:not([hidden]):not(.quiet)), .talk:has(> .talk-hero:not([hidden])) { padding-left: calc(4cqw + 12cqw); min-height: calc(12cqw + 4cqw); }
+
+  /* 戦闘：ドラムは下に横いっぱい、その上に右の速度計と左の言葉の窓、主人公と敵はさらに上。左の列は時間だけ */
+  #stage:has(.battle) .hud-col.left .hud-item:not(.left-t) { display: none; }
+  #stage:has(.battle) .hud-col.left { top: calc(1% + 30cqw); right: auto; }
+  #stage:has(.battle) .hud-col.right { top: calc(1% + 30cqw); left: 34%; right: 2%; flex-direction: row; align-items: flex-end; text-align: left; gap: 6cqw; }
+  #stage:has(.battle) .hud-speed { width: 26cqw; height: 26cqw; bottom: calc(2% + 32cqw); }
+  #stage:has(.battle) .hud-speed b { font-size: 8cqw; margin-top: 1cqw; }
+  #stage:has(.battle) .hud-note { bottom: calc(3% + 58cqw); }
+  .battle .slots { left: 2%; right: 2%; bottom: 1.5%; height: 30cqw; gap: 2cqw; }
+  .battle .slots .reel { border-width: 1cqw; border-radius: 2cqw; }
+  .battle .slots .reel .num { font-size: 15cqw; }
+  .battle .slots .reel .num small { font-size: 4cqw; margin: 0 0 4cqw .6cqw; }
+  .battle .slots .reel .pace { font-size: 6cqw; }
+  .battle .slots .reel .attr { width: 7cqw; height: 7cqw; }
+  .battle .slots .reel .crit { width: 22cqw; height: 22cqw; margin: -11cqw 0 0 -11cqw; }
+  /* 「…が あらわれた！」の窓：速度計の左に、1 行で */
+  .battle .say.win { left: 2%; right: calc(4% + 26cqw); transform: none; width: auto; max-width: none; bottom: calc(3% + 32cqw); text-align: left; }
+  .battle .msg { left: 2%; right: calc(4% + 26cqw); bottom: calc(2% + 32cqw); padding: 2cqw 3cqw; gap: 2cqw; }
+  .battle .msg .line { font-size: var(--fs-m); }
+  /* 敵の並ぶ場所は、速度計（右下）より上に（3 体の右の敵が速度計にかかっていた。2026-11-08） */
+  .battle.side .arena { left: 2%; right: 2%; bottom: calc(4% + 58cqw); height: 34cqw; }
+  /* 主人公と敵を小さくして、間をあける（2026-11-08 試走 指摘 3・判断 31a ユーザー「iPhone 版だと敵が縦型だと敵が近すぎるので、敵と主人公が重なって見える。全般的に小さくした方がいいんじゃないか。」）。
+     横に広い敵（鷲など）は幅でも抑える（絵の高さは battle-view.js が決めるので、object-fit でつぶさずに縮める） */
+  /* 高さは、上の数字の行（回転数・パワー。上から 1%＋30cqw、約 13cqw の高さ）の下から、並ぶ場所の下（下から 4%＋58cqw）までに収める。
+     画面が低いとき（つなげない案内・戦闘をスキップのボタンが出ている 375×667 など）に、敵の上の端が数字の行にかかっていた（2026-11-08 疾風伝の画面の担当の知らせ） */
+  .battle { --arena-room: max(14cqw, calc(95cqh - 104cqw)); }
+  .battle.side .arena .foes .foe img, .battle .foe img { max-height: min(30cqw, var(--arena-room)); max-width: 44cqw; object-fit: contain; object-position: 50% 100%; }
+  .battle.side .arena .foes.trio .foe img { max-height: min(16cqw, var(--arena-room)); max-width: 17cqw; }
+  .battle.side .arena .foes { gap: 1cqw; }
+  .battle.side .arena .hero-side img { max-height: min(26cqw, var(--arena-room)); max-width: 26cqw; object-fit: contain; object-position: 50% 100%; }
+  /* 「○○ RPMで まわせ！」を大きく（2026-11-08 試走 指摘 10） */
+  .battle .say.win.go { font-size: 6.2cqw; }
+
+  /* 「だれと旅に出る」（続けて走る B・試練の前。2026-11-08 試走 指摘 7 ユーザー「誰と旅に出るの画面で、真ん中の魔法使いと舞踏家しか選べない。横にスライドできない。」）：
+     4 人を 2 列 2 段に、窓は画面に収め、はみ出す分は縦にずらす */
+  .end-choice.hero-pick { left: 2%; right: 2%; width: auto; top: 1%; bottom: auto; transform: none; max-height: 98%; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 2.4cqw 3cqw; }
+  .hero-pick .hp-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2cqw; margin: 2cqw 0; }
+  #screen .hero-pick .hp-card { min-width: 0; padding: 1.4cqw; }
+  .hero-pick .hp-card img { height: 16cqw !important; width: auto; }
+  .hero-pick .hp-min { gap: 1.4cqw; }
+
+  /* 女王の試練：窓は地図の左。走行データはその下。ペースメーカーの話は女王の話の上 */
+  .trial-panel { left: 2%; right: calc(4% + 24cqw); top: 1%; transform: none; width: auto; min-width: 0; padding: 1.6cqw 2.4cqw; }
+  .trial-panel .target b { font-size: 11cqw; }
+  #stage:has(.trial-panel) .hud-col.left { top: calc(1% + 44cqw); }
+  #stage:has(.trial-panel) .hud-col.right { top: calc(1% + 44cqw); }
+  #stage:has(.trial-panel) .place { display: none; }
+  /* 女王の絵：縦では窓と走行データの間に入らないので、話の窓の上（速度計の左）に小さく */
+  .trial .queen { display: none; }
+  /* ペースメーカーの話：右の列と速度計のあいだ（左の列〔勾配・総距離〕と女王の話の窓にかからない）。顔は小さく
+     （2026-11-08 試走 指摘 2：話す主人公の顔が総距離にかかっていた。顔の高さは setSprite が style に入れるので !important） */
+  .pacer-talk { left: 47%; right: 2%; width: auto; bottom: calc(3% + 36cqw); padding: 1.4cqw 2cqw; gap: 1.6cqw; }
+  .pacer-talk .pt-face { height: 10cqw !important; }
+}
+
+/* ---- 横向き（背が低い） ---- */
+@media (max-height: 500px) and (min-width: 601px) {
+  #stage { --fs-l: max(5.4cqh, 16px); --fs-m: max(3.4cqh, 12px); --fs-s: max(2.6cqh, 10px); }
+  .minimap { width: 11%; }
+  .hud-col.left { top: 21%; }
+  .hud-col.right { top: 29%; }   /* 地図（11%）の下から。ERG の目標・負荷の行が速度メーターにかからないように */
+  .hud-item .k { font-size: max(3.4cqh, 10px); }
+  .hud-item .v b { font-size: max(7cqh, 18px); }
+  .hud-item .v small { font-size: max(2.8cqh, 9px); }
+  /* 止まっている知らせなどは、右の列（ERG の目標の行）とぶつからないよう、速度メーターの左の下に */
+  .hud-note { right: calc(3% + 30cqh); bottom: 3%; max-width: 34%; }
+  .ftpbox { padding: .4cqh 1cqh; }
+  .fnext { padding: 1cqh 1.6cqh; }
+  .fnext .skip { margin-top: .8cqh; }
+  /* 地名は上の真ん中の窓と地図のあいだに収まらないので、下の真ん中へ */
+  .place { top: auto; bottom: 4%; font-size: max(4cqh, 14px); }
+  /* 話の窓：村人・女王の話は下の右寄り（速度メーターの左まで）、ペースメーカーの話は下の左。上の真ん中の窓（試練）と重ならない */
+  /* 村人・女王の話はパソコン・iPad と同じく下の真ん中（2026-11-07 ユーザー「iPhone版だとセリフの黒枠が右寄りになっているね」）。左の列と速度計にかからない幅 */
+  .talk { left: 50%; right: auto; width: 50%; transform: translateX(-50%); bottom: 3%; padding: 1.4cqh 2cqh; }
+  .pacer-talk { left: 16%; width: 26%; bottom: 3%; }
+  /* ペースメーカーの話が出ている間だけ、村人・女王の話は右へずらす（ぶつからないように） */
+  #stage:has(.pacer-talk:not([hidden])) .talk { left: 44%; right: calc(3% + 30cqh); width: auto; transform: none; }
+  #stage:has(.trial-panel) .place { display: none; }
+  /* 「○○ RPMで まわせ！」を大きく（2026-11-08 試走 指摘 10 ユーザー「横型だと90RPM で回せの字が小さくて、どのぐらいのケイデンスで回せばいいのか分かりにくい。」） */
+  .battle .say.win.go { font-size: max(8cqh, 20px); padding: .6cqh 2.4cqh; }
+  /* 「だれと旅に出る」：4 人を 1 段、時間も 1 段に詰め、窓は画面に収めて縦にずらす（2026-11-08 試走 指摘 7） */
+  .end-choice.hero-pick { top: 1%; transform: translateX(-50%); max-height: 98%; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 1.2cqh 2.4cqh; width: min(96%, 640px); }
+  .end-choice.hero-pick .ec-title { margin-bottom: 0; }
+  .hero-pick .hp-cards { margin: .6cqh 0; gap: 1.2cqh; }
+  #screen .hero-pick .hp-card { min-width: 0; flex: 1 1 0; padding: .6cqh 1cqh; }
+  .hero-pick .hp-card img { height: max(14cqh, 40px) !important; width: auto; }
+  .hero-pick .hp-min { flex-wrap: nowrap; gap: .8cqh; }
+  #screen .hero-pick .hp-min button { padding: .4cqh 1cqh; }
+  .end-choice.hero-pick .buttons { margin-top: .8cqh; }
+  /* コースを選ぶ画面（2026-11-07 ユーザー指摘「コース選択のカードが低くなりすぎて選べない」）：
+     背が足りないので、画面を縦にずらせるようにし、カードは決まった高さ（1段 2 枚ずつ・3 段）で並べる。地図は小さく左上に */
+  .select.courses { overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 6px 10px; gap: 6px; }
+  .select.courses > .course-body { flex: none; height: auto; align-items: flex-start; }
+  .course-body .course-map { height: auto; width: 22%; max-width: 22%; }
+  .course-side .course-cards { flex: none; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: none; grid-auto-rows: 128px; }
+  .select.courses > .hint, .select.courses > p.hint { display: none; }
+  /* 主人公を選ぶカード（2026-11-07 ユーザー「ここはカードの幅広げて1行にしたほうがいい」）：4 枚 1 段のまま左右の余白まで広げ、名前は 1 行に */
+  .select .heroes { width: 100%; max-width: 980px; }
+  .select .hero-card { max-width: none; padding: 6px 4px; }
+  .hero-card .name { white-space: nowrap; font-size: 16px; }
+  .hero-card .lv { font-size: 11px; }
+  /* 下の説明の文：小さく詰め、スライダーの帯の上で読めるように（選ぶ画面は縦にずらせる） */
+  .select > .hint { font-size: 11px; line-height: 1.4; margin: 0 0 6px; }
+  /* 選ぶ時の行（時間・走るのは・負荷・回り方）を詰めて、カードまでを短く（ボタンは 44px のまま） */
+  .select.courses .minutes { padding: 3px 8px; gap: 4px 6px; }
+  .select.courses h2 { margin: 0; }
+}
+
+/* ---- 横向きで、さらに背が低いとき（Bluefy の下の帯がある iPhone の横向き：約 844×300。ゲームの画面は 200px あまり）。
+   2026-11-07 窓口の差し戻し：右の列の見出しが地図に入る・「残り時間」が FTP の箱に隠れる・ERG の行が速度計にくっつく。
+   FTP の箱（指で押すので 44px）と地図の下から列を始め、列の間を詰め、速度計を少し小さく。px で決める（cqh だと小さくなりすぎる） ---- */
+@media (max-height: 340px) and (min-width: 601px) {
+  .topleft { top: 4px; left: 1.5%; }
+  .ftpbox { padding: 2px 4px; }
+  .minimap { top: 4px; right: 1.5%; width: 72px; }
+  .hud-col { gap: 3px; }
+  .hud-col.left { top: 58px; }
+  .hud-col.right { top: 70px; }
+  .hud-item .k { font-size: 10px; }
+  .hud-item .v b { font-size: 17px; }
+  .hud-item .v small { font-size: 8px; }
+  .hud-tgt { font-size: 10px; }
+  .hud-speed { width: 56px; height: 56px; bottom: 4px; right: 1.5%; }
+  .hud-speed b { font-size: 18px; margin-top: 4px; }
+  .hud-speed small { font-size: 7px; }
+  .hud-note { right: calc(3% + 60px); bottom: 4px; }
+  #stage:has(.pacer-talk:not([hidden])) .talk { right: calc(3% + 60px); }
+  .fnext { top: 4px; }
+  /* 背がとても低いときは、スライダーの帯の下に safe-area の余白を足さない（足すとゲームの画面が縮みすぎ、総距離・速度計が重なる。左右の余白は残す） */
+  html .sim { padding-bottom: 2px; }
+  .end-choice.hero-pick { padding: 4px 12px; }
+  .hero-pick .hp-pages { position: absolute; top: 4px; right: 12px; }
+  .end-choice.hero-pick .ec-title { text-align: left; line-height: 44px; }
+  #screen .hero-pick .hp-card { flex-direction: row; justify-content: center; gap: 6px; padding: 2px 6px; }
+  .hero-pick .hp-card img { height: 36px !important; }
+  .hero-pick .hp-cards { margin: 2px 0; }
+  .end-choice.hero-pick .buttons { margin-top: 4px; }
+}
+
+
+
+/* ---- 縦向きのコースを選ぶ画面：画面を縦にずらせるようにし、地図は上、カードは 1 列（2026-11-07。縦でも遊ぶ） ---- */
+@media (max-width: 600px) {
+  .select.courses { overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 6px 8px; gap: 6px; }
+  .select.courses > .course-body { flex: none; height: auto; flex-direction: column; align-items: stretch; }
+  .course-body .course-map { height: auto; width: 46%; max-width: 46%; align-self: center; }
+  .course-side .course-cards { flex: none; grid-template-columns: minmax(0, 1fr); grid-template-rows: none; grid-auto-rows: 120px; }
+  .select.courses .minutes { padding: 3px 6px; gap: 4px 6px; }
+  .select.courses h2 { margin: 0; }
+  .select.courses > .course-foot { flex: none; }
+}

@@ -1,0 +1,1041 @@
+:root {
+  --bg: #14121c; --panel: #1f1b2bee; --line: #3a3350; --text: #ece8f6; --dim: #9a93b0;
+  --g: #e0524a;   /* 格闘＝赤 */
+  --c: #d9b44a;   /* 剣術＝金 */
+  --p: #4a86e0;   /* 魔法＝青 */
+  --ok: #5fc48a; --ng: #e0524a;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, "Hiragino Sans", "Yu Gothic UI", "Meiryo", sans-serif; overflow: hidden; }
+body { display: flex; flex-direction: column; }
+button { background: #1f1b2b; color: var(--text); border: 1px solid var(--line); border-radius: 8px; padding: 8px 14px; font-size: 14px; cursor: pointer; font-family: inherit; }
+button:hover { border-color: var(--c); }
+h2 { margin: 0 0 8px; font-size: 15px; color: var(--dim); font-weight: 600; }
+.hint { margin: 0; color: var(--dim); font-size: 13px; }
+.report-out { white-space: pre-wrap; max-height: 320px; overflow: auto; margin: 6px 0; padding: 8px 10px; border: 1px solid var(--dim); border-radius: 6px; font: inherit; font-size: 13px; line-height: 1.6; }
+
+/* 上の帯 */
+#bar { display: flex; align-items: center; gap: 14px; padding: 8px 16px; background: #0e0c14; border-bottom: 1px solid var(--line); }
+#bar button { flex: none; }
+#bar h1 { margin: 0 8px 0 0; font-size: 18px; letter-spacing: .04em; }
+.mini b { font-size: 22px; font-variant-numeric: tabular-nums; }
+.mini small { margin-left: 3px; color: var(--dim); font-size: 12px; }
+.mini.dim b { color: var(--dim); }
+.conn { color: var(--dim); font-size: 13px; min-width: 0; flex: 0 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.conn.ok { color: var(--ok); } .conn.ng { color: var(--ng); }
+.grow { flex: 1; }
+
+#screen { flex: 1; position: relative; min-height: 0; overflow: hidden; container-type: size; background: #000 center / cover no-repeat; }
+/* タイトルの背景：島の地図を画面いっぱいに（はみ出す所は切る。島が真ん中）。ドットをぼかさない。文字が読めるよう .select の暗い幕を重ねる */
+#screen.title-map { background: #1a3a9c url("../assets/title/island_map.jpg") center / cover no-repeat; image-rendering: pixelated; }
+/* 背の低い画面（iPad の横向きでブラウザの帯がある・案内の帯が出ている）では、選ぶ画面の下（「旅に出る」）が切れるので、縦にずらせるように（2026-11-07 25a）。
+   真ん中寄せのままだと上にはみ出した分へは戻れないので、上と下の余白（margin: auto）で真ん中に寄せる */
+.select:not(.courses):not(.collection) { justify-content: flex-start; overflow-y: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }   /* 帯（スクロールバー）は出さない。ホイールと指でずらせる */
+.select:not(.courses):not(.collection)::-webkit-scrollbar { display: none; }
+.select:not(.courses):not(.collection) > :first-child { margin-top: auto; }
+.select:not(.courses):not(.collection) > :last-child { margin-bottom: auto; }
+
+/* つながずに試す */
+.sim { display: none; gap: 18px; align-items: center; padding: 8px 16px; background: #0e0c14; border-top: 1px solid var(--line); flex-wrap: wrap; }
+.sim.on { display: flex; }
+.sim label { display: flex; align-items: center; gap: 8px; }
+.sim input[type=range] { width: min(280px, 30vw); }
+output { font-variant-numeric: tabular-nums; min-width: 60px; }
+
+/* ダイアログ */
+.modal { position: fixed; inset: 0; background: rgba(0,0,0,.6); display: flex; align-items: center; justify-content: center; z-index: 50; }
+.modal[hidden] { display: none; }
+#cal .cal-speed { font-size: 28px; text-align: center; margin: 4px 0; }   /* 補正の案内：今の速さ */
+#cal .cal-btns { display: flex; gap: 10px; justify-content: flex-end; }
+.modal .box { background: #1f1b2b; border: 1px solid var(--line); border-radius: 12px; padding: 16px; width: min(460px, 92vw); max-height: 92vh; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }   /* 設定が長くなっても、画面に収まって、スクロールで閉じるまで届く */
+.modal label { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.modal input[type=number] { width: 80px; background: var(--bg); color: var(--text); border: 1px solid var(--line); border-radius: 6px; padding: 4px 6px; }
+#picker-list { list-style: none; padding: 0; margin: 0; max-height: 50vh; overflow: auto; }
+#picker-list li { margin: 0 0 6px; }
+#picker-list button { width: 100%; text-align: left; }
+/* 「つなぐ」1つで全部（2026-10-29 試走 No.8）：種類ごとに見つかった機器を並べ、選んだもの（緑）を全部つなぐ */
+#picker-list li.kind { margin: 10px 0 4px; font-weight: 700; color: #f3dc8a; }
+#picker-list li.none { color: #aaa; font-size: .9em; }
+#picker-list button.sel { border-color: #5ee07a; color: #5ee07a; box-shadow: 0 0 0 2px #5ee07a66; }
+#picker-list button.sel::before { content: '✔ '; }
+.picker-btns { display: flex; gap: 8px; margin-top: 8px; }
+.picker-btns [hidden] { display: none; }
+
+/* 主人公を選ぶ */
+.select { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; background: rgba(10,8,16,.45); padding: 16px; }
+.select h2 { color: var(--text); font-size: 22px; text-shadow: 0 2px 6px #000; }
+.heroes { display: flex; gap: 18px; flex-wrap: wrap; justify-content: center; }
+.hero-card { width: 250px; background: var(--panel); border: 2px solid var(--line); border-radius: 14px; padding: 12px; display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; text-align: center; }
+.hero-card:hover { transform: translateY(-3px); }
+.hero-card.g { border-color: var(--g); } .hero-card.c { border-color: var(--c); } .hero-card.p { border-color: var(--p); }
+.hero-card img { height: 30vh; max-height: 260px; }
+.hero-card .name { font-size: 18px; font-weight: 700; }
+.hero-card .style { font-size: 14px; }
+.hero-card .how { font-size: 12px; color: var(--dim); min-height: 3em; }
+
+/* 戦闘 */
+.battle { position: absolute; inset: 0; }
+.spr { position: absolute; bottom: 4%; height: 62%; transition: transform .15s; }
+.spr img { height: 100%; display: block; }
+#spr-hero { left: 6%; }
+#spr-enemy { right: 6%; }
+#spr-enemy img { transform: scaleX(-1); }
+.spr.lunge-r { transform: translateX(8%); } .spr.lunge-l { transform: translateX(-8%); }
+.spr.shake { animation: shake .35s; }
+@keyframes shake { 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
+.plate { position: absolute; top: 3%; width: 30%; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; }
+#plate-hero { left: 3%; } #plate-enemy { right: 3%; }
+.plate .name { font-weight: 700; display: flex; justify-content: space-between; gap: 8px; }
+.plate .sub { color: var(--dim); font-size: 12px; font-weight: 400; }
+.hp { height: 12px; background: #0008; border-radius: 6px; overflow: hidden; margin-top: 6px; }
+.hp > i { display: block; height: 100%; background: var(--ok); transition: width .3s; }
+.gauge { height: 6px; background: #0008; border-radius: 3px; overflow: hidden; margin-top: 6px; }
+.gauge > i { display: block; height: 100%; background: var(--ng); }
+.gauge-label { font-size: 11px; color: var(--dim); margin-top: 4px; }
+
+/* スロット */
+.slot[hidden] { display: none; }
+.slot { position: absolute; left: 50%; top: 22%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.reels { display: flex; gap: 10px; padding: 12px; background: #0b0911ee; border: 2px solid var(--c); border-radius: 14px; }
+.reel { width: min(13vh, 120px); height: min(13vh, 120px); background: #1b1726; border: 2px solid var(--line); border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+.reel img { width: 86%; height: 86%; }
+.reel.spin img { opacity: .55; filter: blur(1.5px); }
+.reel.now { border-color: var(--text); box-shadow: 0 0 14px #fff6; }
+.reel.stopped { border-color: var(--c); }
+.cond { width: min(56vh, 460px); background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; }
+.cond .what { font-size: 14px; display: flex; justify-content: space-between; gap: 8px; }
+.cond .what b { font-variant-numeric: tabular-nums; }
+.cond.in { border-color: var(--ok); }
+.cond.go { border-color: var(--ng); animation: pulse .5s infinite alternate; }
+@keyframes pulse { to { box-shadow: 0 0 18px var(--ng); } }
+.track { position: relative; height: 18px; background: #0008; border-radius: 4px; margin-top: 8px; }
+.track .band { position: absolute; top: 0; bottom: 0; background: #5fc48a55; border-left: 2px solid var(--ok); border-right: 2px solid var(--ok); }
+.track .mark { position: absolute; top: -3px; bottom: -3px; width: 4px; margin-left: -2px; background: var(--text); border-radius: 2px; }
+.progress { height: 8px; background: #0008; border-radius: 4px; overflow: hidden; margin-top: 8px; }
+.progress > i { display: block; height: 100%; background: var(--c); }
+.banner:empty { visibility: hidden; }
+.banner { padding: 2px 16px; background: #0b0911cc; border-radius: 10px; min-height: 1.6em; font-size: 22px; font-weight: 800; text-shadow: 0 2px 6px #000; text-align: center; }
+.banner.trisk { color: var(--c); font-size: 30px; }
+.banner.g { color: var(--g); } .banner.c { color: var(--c); } .banner.p { color: var(--p); }
+
+.pop { position: absolute; font-size: 34px; font-weight: 900; color: #fff; text-shadow: 0 2px 6px #000, 0 0 2px #000; pointer-events: none; animation: pop 1s forwards; }
+.pop.hurt { color: #ff8a80; }
+@keyframes pop { from { transform: translateY(0); opacity: 1; } to { transform: translateY(-60px); opacity: 0; } }
+.fx { position: absolute; width: 22%; pointer-events: none; mix-blend-mode: screen; animation: fx .5s forwards; }
+@keyframes fx { from { opacity: 1; transform: scale(.7); } to { opacity: 0; transform: scale(1.2); } }
+
+.end { position: absolute; inset: 0; background: rgba(0,0,0,.55); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; }
+.end h2 { font-size: 44px; color: var(--text); margin: 0; text-shadow: 0 2px 8px #000; }
+.end .buttons { display: flex; gap: 12px; }
+
+.slot .target, .select > .hint { background: #0b0911cc; color: var(--text); padding: 4px 12px; border-radius: 8px; }
+
+/* 挑戦者のカードのボタン */
+.card-buttons { display: flex; gap: 8px; margin-top: 4px; }
+.card-buttons button { white-space: nowrap; }
+.card-buttons .go { border-color: var(--c); }
+
+/* 加護 */
+.buffs { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+.buffs:empty { display: none; }
+.buff { font-size: 11px; padding: 1px 8px; border-radius: 999px; background: #d9b44a33; border: 1px solid var(--c); color: var(--text); }
+.banner.appear { color: var(--text); }
+
+/* フィールド */
+.field { position: absolute; inset: 0; overflow: hidden; background: #000; }
+.scene { position: absolute; inset: 0; background: center / cover no-repeat; opacity: 0; transition: opacity 3s; transform: scale(1.14); }
+.scene.on { opacity: 1; }
+.walker { left: 14%; bottom: 3%; height: 60%; transition: transform .04s; }
+.place { position: absolute; top: 18%; left: 50%; transform: translateX(-50%); font-size: 30px; font-weight: 800; letter-spacing: .1em; text-shadow: 0 2px 10px #000, 0 0 2px #000; opacity: 0; transition: opacity 1.5s; white-space: nowrap; }
+.place.on { opacity: 1; }
+.fplate { left: 3%; }
+.fnext { right: 3%; width: auto; min-width: 22%; }
+.fnext .next { font-weight: 700; margin-top: 4px; }
+.talk { position: absolute; left: 50%; bottom: 4%; transform: translateX(-50%); width: min(760px, 70%); background: #0b0911e6; border: 2px solid var(--line); border-radius: 14px; padding: 12px 18px 10px; }
+.talk .who { display: inline-block; font-weight: 700; color: var(--c); margin-bottom: 4px; }
+.talk.by-hero .who { color: var(--p); }
+.talk.by-sys .text { color: var(--dim); }
+.talk .text { font-size: 19px; line-height: 1.6; min-height: 3.2em; }
+.talk .effect { color: var(--c); font-weight: 700; min-height: 1.2em; }
+.talk .hint { text-align: right; font-size: 11px; }
+.idle { position: absolute; top: 40%; left: 50%; transform: translateX(-50%); background: #0b0911cc; padding: 8px 18px; border-radius: 10px; font-size: 18px; }
+.idle[hidden] { display: none; }
+
+/* 旅の記録 */
+.summary { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; background: rgba(10,8,16,.55); }
+.summary h2 { font-size: 34px; color: var(--text); margin: 0; text-shadow: 0 2px 8px #000; }
+.summary table { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 10px 18px; border-spacing: 18px 6px; }
+.summary th { text-align: left; color: var(--dim); font-weight: 400; }
+.summary td { text-align: right; font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+/* 挑戦者を選ぶ：FTP と時間 */
+.ftp-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: center; background: #0b0911cc; padding: 8px 14px; border-radius: 10px; }
+.ftp-row.first { border: 1px solid var(--c); }
+.select > .habit { background: #0b0911cc; padding: 4px 14px; border-radius: 10px; font-size: var(--fs-s); }
+.trial-btn { border-color: var(--c); }
+.minutes { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: center; background: #0b0911cc; padding: 6px 12px; border-radius: 10px; }
+.minutes span { margin-right: 6px; }
+.minutes button { padding: 5px 10px; }
+.minutes button.on { background: var(--c); color: #14121c; border-color: var(--c); font-weight: 700; }
+.select .hero-card img { height: 24vh; }
+
+/* 女王の試練 */
+.trial { position: absolute; inset: 0; }
+.trial .queen { right: 7%; bottom: 3%; height: 64%; }
+.trial .queen img { transform: scaleX(-1); }
+.trial .queen img[hidden] { display: none; }
+.trial-panel { position: absolute; top: 6%; left: 42%; transform: translateX(-50%); width: min(560px, 80%); background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px 20px; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.trial-panel .phase { color: var(--dim); font-size: 16px; }
+.trial-panel .target b { font-size: 72px; font-variant-numeric: tabular-nums; line-height: 1; }
+.trial-panel .target small { color: var(--dim); margin-left: 6px; font-size: 20px; }
+.trial-panel .now { font-size: 18px; font-variant-numeric: tabular-nums; }
+.trial-panel .meter { position: relative; width: 100%; height: 16px; background: #0008; border-radius: 4px; }
+.trial-panel .meter .fill { position: absolute; left: 0; top: 0; bottom: 0; background: var(--ok); border-radius: 4px; }
+.trial-panel .meter.low .fill { background: var(--ng); }
+.trial-panel .meter .line { position: absolute; top: -4px; bottom: -4px; width: 3px; margin-left: -1px; background: var(--text); }
+.trial-panel .progress { width: 100%; }
+.trial-panel .info { font-size: 14px; font-variant-numeric: tabular-nums; text-align: center; }
+.trial .talk .buttons { display: flex; gap: 10px; margin-top: 8px; }
+
+/* 旅のまとめ */
+.report { position: absolute; inset: 0; overflow: auto; background: var(--bg); padding: 14px 20px; display: flex; flex-direction: column; gap: 10px; }
+.report-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+.report-head h2 { font-size: 24px; color: var(--text); margin: 0; }
+.report-head .sub { color: var(--dim); font-size: 13px; margin-top: 2px; }
+.report-buttons { display: flex; gap: 8px; }
+.tiles { display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px; }
+.tiles:has(> :nth-child(9)) { grid-template-columns: repeat(9, 1fr); }   /* W/kg を足したとき（1段のまま） */
+.tile { background: #1f1b2b; border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; }
+.tile .k { color: var(--dim); font-size: 12px; }
+.tile .v { font-size: 24px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.tile .v small { font-size: 12px; color: var(--dim); margin-left: 3px; font-weight: 400; }
+.peaks { color: var(--dim); font-size: 13px; }
+.peaks b { color: var(--text); font-variant-numeric: tabular-nums; }
+.charts { display: grid; grid-template-columns: 3fr 2fr; gap: 10px; min-height: 0; flex: 1; }
+.chart-box { background: #1f1b2b; border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; display: flex; flex-direction: column; min-height: 220px; }
+.chart-title { font-size: 13px; color: var(--dim); display: flex; gap: 14px; align-items: center; }
+.chart-title .key { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; }
+.chart-title .key i { display: inline-block; width: 14px; height: 10px; border-radius: 2px; }
+.chart-title .key i.band { background: rgba(224, 82, 74, 0.35); }
+.chart-title .key i.ftp { height: 1px; background: var(--dim); }
+.chart { position: relative; flex: 1; min-height: 180px; overflow: hidden; }
+.chart canvas { position: absolute; inset: 0; }
+.chart .tip { position: absolute; background: #0b0911; border: 1px solid var(--line); border-radius: 6px; padding: 3px 8px; font-size: 12px; pointer-events: none; white-space: nowrap; }
+.zones { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+.zrow { display: grid; grid-template-columns: 120px 1fr; align-items: center; gap: 8px; }
+.zname { font-size: 13px; display: flex; flex-direction: column; }
+.zname small { color: var(--dim); font-size: 11px; }
+.zbar { display: flex; align-items: center; gap: 8px; }
+.zbar i { display: block; height: 18px; border-radius: 0 4px 4px 0; }
+.zbar span { font-size: 12px; color: var(--dim); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.game-row { display: flex; gap: 22px; flex-wrap: wrap; font-size: 14px; color: var(--dim); }
+.game-row b { color: var(--text); }
+.king { background: #1f1b2b; border-left: 3px solid var(--c); padding: 8px 12px; border-radius: 6px; }
+.king b { color: var(--c); margin-right: 8px; }
+.saved { display: flex; align-items: center; gap: 8px; }
+.saved[hidden] { display: none; }
+
+/* タイトルロゴ */
+.select .logo { height: 14vh; max-height: 120px; filter: drop-shadow(0 3px 8px #000c); }
+.select .subtitle { margin-top: -10px; font-size: 18px; font-weight: 700; letter-spacing: .15em; color: #f3dc8a; text-shadow: 0 2px 6px #000, 0 0 2px #000; }
+.report-head .brand { display: flex; flex-direction: column; align-items: center; }
+.report-head .subtitle-sm { font-size: 10px; letter-spacing: .1em; color: var(--c); margin-top: -2px; }
+.select { gap: 12px; }
+.select .hero-card img { height: 22vh; }
+.report-head .logo-sm { height: 48px; }
+.report-head .grow { flex: 1; }
+
+/* FIT と Strava */
+.fit-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 13px; color: var(--dim); }
+.fit-row[hidden] { display: none; }
+.fit-row .fit-msg { flex-basis: 100%; }   /* 文は1行に置き、ボタンはその下に1列で並べる（2026-10-26 ユーザー指摘：「ZIP でダウンロードしました」の横でボタンが折り返していた） */
+.fit-row button { white-space: nowrap; }
+.fit-row button.strava { border-color: #fc4c02; }
+
+/* フリーライド：コースを選ぶ */
+.free-btn { margin-left: 10px; border-color: #ffb347; }
+.courses h2 { color: var(--text); font-size: 20px; text-shadow: 0 2px 6px #000; }
+.course-cards { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+.course-card { width: 250px; background: var(--panel); border: 2px solid #c08a50; border-radius: 12px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; }
+.course-card .name { font-size: 17px; font-weight: 700; }
+.course-card canvas { width: 100%; height: 54px; background: #0006; border-radius: 6px; }
+.course-card .how { font-size: 12px; color: var(--dim); min-height: 3em; }
+.course-card .stat { font-size: 12px; }
+.course-card .stat.dim { color: var(--dim); }
+
+/* フリーライド：走る画面 */
+.ride { position: absolute; inset: 0; }
+.ride3d { position: absolute; inset: 0; }
+.ride3d canvas { display: block; }
+.rplate { left: 2%; width: 32%; }
+.rplate .progress { margin-top: 6px; }
+.gradebox { position: absolute; top: 3%; left: 50%; transform: translateX(-50%); background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 6px 18px; text-align: center; }
+.gradebox .g { display: block; font-size: 34px; font-variant-numeric: tabular-nums; }
+.gradebox .h { color: var(--dim); font-size: 12px; }
+.gradebox.up .g { color: #f3dc8a; } .gradebox.steep .g { color: #ff8a65; } .gradebox.down .g { color: #8fd3ff; }
+.minimap { position: absolute; top: 3%; right: 2%; width: 22%; aspect-ratio: 2476 / 2052; border-radius: 10px; border: 1px solid var(--line); background: #2a5a8c; }
+.profile { position: absolute; left: 2%; bottom: 3%; width: 96%; height: 12%; background: #0b091199; border-radius: 10px; }
+.ride .place { top: 26%; }
+
+/* ===== 昔の RPG 風（2026-10-19）：ドット文字、黒地に白いふちの窓、ドット絵はぼかさない ===== */
+@font-face { font-family: 'DotGothic16'; src: url('fonts/DotGothic16-Regular.ttf') format('truetype'); font-display: swap; }
+:root { --panel: #000000e6; --line: #ffffff; --dim: #b8b4c8; --win: 3px solid #fff; }
+html, body, button, input, select { font-family: 'DotGothic16', "Hiragino Sans", "Yu Gothic UI", sans-serif; }
+body { -webkit-font-smoothing: none; }
+img.pixel, canvas.pixel { image-rendering: pixelated; }
+button { background: #000; border: 2px solid #fff; border-radius: 6px; }
+button:hover, button:focus-visible { border-color: #f3dc8a; color: #f3dc8a; outline: none; }
+/* 乗せた・選んだボタンの「▶」（2026-10-24 直した）：ボタンの外の左に重ねて出す。ボタンの幅も、ほかのボタンの並びも、1ドットも変えない
+   （前は文字の前に足していたので、幅が広がって2段の並びが折り返し、押した所がずれることがあった） */
+button { position: relative; }
+button:hover::before, button:focus-visible::before { content: '▶'; position: absolute; right: calc(100% + .25em); top: 50%; transform: translateY(-50%); font-size: .8em; line-height: 1; pointer-events: none; color: #f3dc8a; text-shadow: 0 0 2px #000, 0 1px 2px #000; }
+.win, .modal .box { background: var(--panel); border: var(--win); border-radius: 8px; box-shadow: 0 0 0 2px #000, 0 4px 14px #0008; }
+.hp { height: 10px; border-radius: 0; border: 1px solid #fff; background: #000; }
+.hp > i { background: #fff; }
+.progress, .gauge, .track { border-radius: 0; }
+#bar { background: #000; border-bottom: 2px solid #fff; }
+.select { background: rgba(0,0,0,.35); }
+
+/* 挑戦者のカード */
+.hero-card { width: 220px; border-radius: 8px; border: var(--win); background: var(--panel); }
+.hero-card.g, .hero-card.c, .hero-card.p { border-color: #fff; }
+.hero-card img, .select .hero-card img { height: auto; max-height: none; margin: 4px 0; }
+.hero-card .style { color: #f3dc8a; }
+.select .heroes { flex-wrap: nowrap; gap: 10px; }   /* 主人公は4人ずつ「1 2」のページ（2026-10-27）：1列に並べる。狭い画面ではカードが縮む */
+.hero-pages { justify-content: center; } .hero-pages[hidden] { display: none; }
+.hero-card.soon { cursor: default; opacity: .8; } .hero-card.soon img { filter: brightness(.25); } .hero-card.soon .plan { color: var(--dim); letter-spacing: .05em; }
+.select .hero-card { width: auto; flex: 1 1 0; max-width: 220px; min-width: 0; padding: 10px 6px; }
+
+/* 戦闘：上に主人公の窓、まん中に敵、下にメッセージの窓 */
+.battle .status { position: absolute; top: 3%; left: 50%; transform: translateX(-50%); width: min(420px, 46%); padding: 8px 14px; }
+.battle .status .name { display: flex; justify-content: space-between; gap: 8px; font-size: 18px; }
+.battle .status .sub { color: var(--dim); font-size: 13px; }
+.battle .status.hurt { animation: hurt .6s; }
+@keyframes hurt { 30% { background: #a01818e6; } }
+.foe { position: absolute; left: 50%; bottom: 36%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; transition: transform .15s, opacity .8s; }
+.foe img { display: block; max-height: 44cqh; width: auto; filter: drop-shadow(0 6px 4px #0008); }
+.foe.blink img { animation: blink .5s steps(2) ; }
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+.foe.lunge { transform: translateX(-50%) scale(1.08); }
+.foe.gone { opacity: 0; }
+.hp.thin { height: 6px; margin-top: 4px; }
+.battle.quake { animation: quake .4s; }
+@keyframes quake { 20% { transform: translate(-8px, 4px); } 40% { transform: translate(8px, -4px); } 60% { transform: translate(-6px, 2px); } 80% { transform: translate(4px, 0); } }
+.battle.quake-big { animation: quake-big .6s; }   /* 必殺技の着地・振り下ろし（会心） */
+@keyframes quake-big { 10% { transform: translate(-14px, 8px); } 25% { transform: translate(12px, -8px); } 40% { transform: translate(-10px, 5px); } 55% { transform: translate(8px, -4px); } 70% { transform: translate(-5px, 2px); } 85% { transform: translate(3px, 0); } }
+.battle .after-img { position: absolute; z-index: 1; pointer-events: none; image-rendering: pixelated; filter: brightness(1.4) saturate(.6); }   /* 必殺技の残像 */
+.battle .msg { position: absolute; left: 3%; right: 3%; bottom: 3%; height: 31%; padding: 10px 18px; display: flex; flex-direction: column; gap: 8px; }
+.battle .msg .line { font-size: 22px; min-height: 1.4em; line-height: 1.4; }
+.battle .msg .line.trisk { color: #f3dc8a; } .battle .msg .line.hurt { color: #ff8a80; } .battle .msg .line.go { color: #ffb347; }
+.battle .msg .line.g { color: #ff9a8a; } .battle .msg .line.c { color: #f3dc8a; } .battle .msg .line.p { color: #9ac0ff; }
+.battle .slot { position: static; transform: none; flex-direction: row; align-items: stretch; gap: 16px; flex: 1; min-height: 0; }
+.battle .reels { border: 2px solid #fff; border-radius: 6px; background: #000; padding: 8px; gap: 8px; }
+.battle .reel { width: min(11vh, 100px); height: min(11vh, 100px); border-radius: 4px; background: #111; border-color: #555; }
+.battle .reel.now { border-color: #fff; box-shadow: none; }
+.battle .reel.stopped { border-color: #f3dc8a; }
+.battle .cond { flex: 1; width: auto; background: transparent; border: none; padding: 0; }
+.battle .cond.in .value { color: var(--ok); }
+.battle .cond.go { animation: none; box-shadow: none; }
+.battle .cond .target { margin-top: 4px; font-size: 13px; color: var(--dim); }
+.battle .cond .wo { margin-top: 6px; font-size: 14px; color: #f3dc8a; }
+.battle .msg .buttons { display: flex; gap: 12px; }
+
+/* フィールド */
+.walker { position: absolute; bottom: 6%; }
+.walker { left: 18%; }
+.npc.on { opacity: 1; transform: none; }
+.walker img { display: block; filter: drop-shadow(0 4px 3px #0008); }
+.talk { border-radius: 8px; border: var(--win); background: var(--panel); }
+.talk .who { color: #f3dc8a; }
+.talk .text { font-size: 20px; }
+.place { font-weight: 400; }
+
+/* 女王の試練 */
+.trial .queen { position: absolute; right: 9%; bottom: 6%; }
+.trial .queen img { transform: none; }
+.trial-panel { border-radius: 8px; }
+
+/* フリーライド */
+.ride3d canvas.pixel { image-rendering: pixelated; }
+.course-card { border: var(--win); border-radius: 8px; }
+.gradebox, .rplate { border-radius: 8px; }
+.minimap { border: 2px solid #fff; border-radius: 6px; }
+.profile { border-radius: 6px; }
+
+/* まとめ */
+.tile, .chart-box, .king { background: #000; border: 2px solid #fff; border-radius: 6px; }
+
+/* 旅の3D の世界：3D の上に、フィールドと戦闘の層を重ねる */
+.world3d { position: absolute; inset: 0; }
+.world3d canvas { display: block; }
+.world3d canvas.pixel { image-rendering: pixelated; }
+.layer { position: absolute; inset: 0; z-index: 1; }
+.field.on-world { background: transparent; }
+.world-place { position: absolute; top: 30%; left: 50%; transform: translateX(-50%); z-index: 2; font-size: 30px; letter-spacing: .1em; text-shadow: 0 2px 10px #000, 0 0 2px #000; opacity: 0; transition: opacity 1.5s; white-space: nowrap; pointer-events: none; }
+.world-place.on { opacity: 1; }
+.world-place.hide { transition: none; opacity: 0; }
+.fnext .skip { margin-top: 8px; width: 100%; }
+
+/* 走行データの表示（アクションカメラの重ね表示のように、遊んでいる間はいつも出す） */
+#stage { flex: 1; position: relative; min-height: 0; display: flex; container-type: size; }
+#stage > #screen { flex: 1; }
+#hud { position: absolute; inset: 0; pointer-events: none; z-index: 20; color: #fff;
+  --num: "Arial Black", "Helvetica Neue", "Hiragino Sans", "Yu Gothic UI", sans-serif; }
+#hud[hidden] { display: none; }
+.hud-col { position: absolute; display: flex; flex-direction: column; gap: 1.2cqh; }
+.hud-col.left { left: 2%; top: 12.5%; }   /* 心拍まで6つ出ても下に収まるように（2026-10-24） */
+.hud-col.right { right: 2.5%; top: 31%; align-items: flex-start; }   /* 速度メーターのすぐ上から上へ積む（2026-10-24：3本目の ERG・負荷がメーターに重ならないように） */
+.hud-item .k { font-size: 3.4cqh; text-shadow: 0 1px 3px #000, 0 0 2px #000; }
+.hud-item .v { line-height: 1; white-space: nowrap; }
+.hud-item .v b { font: italic 900 7cqh var(--num); letter-spacing: -.01em; text-shadow: 0 3px 6px #000c, 0 0 3px #000; }
+.hud-item .v small { font: italic 900 2.8cqh var(--num); margin-left: .5cqh; text-shadow: 0 2px 4px #000; }
+.hud-item[hidden] { display: none; }
+.hud-tgt { font-size: var(--fs-s); color: #f3dc8a; white-space: nowrap; text-shadow: 0 1px 3px #000, 0 0 2px #000; }   /* ERG の目標（2026-10-29 試走 No.1：パワーの下に、黄色い小さな知らせ（.hud-note）と同じ字で1行。下げている間は ↓ を前に） */
+.hud-tgt[hidden] { display: none; }
+.hud-tgt.down { color: #ffb347; }
+#m-grade.down { color: #ffb347; }
+#m-grade.down::before { content: '↓'; }
+.hud-note { position: absolute; right: 2.5%; bottom: calc(2% + 30cqh); max-width: 30%; text-align: right; font-size: var(--fs-s); color: #f3dc8a; text-shadow: 0 1px 3px #000, 0 0 2px #000; }   /* つなぎ直している・自動の一時停止（2026-10-24） */
+.hud-note[hidden] { display: none; }
+.hud-speed { position: absolute; right: 1.5%; bottom: 2%; width: 28cqh; height: 28cqh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.hud-speed svg { position: absolute; inset: 0; width: 100%; height: 100%; filter: drop-shadow(0 2px 4px #000a); overflow: visible; }
+.hud-speed .track { fill: none; stroke: #ffffff40; stroke-width: 8; stroke-linecap: round; }
+.hud-speed .fill { fill: none; stroke: #fff; stroke-width: 8; stroke-linecap: round; }
+.hud-speed .seg { fill: none; stroke-width: 7; }
+.hud-speed .needle { fill: #fff; }
+.hud-speed b { font: italic 900 9cqh var(--num); line-height: 1; text-shadow: 0 3px 6px #000c; margin-top: 2cqh; }
+.hud-speed small { font: italic 900 2.8cqh var(--num); text-shadow: 0 2px 4px #000; }
+
+/* 走行データの表示と重ならないように */
+.battle .msg { left: 15%; right: 21%; }
+.talk { width: min(760px, 62%); }
+.profile { left: 16%; width: 60%; }   /* 左の列（総距離・ERG・心拍）の右から、速度メーターの手前まで */
+
+/* 文字の大きさは3段だけ（走行中に読めるように）：大＝メッセージ・場所、中＝窓の中、小＝補い */
+#stage { --fs-l: 5.4cqh; --fs-m: 3.4cqh; --fs-s: 2.6cqh; --num: "Arial Black", "Helvetica Neue", "Hiragino Sans", "Yu Gothic UI", sans-serif; }
+#screen button { font-size: var(--fs-s); padding: .8cqh 1.6cqh; }
+.world-place, .place { font-size: var(--fs-l); font-weight: 400; }
+.minimap { width: 15%; }
+
+/* 戦闘：まん中に敵と名前、下に大きなメッセージとドラムだけ */
+.foe { bottom: 40%; }
+.battle .msg { left: 15%; right: 21%; bottom: 3%; height: auto; padding: 2cqh 3cqh; gap: 2cqh; align-items: flex-start; }
+.battle .msg .line { font-size: var(--fs-l); min-height: 1.3em; line-height: 1.3; }
+.battle .msg .reels { display: flex; gap: 2cqh; padding: 0; border: none; background: none; }
+.battle .msg .reels[hidden] { display: none; }
+.battle .reel { position: relative; width: 17cqh; height: 17cqh; border: 3px solid #555; border-radius: 6px; background: #111; display: flex; align-items: center; justify-content: center; }
+.battle .reel img { width: 86%; height: 86%; }
+.battle .reel.now.ok { border-color: var(--ok); box-shadow: 0 0 2cqh #5fc48a88; }
+.battle .reel.now.ng { border-color: var(--ng); box-shadow: 0 0 2cqh #e0524a88; }
+.battle .reel .left { position: absolute; right: 4%; bottom: 2%; font: italic 900 var(--fs-m) var(--num, sans-serif); text-shadow: 0 2px 4px #000; }
+.battle .msg .buttons button { font-size: var(--fs-m); }
+
+/* フィールド：右上に「つぎの戦闘まで」とボタンだけ。会話は大きく */
+.fnext { top: 3%; right: 2%; min-width: 0; padding: 1.4cqh 2cqh; }
+.fnext .next { font-size: var(--fs-m); font-weight: 400; margin: 0; white-space: nowrap; }
+.fnext .skip { margin-top: 1.2cqh; }
+.talk { width: min(1100px, 62%); padding: 2cqh 3cqh; }
+.talk .who { font-size: var(--fs-s); margin-bottom: .6cqh; }
+.talk .text { font-size: var(--fs-m); line-height: 1.5; min-height: 3em; }
+.talk .effect { font-size: var(--fs-s); font-weight: 400; }
+.talk .hint { display: none; }
+.idle { font-size: var(--fs-m); }
+
+/* 女王の試練：上に目標パワー、左に女王、下にせりふ */
+.trial-panel { top: 4%; left: 50%; width: auto; min-width: 30%; padding: 1cqh 3cqh; gap: .4cqh; }   /* 2026-10-28 試走：窓の高さが大きすぎる → 余白と目標の数字を小さく */
+.trial-panel .phase { font-size: var(--fs-s); }
+.trial-panel .target b { font: italic 900 7.5cqh var(--num, sans-serif); }
+.trial-panel .target small { font-size: var(--fs-m); }
+.trial-panel .info { font-size: var(--fs-s); }
+.trial .queen { left: 18%; right: auto; bottom: 30%; }
+.trial .talk .buttons button { font-size: var(--fs-s); }
+
+/* フリーライド */
+.rplate { padding: 1.4cqh 2cqh; }
+.rplate .name { font-size: var(--fs-m); }
+.rplate .sub { font-size: var(--fs-s); }
+
+/* 戦闘（2026-10-19 ユーザー要望）：主人公は隠れて敵に寄る。敵を大きく、メッセージの窓はなくし、下いっぱいをスロットのドラムに */
+.foe { bottom: 44%; }
+.foe img { max-height: 52cqh; }
+.battle .say { position: absolute; left: 15%; right: 21%; bottom: 34.5%; text-align: center; font-size: var(--fs-l); line-height: 1.3; min-height: 1.3em; }
+/* 戦闘の行は、会話と同じ黒地に白いふちの窓に入れる（2026-10-22 ユーザー判断「このメッセージも黒枠に入れてしまっていい」）。ドラムのすぐ上、主人公・敵の足もとより下。
+   文字は中（3段の真ん中）。長い行は2行に折り返す（切らない） */
+.battle .say.win { left: 50%; right: auto; transform: translateX(-50%); width: max-content; max-width: 64%; font-size: var(--fs-m); line-height: 1.35; min-height: 0;
+  padding: .7cqh 2.4cqh; white-space: normal; overflow-wrap: anywhere; z-index: 4; }
+.battle .say.win:empty { visibility: hidden; }
+.battle .boss-say { position: absolute; right: 3%; top: 3%; max-width: 50%; font-size: var(--fs-m); line-height: 1.35; padding: .8cqh 2cqh; z-index: 6; color: #ffd6c8; pointer-events: none; }   /* 鬼王のセリフ（鬼王の上の吹き出し。2026-10-25） */
+.battle .boss-say[hidden] { display: none; }
+.battle .foes .foe.enraged img { filter: drop-shadow(0 0 1.2cqh #ff3020) drop-shadow(0 0 3cqh #ff5a20aa) brightness(1.08) saturate(1.3); }   /* 本気を出した鬼王（後半の3本。2026-10-26） */
+.battle .say.go { color: #ffd166; } .battle .say.crit { color: #f3dc8a; } .battle .say.skill { color: #bfe8ff; } .battle .say.hurt { color: #ff8a80; }
+.battle .slots .reel .count { position: absolute; right: 6%; top: 4%; z-index: 3; font: italic 900 var(--fs-l) var(--num); color: #f3dc8a; text-shadow: 0 2px 4px #000, 0 0 2px #000; animation: count-pop .9s ease-out; }   /* 3・2・1 の合図（アニメーションが止まっていても見えるよう、ふだんは見える） */
+@keyframes count-pop { 0% { transform: scale(1.6); } 25% { transform: scale(1); } 80% { opacity: 1; } 100% { opacity: 0; } }
+.battle .slots { position: absolute; left: 15%; right: 21%; bottom: 3%; height: 30cqh; display: flex; gap: 2cqh; }
+.battle .slots[hidden] { display: none; }
+.battle .slots .reel { position: relative; flex: 1; height: 100%; width: auto; overflow: hidden; border: .6cqh solid #666; border-radius: 1.2cqh;
+  background: linear-gradient(#000 0%, #1b1726 22%, #1b1726 78%, #000 100%); display: block; }
+/* 回すドラム：ふちと十の位の色は、今の回転が目標より遅い（緑）・合う（青）・速い（橙）。合致率が90%以上なら、ふちが太く青く光る
+   （2026-10-24 ユーザー判断で緑と青を入れ替えた：遅いのが青だと、正解しているように見える。前は 遅い＝青・合う＝緑） */
+.battle .slots .reel.now { --pc: #888; border-color: var(--pc); }
+.battle .slots .reel.now.slow { --pc: #4aa8ff; } .battle .slots .reel.now.on { --pc: #5ee07a; } .battle .slots .reel.now.fast { --pc: #ff8c3a; }   /* 遅い＝青・合う＝緑・速い＝橙。左下の印（▲ 青・● 緑）と同じ色（2026-10-28 ユーザー判断。10-24 に入れ替えたのを戻した） */
+.battle .slots .reel.now .d10 { color: var(--pc); }
+.battle .slots .reel.now.win { border-width: 1.1cqh; box-shadow: 0 0 3.5cqh #5ee07a, inset 0 0 2cqh #5ee07a; }   /* 90%以上の光は、いつも緑（2026-10-28：「合う」の緑にそろえた。青だと「遅い」に見える） */
+.battle .slots .reel .pace { position: absolute; left: 5%; bottom: 2%; font: normal 900 5.6cqh/1 var(--num, sans-serif); color: var(--pc); text-shadow: 0 0 .6cqh #000, 0 0 .3cqh #000; }   /* ▲ 低い（青）・● ±1 回転以内（緑）・▼ 高い（赤）。2026-10-27 ユーザー判断：印はドラムの色とは別の色 */
+.battle .slots .reel .pace.lo { color: #4aa8ff; } .battle .slots .reel .pace.ok { color: #5ee07a; } .battle .slots .reel .pace.hi { color: #ff5a4a; }
+.battle .slots .reel.stopped { border-color: #f3dc8a; }
+.battle .slots .left { position: absolute; right: 4%; bottom: 3%; font: italic 900 var(--fs-m) var(--num, sans-serif); text-shadow: 0 2px 4px #000; }
+.battle > .buttons { position: absolute; left: 50%; bottom: 10%; transform: translateX(-50%); display: flex; gap: 2cqh; }
+.battle > .buttons button { font-size: var(--fs-m); }
+
+/* 会話：話す人（村人）は、会話の窓の右上からこちらを向いて話す。主人公は左上（2026-10-29 試走 No.14 ユーザー判断：主人公の絵は右向きなので左に、村人を右に。前は村人が左・主人公が右） */
+.talk .talk-face { position: absolute; right: 2cqh; bottom: 100%; margin-bottom: -1.2cqh; filter: drop-shadow(0 .4cqh .6cqh #000a); }
+.talk .talk-face[hidden] { display: none; }
+/* 主人公が話す行：左上に主人公の絵。話していない NPC は暗く（2026-10-22 ユーザー要望：だれが話しているか分かるように） */
+.talk .talk-hero { position: absolute; left: 2cqh; bottom: 100%; margin-bottom: -1.2cqh; filter: drop-shadow(0 .4cqh .6cqh #000a); }
+.talk .talk-hero[hidden] { display: none; }
+.talk .talk-face.quiet { filter: brightness(.45) drop-shadow(0 .4cqh .6cqh #000a); }
+
+/* 旅の右上：島の現在地。フィールドの「つぎの戦闘まで」（クールダウンあと何分）は、地図の左に並べる（2026-10-29 試走 No.12 ユーザー判断：まん中の上だと道の先が見えない） */
+.world-map { top: 3%; right: 2%; width: 15%; z-index: 2; }
+.field.on-world .fnext { left: auto; right: calc(2% + 15% + 1.2%); transform: none; }
+
+/* 逃げていく敵と、ミッション */
+.foe.flee { transform: translateX(-50%) translateY(-8cqh) scale(.4); opacity: 0; transition: transform 1.6s, opacity 1.6s; }
+.fnext .mission { margin-top: 1cqh; font-size: var(--fs-m); padding: .6cqh 1.2cqh; border-radius: .8cqh; white-space: nowrap; }
+.fnext .mission.ok { background: #1e5a36; } .fnext .mission.ng { background: #6a1e1e; }
+.fnext .mission[hidden] { display: none; }
+/* ミッションの今の目標の回転数は、まん中に大きく（左右の列と速度メーターに重ならない幅で） */
+.mcall { position: absolute; left: 15%; right: 21%; bottom: 30%; text-align: center; font-size: var(--fs-l); line-height: 1.3;
+  text-shadow: 0 0 .4cqh #000, 0 0 .4cqh #000, 0 .4cqh 1cqh #000; }
+.mcall.ok { color: #9be7b4; } .mcall.ng { color: #ff9a8a; } .mcall[hidden] { display: none; }
+.place.ok { color: #9be7b4; } .place.ng { color: #ff9a8a; }
+.field.on-world .place { top: 30%; font-size: var(--fs-l); }
+
+/* フリーライドの名札は上のまん中に（左は走行データ） */
+.rplate { left: 50%; transform: translateX(-50%); width: auto; min-width: 30%; }
+
+/* コースを選ぶ画面はスクロールさせない（2026-10-21 ユーザー要望）：カードは「1 2 3」のページに分け、残りの高さに収める */
+.select.courses { justify-content: flex-start; overflow: hidden; padding: 1.6cqh 16px; gap: 1.2cqh; }
+.select.courses > * { flex: none; }
+.select.courses h2 { font-size: var(--fs-m); }
+.course-card { padding: 1cqh 1.2cqh; gap: .6cqh; min-height: 0; overflow: hidden; }
+.course-card .stat.dim { display: none; }
+
+/* 星（2026-10-20）：回せたドラムに星、フィールドの窓に集めた星の数 */
+.battle .slots .reel .star { position: absolute; left: 4%; top: 2%; font-style: normal; font-size: var(--fs-m); color: #e4e9f0; text-shadow: 0 0 1cqh #000, 0 0 2cqh #ffffff66; opacity: 0; transform: scale(.3); transition: opacity .3s, transform .4s cubic-bezier(.3, 1.8, .5, 1); }
+.battle .slots .reel.got .star { opacity: 1; transform: scale(1); }
+.fnext .stars { font-size: var(--fs-m); color: #ffd84a; margin-top: .4cqh; }
+.fnext .stars .silver { color: #e4e9f0; margin-left: .6em; }   /* 銀の星（戦闘のドラムの銀の星と同じ色。2026-10-29 試走 No.22） */
+/* 敵が震える：回せたドラムで小さく、ダメージで大きく（点滅もする） */
+.foe.hit-s img { animation: foe-shake .4s linear; }
+.foe.hit img { animation: foe-shake .7s linear, blink .7s steps(2); }
+@keyframes foe-shake { 0%, 100% { transform: translateX(0); } 10% { transform: translateX(-4%); } 25% { transform: translateX(4%); } 40% { transform: translateX(-3%); } 55% { transform: translateX(3%); } 70% { transform: translateX(-1.5%); } 85% { transform: translateX(1.5%); } }
+/* 敵はいつも息をするように、少し上下する */
+.foe img { animation: foe-idle 1.6s ease-in-out infinite; transform-origin: 50% 100%; }
+@keyframes foe-idle { 50% { transform: translateY(-1.2%) scaleY(1.015); } }
+
+/* フリーライドの ERG の強さ（◀ ▶ で変える）。高低図の上のまん中 */
+.ergbox { position: absolute; left: 50%; bottom: 16%; transform: translateX(-50%); display: flex; align-items: center; gap: 2cqh; padding: .6cqh 2cqh; }   /* 分かれ道の矢印（.turn、bottom 27%）に重ならないよう、1行にして低くした */
+.ergbox[hidden] { display: none; }
+.ergbox .erg-v { display: flex; flex-direction: row; align-items: baseline; justify-content: center; gap: 1.6cqh; min-width: 30cqh; }
+/* 中の字は HUD の項目と同じ（2026-10-24 ユーザー判断「ERG は HUD に合わせる」）：見出しはドット文字、数字は太い斜体、単位は小さい太い斜体 */
+.ergbox .erg-v .k { color: #fff; font-size: 3.4cqh; align-self: center; }
+.ergbox .erg-v b { color: #fff; font: italic 900 6cqh var(--num); letter-spacing: -.01em; line-height: 1; text-shadow: 0 3px 6px #000c, 0 0 3px #000; }
+.ergbox .erg-v small { color: #fff; font: italic 900 2.8cqh var(--num); margin-left: -1.1cqh; text-shadow: 0 2px 4px #000; }
+#screen .ergbox button { font-size: var(--fs-m); padding: .7cqh 2cqh; }
+
+/* 与えたダメージの数字：敵の上に落ちてきて、2回弾んで消える */
+.dmg-bounce { position: absolute; z-index: 5; transform: translate(-50%, -100%); font: italic 900 12cqh var(--num, sans-serif); color: #fff; -webkit-text-stroke: .5cqh #000; paint-order: stroke fill; text-shadow: 0 1cqh 1.5cqh #000a; pointer-events: none; animation: dmg-bounce 1.8s forwards; }
+.dmg-bounce.crit { color: #f3dc8a; }
+.dmg-bounce.small { font-size: 6.5cqh; -webkit-text-stroke-width: .35cqh; }   /* 通常攻撃の打ち合いの小さなダメージ（2026-10-29 試走 No.18） */
+@keyframes dmg-bounce {
+  0%   { transform: translate(-50%, -260%) scale(.6); opacity: 0; animation-timing-function: ease-in; }
+  20%  { transform: translate(-50%, -100%) scale(1.15, .85); opacity: 1; animation-timing-function: ease-out; }
+  35%  { transform: translate(-50%, -160%) scale(1); animation-timing-function: ease-in; }
+  50%  { transform: translate(-50%, -100%) scale(1.08, .92); animation-timing-function: ease-out; }
+  60%  { transform: translate(-50%, -125%) scale(1); animation-timing-function: ease-in; }
+  70%  { transform: translate(-50%, -100%) scale(1); opacity: 1; }
+  100% { transform: translate(-50%, -100%); opacity: 0; }
+}
+
+/* ドラムは合致率の数字（2026-10-20）：十の位はその時点の値、一の位は回り続ける。判定の前は「--」、会心は紋章が回る */
+.battle .slots .reel .num { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font: italic 900 19cqh var(--num, sans-serif); line-height: 1; text-shadow: 0 .6cqh 1cqh #000; }
+.battle .slots .reel .num small { font-size: 6cqh; align-self: flex-end; margin: 0 0 6cqh .6cqh; }
+.battle .slots .reel .d1 { position: relative; display: inline-block; width: .82em; margin: 0 -.06em; height: 1em; overflow: hidden; text-align: center;   /* 斜体の傾きの分、幅を広げて（並びは変えない）右が欠けないように。上下は battle-view.js が数字の高さで切る */
+  -webkit-mask-image: linear-gradient(transparent, #000 25%, #000 75%, transparent); mask-image: linear-gradient(transparent, #000 25%, #000 75%, transparent); }
+.battle .slots .reel .d1 .strip { position: absolute; left: 0; right: 0; top: 0; display: flex; flex-direction: column; will-change: transform; }
+.battle .slots .reel .d1 .strip span { display: block; height: 1em; }
+.battle .slots .reel .d1 .dash { display: none; }
+.battle .slots .reel.waiting .d1 .strip { display: none; }
+.battle .slots .reel.waiting .d1 .dash { display: block; }
+.battle .slots .reel.waiting .num { color: #ffffff99; }
+.battle .slots .reel.stopped .d1 { -webkit-mask-image: none; mask-image: none; }
+.battle .slots .reel .attr { position: absolute; right: 4%; top: 4%; width: 7cqh; height: 7cqh; opacity: .85; }
+.battle .slots .reel .crit { position: absolute; left: 50%; top: 50%; width: 22cqh; height: 22cqh; margin: -11cqh 0 0 -11cqh; display: none; }
+.battle .slots .reel.is-crit .num { display: none; }
+.battle .slots .reel.is-crit .crit { display: block; animation: crit-spin 1.2s linear infinite; filter: drop-shadow(0 0 2cqh #f3dc8a); }
+@keyframes crit-spin { from { transform: rotateY(0); } to { transform: rotateY(360deg); } }
+.battle .slots .reel.land .num { animation: reel-land .3s ease-out; }
+@keyframes reel-land { 0% { transform: translateY(-8%); } 60% { transform: translateY(4%); } 100% { transform: none; } }
+.battle .slots .reel.got.gold .star { color: #ffd84a; text-shadow: 0 0 1cqh #000, 0 0 2cqh #ffd84a88; }
+
+/* 敵は1体か、小さな雑魚3体（2026-10-20）。ウェーブが変わると、次の敵が出てくる */
+.battle .foes { position: absolute; left: 15%; right: 21%; bottom: 44%; display: flex; justify-content: center; align-items: flex-end; gap: 6cqh; pointer-events: none; }
+.battle .foes .foe { position: relative; left: auto; bottom: auto; transform: none; }
+.battle .foes .foe.lunge { transform: scale(1.08); }
+.battle .foes .foe.flee { transform: translateY(-8cqh) scale(.4); }
+.battle .foes.trio .foe img { max-height: 26cqh; }
+.battle .foes .foe.enter { animation: foe-enter .5s ease-out; }
+@keyframes foe-enter { from { opacity: 0; transform: translateY(-4cqh); } to { opacity: 1; transform: none; } }
+/* エンカウントの演出（battle-view.js。2026-10-24）：敵は黒い影から色づいて現れる（上から少し降りて着地し、小さく弾む） */
+.battle .foes .foe.shadow img { filter: brightness(0); opacity: .85; }
+.battle .foes .foe.reveal img { animation: foe-reveal calc(.5s * var(--enc-k, 1)) steps(5) both; }
+@keyframes foe-reveal { 0% { filter: brightness(0); transform: translateY(-3cqh); } 60% { filter: brightness(.6); transform: translateY(0); } 80% { transform: translateY(-.8cqh); } 100% { filter: none; transform: none; } }
+/* 前ぶれのちらつき（steps でパッパッと）と、黒い横の帯（左右から交互に閉じて開く） */
+.battle.pre .arena, .battle.pre .slots, .battle.pre .say { visibility: hidden; }
+.battle .enc { position: absolute; inset: 0; z-index: 30; pointer-events: none; overflow: hidden; }
+.battle .enc .enc-flash { position: absolute; inset: 0; background: #fff; opacity: 0; }
+.battle .enc.go .enc-flash { animation: enc-flash calc(.9s * var(--enc-k, 1)) steps(1) both; }
+.battle .enc.big .enc-flash { background: #e0302a; }
+.battle .enc.big.go .enc-flash { animation: enc-flash-big calc(1.2s * var(--enc-k, 1)) steps(1) both; }
+.battle .enc.soft.go .enc-flash { animation: enc-flash-soft calc(.45s * var(--enc-k, 1)) steps(1) both; }
+@keyframes enc-flash { 0% { opacity: .6; } 17% { opacity: 0; } 34% { opacity: .6; } 51% { opacity: 0; } 68% { opacity: .45; } 85%, 100% { opacity: 0; } }
+@keyframes enc-flash-big { 0% { opacity: .55; } 12% { opacity: 0; } 25% { opacity: .55; } 37% { opacity: 0; } 50% { opacity: .55; } 62% { opacity: 0; } 75% { opacity: .4; } 87%, 100% { opacity: 0; } }
+@keyframes enc-flash-soft { 0% { opacity: .3; } 50%, 100% { opacity: 0; } }
+.battle .enc .enc-bars i { position: absolute; left: 0; width: 100%; height: 12.5%; background: #000; transform: translateX(-101%); }
+.battle .enc .enc-bars i.r { transform: translateX(101%); }
+.battle .enc .enc-bars i:nth-child(1) { top: 0; } .battle .enc .enc-bars i:nth-child(2) { top: 12.5%; } .battle .enc .enc-bars i:nth-child(3) { top: 25%; } .battle .enc .enc-bars i:nth-child(4) { top: 37.5%; }
+.battle .enc .enc-bars i:nth-child(5) { top: 50%; } .battle .enc .enc-bars i:nth-child(6) { top: 62.5%; } .battle .enc .enc-bars i:nth-child(7) { top: 75%; } .battle .enc .enc-bars i:nth-child(8) { top: 87.5%; }
+.battle .enc.close .enc-bars i { animation: enc-close-l calc(.45s * var(--enc-k, 1)) steps(6) forwards; }
+.battle .enc.close .enc-bars i.r { animation-name: enc-close-r; }
+.battle .enc.open .enc-bars i { transform: none; animation: enc-open-l calc(.35s * var(--enc-k, 1)) steps(5) forwards; }
+.battle .enc.open .enc-bars i.r { animation-name: enc-open-r; }
+@keyframes enc-close-l { from { transform: translateX(-101%); } to { transform: none; } }
+@keyframes enc-close-r { from { transform: translateX(101%); } to { transform: none; } }
+@keyframes enc-open-l { from { transform: none; } to { transform: translateX(101%); } }
+@keyframes enc-open-r { from { transform: none; } to { transform: translateX(-101%); } }
+.hero-card .plan { font-size: var(--fs-s); color: #f3dc8a; }
+.hero-card .plan .long { font-size: .82em; white-space: nowrap; letter-spacing: -0.02em; }   /* 長いプラン名（スイートスポット）を1行に（2026-10-27）。行の高さはほかのカードと同じ（span の外の .plan が決める） */
+
+/* 旅の途中で FTP を変える窓（左上。走行データの左の列の上） */
+.topleft { position: absolute; left: 2%; top: 3%; z-index: 21; display: flex; align-items: stretch; gap: 1.4cqh; pointer-events: none; }
+.topleft > * { pointer-events: auto; }
+.ride-acts { display: flex; align-items: stretch; gap: 1.4cqh; }
+.ride-acts:empty { display: none; }
+.ride-acts > [hidden] { display: none; }
+#stage .topbtn { font-size: var(--fs-s); padding: .8cqh 1.6cqh; white-space: nowrap; color: #fff; }   /* 左上の並びのボタン（スキップ） */
+.ftpbox { display: flex; align-items: center; gap: 1.4cqh; padding: .8cqh 1.4cqh; }
+.ftpbox[hidden] { display: none; }
+.ftpbox .ftp-v { display: flex; align-items: baseline; gap: 1cqh; min-width: 16cqh; justify-content: center; }
+.ftpbox .ftp-v small { font-size: var(--fs-s); color: #f3dc8a; }
+.ftpbox .ftp-v b { font-size: var(--fs-m); font-weight: 400; }
+/* 左上の FTP の右に並べるボタン（引き返す・戦闘をスキップ）。HUD の左の列と右下の速度メーターに重ならない */
+.ride-acts .topbtn:disabled { opacity: .45; cursor: default; }
+#stage .ftpbox button { font-size: var(--fs-s); padding: .6cqh 1.4cqh; }
+
+/* 合致率が90%以上のときの一の位：その時点の値が、その場でくるくる回る */
+.battle .slots .reel .d1 .same { display: none; position: absolute; left: 0; right: 0; top: 0; flex-direction: column; will-change: transform; }   /* 90%以上：その値の数字が縦に流れる（2026-10-25。前は横に回っていた＝rotateY） */
+.battle .slots .reel .d1 .same span { display: block; height: 1em; }
+.battle .slots .reel.locked .d1 .same { display: flex; }
+.battle .slots .reel.locked .d1 .strip { visibility: hidden; }
+
+/* 試練の間は、地名を試練の窓の下に出す */
+#screen:has(.trial.on-world) .world-place { top: 42%; }
+
+/* コースを選ぶ画面：左に島の地図、右に「1 2 3」のページとコースのカード（3×2）。残りの高さいっぱいに */
+.select.courses > .course-body { flex: 1 1 0; min-height: 0; display: flex; gap: 16px; align-items: stretch; width: min(1240px, 100%); }
+.course-body .course-map { flex: none; height: 100%; max-width: 50%; aspect-ratio: 2476 / 2052; object-fit: contain; padding: 0; background: #1b3f9a; align-self: flex-start; }
+.course-side { flex: 1; min-width: 0; min-height: 0; display: flex; flex-direction: column; gap: 1cqh; }
+.course-pages { flex: none; align-self: center; }
+.course-pages[hidden] { display: none; }
+.course-side .course-cards { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); gap: 1.2cqh; }
+.course-side .course-card { width: auto; }
+.course-card .name { font-size: var(--fs-m); font-weight: 400; flex: none; }
+.course-card canvas { flex: 1 1 0; min-height: 0; height: auto; }
+.course-card .how, .course-card .stat { font-size: var(--fs-s); flex: 0 1 auto; min-height: 0; overflow: hidden; line-height: 1.3; }
+.course-card .how { flex: 0 1 auto; min-height: 0; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+.course-card .name { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+/* 日本語以外：名前が長いので2行まで折り返す（字は小さくしない。2026-10-23 窓口） */
+html:not([lang="ja"]) .course-card .name { white-space: normal; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-height: 1.15; overflow-wrap: anywhere; }
+html:not([lang="ja"]) .course-card .stat { flex: none; }   /* 名前が2行のときも、数字の行を途中で切らない。説明は1行で「…」（高低図から縮める） */
+html:not([lang="ja"]) .course-card .how { flex: none; -webkit-line-clamp: 1; }
+#screen .course-card .go-btn { flex: none; align-self: center; font-size: var(--fs-s); padding: .5cqh 1.4cqh; background: #14121c; color: #fff; border: .4cqh solid #fff; }
+#screen .course-card .go-btn:hover, #screen .course-card .go-btn:focus-visible { color: #ffd84a; border-color: #ffd84a; }
+.minutes .sep { margin-left: 1.6cqh; }
+.course-foot { display: flex; align-items: center; gap: 12px; width: min(1240px, 100%); }
+/* 選んだカード：名前・数字・スタートを優先。説明は1行で「…」、入りきらなければ隠す（app.js の fitSel） */
+.course-card.on .stat { flex: none; }
+.course-card.on .how { flex: none; display: block; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+.course-card.on.tight .how { display: none; }
+.course-card.on.tight2 .stat { white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+.course-foot .hint { flex: 1; min-width: 0; font-size: var(--fs-s); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hero-card .lv { font-size: var(--fs-s); color: var(--dim, #bbb); }
+/* 4枚のカードは同じ高さ（.heroes の flex でそろう）。名前やプランが2行になるカードがあっても、［旅に出る］はどのカードもいちばん下にそろえる */
+.heroes .hero-card .card-buttons { margin-top: auto; }
+
+/* 装備のコレクション */
+.select.collection { justify-content: flex-start; overflow-y: auto; padding-top: 2cqh; gap: 1.4cqh; }
+.col-hero { width: min(1100px, 94%); padding: 1.2cqh 2cqh; }
+.col-name { font-size: var(--fs-m); margin-bottom: 1cqh; }
+.col-items { display: grid; grid-template-columns: repeat(6, 1fr); gap: 1.2cqh; }
+.col-item { display: flex; flex-direction: column; align-items: center; gap: .6cqh; text-align: center; }
+.col-pic { width: 11cqh; height: 11cqh; border: .4cqh solid #f3dc8a; border-radius: .8cqh; background: #111; display: flex; align-items: center; justify-content: center; font-size: var(--fs-l); color: #f3dc8a; }
+.col-pic img { width: 100%; height: 100%; object-fit: contain; }
+.col-n { font-size: var(--fs-s); }
+.col-d { font-size: var(--fs-s); color: #bbb; line-height: 1.4; }
+.col-item.locked .col-pic { border-color: #555; color: #555; }
+.badges .col-items { grid-template-columns: repeat(5, 1fr); }   /* 勲章：まとまりごとに5つ（トレーニングは6つで2段） */
+.badges .col-pic { font-size: 6cqh; }
+.col-item.locked .col-n { color: #777; }
+
+/* 分かれ道の矢印：手前で左右に出す。何もしないで曲がる向きを点灯、反対側を点滅 */
+.turn { position: absolute; left: 50%; bottom: 27%; transform: translateX(-50%); z-index: 3; display: flex; gap: 14cqh; pointer-events: none; }
+.turn[hidden] { display: none; }
+.turn-side { display: flex; flex-direction: column; align-items: center; min-width: 24cqh; padding: 1cqh 2cqh; opacity: .45; }
+.turn-side b { font-size: var(--fs-l); font-weight: 400; line-height: 1.1; }
+.turn-side small { font-size: var(--fs-s); color: var(--dim, #ccc); }
+.turn-side.lit { opacity: 1; color: #ffd84a; }
+.turn-side.lit small { color: #fff; }
+.turn-side.blink { animation: turn-blink 1s steps(2, end) infinite; }
+@keyframes turn-blink { 0% { opacity: .95; } 50% { opacity: .15; } }
+
+/* コースを選ぶ：カードを選び、右回り／左回りで走り出す */
+.course-card { cursor: pointer; }
+/* 選んだコース：窓を金地・黒文字に反転し、ふちを太く、名前の頭に ▶。ほかのコースは暗く（2026-10-21 ユーザー要望） */
+.course-card:not(.on) { filter: brightness(0.55); }
+.course-card:not(.on):hover { filter: brightness(0.8); }
+.course-card.on { background: var(--c); color: #14121c; border: 4px solid #fff; box-shadow: 0 0 0 3px #000, 0 0 16px var(--c); }
+.course-card.on .name::before { content: '▶ '; }
+.course-card.on .how, .course-card.on .stat { color: #14121c; }
+.course-card.on canvas { background: #14121c; }
+.course-start { justify-content: center; }
+
+.modal input[type=text] { background: var(--bg); color: var(--text); border: 1px solid var(--line); border-radius: 6px; padding: 4px 6px; min-width: 0; }
+
+/* 設定：出典・クレジット（小さい文字）。設定が長くても「閉じる」は窓の下に見えたまま */
+.modal .credits { margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 2px; font-size: 12px; }
+#settings-close { position: sticky; bottom: 0; box-shadow: 0 12px 0 12px var(--panel), 0 -6px 10px 4px var(--panel); }
+
+/* レース（docs/impl-race.md）：スタート前の数えと、順位の窓。文字の大きさは 3 段のまま（数えは大を拡大して見せる） */
+.ride .countdown { position: absolute; left: 50%; top: 30%; transform: translate(-50%, -50%); font-size: var(--fs-l); color: #fff; text-shadow: 0 .4cqh 0 #000, 0 0 2cqh #000; pointer-events: none; }
+.ride .countdown[hidden] { display: none; }
+.ride .countdown.pop { animation: cd-pop .9s ease-out both; }
+@keyframes cd-pop { from { transform: translate(-50%, -50%) scale(3); opacity: 0; } 25% { opacity: 1; } to { transform: translate(-50%, -50%) scale(2.2); opacity: 1; } }
+.rplate .r-rank { font-size: var(--fs-l); color: #f3dc8a; line-height: 1.2; }
+.rplate .r-togo { font-size: var(--fs-m); color: #cfe8ff; line-height: 1.2; margin-top: 2px; }
+.race-info { text-align: center; line-height: 1.7; font-size: var(--fs-m); }
+.race-info b { color: #f3dc8a; font-weight: 400; }
+.race-list { display: grid; grid-template-columns: auto 1fr auto; gap: .2cqh 2cqh; font-size: var(--fs-s); max-width: 60%; margin: 0 auto; text-align: left; }
+.race-list .me { color: #f3dc8a; }
+
+/* まとめのゾーン別の時間：6段が窓に収まるよう、名前と W を1行にし、残りの高さに並べる（窓の外へはみ出して下の行と重なっていた。2026-10-21） */
+.zones-box { overflow: hidden; }
+/* 体力の推移（2026-10-24）：体力（CTL）は青、疲れ（ATL）は橙。週ごとの TSS は小さな棒 */
+.charts:has(.fit-box) { grid-template-columns: 5fr 4fr 3fr; }
+.fit-box .key i.ctl { background: #3987e5; } .fit-box .key i.atl { background: #e0a040; }
+.fit-box .fit-now { font-size: 13px; color: var(--dim); margin: 2px 0; } .fit-box .fit-now b { color: var(--text); font-size: 16px; }
+.fit-box .fit-line { width: 100%; height: 70px; } .fit-box .fit-line polyline { fill: none; stroke-width: 2; vector-effect: non-scaling-stroke; }
+.fit-box .fit-line .ctl { stroke: #3987e5; } .fit-box .fit-line .atl { stroke: #e0a040; }
+.fit-box .chart-title.sm { font-size: 12px; margin-top: 4px; }
+.fit-box .fit-weeks { flex: 1; display: flex; gap: 6px; align-items: stretch; min-height: 60px; }
+.fit-box .wk { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; font-size: 11px; color: var(--dim); }
+.fit-box .wk i { display: block; width: 70%; background: #3987e5; border-radius: 2px 2px 0 0; } .fit-box .wk span { color: var(--text); }
+.zones-box .zones { flex: 1; min-height: 0; justify-content: space-around; gap: 2px; margin-top: 4px; }
+.zones-box .zrow { grid-template-columns: 150px 1fr; }
+.zones-box .zname { flex-direction: row; align-items: baseline; gap: 6px; white-space: nowrap; }
+.zones-box .zbar i { height: 14px; }
+.zones-box .chart-title.sm { font-size: 12px; margin-top: 6px; }
+.zones-box .hrz-bar { display: flex; height: 12px; border-radius: 3px; overflow: hidden; background: #222; margin-top: 3px; } .zones-box .hrz-bar i { display: block; height: 100%; }
+.zones-box .hrz-key { display: flex; flex-wrap: wrap; gap: 2px 10px; font-size: 11px; color: var(--dim); margin-top: 3px; } .zones-box .hrz-key i { display: inline-block; width: 8px; height: 8px; margin-right: 3px; border-radius: 2px; } .zones-box .hrz-key b { color: var(--text); font-weight: 400; }
+/* まとめが窓に入りきらないとき（960×600 など）、行が縮んで重ならないよう、縮めずに下へスクロールさせる */
+.report > * { flex-shrink: 0; }
+.report > .charts { flex: 1 0 auto; }
+
+/* 上の帯：ロゴの文字・数字・ボタンは折り返さず縮めない。狭いときは、曲名から先に「…」で縮め、次に接続の表示を縮める（2026-10-21） */
+#bar h1, #bar .mini { flex: none; white-space: nowrap; }
+#bar #conn { flex: 0 1 auto; }
+#bar #now-playing { flex: 0 100 auto; }
+@media (max-width: 1180px) {
+  #bar { gap: 8px; padding: 6px 10px; }
+  #bar h1 { font-size: 16px; margin-right: 2px; }
+  .mini b { font-size: 18px; }
+  #bar button { padding: 5px 8px; font-size: 13px; }
+}
+
+/* タッチの画面（ブラウザ版。docs/impl-web.md）：分かれ道の矢印は押せる（押すとその向き）。指で押すボタンは 44px 以上 */
+.turn .turn-side { pointer-events: auto; cursor: pointer; }
+.trial-panel .giveup { margin-top: 4px; }
+.trial-panel .giveup[hidden] { display: none; }
+#b-pause[hidden] { display: none; }
+@media (pointer: coarse) {
+  #screen button, #bar button, .modal button { min-height: 44px; min-width: 44px; }
+}
+/* つなげないブラウザの案内（ブラウザ版だけ。web.js が出す。2026-11-07 ユーザー判断 25a） */
+#web-note { flex: none; display: flex; align-items: center; gap: 10px; padding: 6px 12px; background: #3a2c08; color: #ffe9a8; font-size: 13px; line-height: 1.4; border-bottom: 1px solid #6b5418; }
+#web-note[hidden] { display: none; }
+#web-note span { flex: 1; }
+#web-note a, #bar .conn a { color: #ffd84a; }
+#web-note button { flex: none; min-width: 32px; min-height: 32px; }
+@media (pointer: coarse) { #web-note button, #stage button { min-width: 44px; min-height: 44px; } }
+
+
+/* 横から見る戦闘（2026-10-22 ユーザー判断。battle-view.js）：ドラムの上で、左に右向きの主人公、右に左向きの敵が、離れて向かい合う。
+   間合いのある戦い（2026-10-22 ユーザー要望）：攻める側が近づいて攻撃して戻る（.atk。--gap は相手までの距離、battle-view.js が入れる）。
+   戦闘中は場所の名前も看板も出さない（今のまま） */
+.battle.side .arena { position: absolute; left: 15%; right: 21%; bottom: 41%; height: 52cqh; pointer-events: none; }
+.battle.side .arena .hero-side { position: absolute; left: 4%; bottom: 0; z-index: 2; }
+.battle.side .arena .hero-side img { display: block; filter: drop-shadow(0 6px 4px #0008); transform-origin: 50% 100%; animation: foe-idle 1.4s ease-in-out infinite; }
+.battle.side .arena .foes { position: absolute; left: auto; right: 2%; bottom: 0; top: auto; display: flex; justify-content: flex-end; align-items: flex-end; gap: 1.5cqh; }
+.battle.side .arena .foes .foe { position: relative; left: auto; bottom: auto; transform: none; transition: transform .25s, opacity .8s; }
+.battle.side .arena .foes .foe img { max-height: 52cqh; }
+.battle .foes .foe.out { display: none; }   /* 消えたあとは場所も空ける（残りの敵だけが並ぶ） */
+.battle.side .arena .foes.trio .foe:not(.front) { transform: translateX(2cqh) scale(.92); opacity: .9; }
+.battle.side .arena .foes.trio .foe.front { transform: translateX(-1cqh); z-index: 1; }
+/* 近づいて攻撃して戻る：走り寄る → 当てる → 戻る */
+.battle.side .arena .atk { animation: atk var(--atk-ms, 900ms) ease-in-out; z-index: 3; }
+@keyframes atk { 0% { transform: none; } 35% { transform: translateX(var(--gap)); } 42% { transform: translateX(calc(var(--gap) * 1.03)) scale(1.06); } 60% { transform: translateX(var(--gap)); } 100% { transform: none; } }
+/* 弾かれる：ぶつかった所から、のけぞって跳ね返る */
+.battle.side .arena .atk.bounce { animation-name: atk-bounce; }
+@keyframes atk-bounce { 0% { transform: none; } 35% { transform: translateX(var(--gap)); } 48% { transform: translateX(calc(var(--gap) * .62)) rotate(var(--lean, -8deg)); } 62% { transform: translateX(calc(var(--gap) * .55)) rotate(calc(var(--lean, -8deg) / 2)); } 100% { transform: none; } }
+.battle.side .arena .foes .foe.atk.bounce { --lean: 8deg; }
+/* 弾いた火花（金属の音のような、白と青の光） */
+.battle .clang { position: absolute; z-index: 5; pointer-events: none; transform: translate(-50%, -50%); font-size: calc(var(--fs-l) * 3); color: #fff; text-shadow: 0 0 1cqh #9fe0ff, 0 0 3cqh #6ab8ff, 0 0 6cqh #6ab8ff; animation: clang .75s ease-out both; }
+.battle .clang::before, .battle .clang::after { content: ''; position: absolute; left: 50%; top: 50%; width: 30cqh; height: 1cqh; margin: -.5cqh 0 0 -15cqh; background: linear-gradient(90deg, transparent, #fff, transparent); box-shadow: 0 0 1.5cqh #9fe0ff; }
+.battle .clang::before { transform: rotate(25deg); } .battle .clang::after { transform: rotate(-25deg); }
+@keyframes clang { 0% { opacity: 0; transform: translate(-50%, -50%) scale(.3) rotate(0); } 20% { opacity: 1; transform: translate(-50%, -50%) scale(1.15) rotate(15deg); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(.8) rotate(40deg); } }
+.battle.side .arena .hero-side.hurt-s img { animation: hero-hurt .5s ease-out; filter: brightness(1.1) sepia(.45) saturate(2) hue-rotate(-25deg) drop-shadow(0 6px 4px #0008); }
+@keyframes hero-hurt { 0% { transform: none; } 12% { transform: translateX(-1.6cqh) rotate(-4deg); } 22% { transform: translateX(-.6cqh) rotate(-1deg); } 32% { transform: translateX(-2.6cqh) rotate(-6deg); } 46% { transform: translateX(-1.4cqh) rotate(-3deg); } 100% { transform: none; } }   /* 短く震えて、少しよろける */
+/* 必殺技の名前：主人公の上に大きく（会心は金） */
+.battle.side .arena .skill-name { position: absolute; left: 0; bottom: 40cqh; transform: translateX(-50%); white-space: nowrap; text-align: center; font-size: var(--fs-l); color: #fff; opacity: 0; z-index: 5;
+  text-shadow: 0 0 .5cqh #000, 0 0 .5cqh #000, 0 .4cqh 1.2cqh #000, 0 0 2.5cqh #7fd0ff; }
+.battle.side .arena .skill-name.crit { color: #ffd84a; text-shadow: 0 0 .5cqh #000, 0 0 .5cqh #000, 0 .4cqh 1.2cqh #000, 0 0 3cqh #ffb020; }
+.battle.side .arena .skill-name.on { animation: skill-name 1.6s ease-out; }
+@keyframes skill-name { 0% { opacity: 0; transform: translateX(-50%) scale(1.6); } 12% { opacity: 1; transform: translateX(-50%) scale(1); } 75% { opacity: 1; transform: translateX(-50%); } 100% { opacity: 0; transform: translateX(-50%) translateY(-2cqh); } }
+.battle .flash { position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none; }
+.battle .flash.on { animation: flash .4s ease-out; }
+.battle .flash.gold { background: #f3dc8a; animation: flash .4s ease-out; }
+@keyframes flash { 0% { opacity: .55; } 100% { opacity: 0; } }
+/* 必殺技の演出（職業ごと）：敵の上に。会心（.crit）は大きく金色 */
+.battle .skill-fx { position: absolute; width: 0; height: 0; z-index: 4; pointer-events: none; --z: 1; --s: calc(var(--z) * var(--b, 1)); }   /* --b：狙った敵の絵の大きさ（battle-view の fxBox） */
+.battle .skill-fx.crit { --z: 1.6; }
+.battle .skill-fx::before, .battle .skill-fx::after { content: ''; position: absolute; left: 0; top: 0; }
+/* 戦士：剣の閃き（斜めの2本の光の筋） */
+.battle .fx-slash::before, .battle .fx-slash::after { width: calc(46cqh * var(--s)); height: 2.2cqh; margin: -1.1cqh 0 0 calc(-23cqh * var(--s)); background: linear-gradient(90deg, transparent, #fff 40%, #9fe0ff 60%, transparent); box-shadow: 0 0 2cqh #9fe0ff; animation: slash .6s ease-out both; }
+.battle .fx-slash::before { transform: rotate(-35deg); } .battle .fx-slash::after { transform: rotate(35deg); animation-delay: .15s; }
+.battle .fx-slash.crit::before, .battle .fx-slash.crit::after { background: linear-gradient(90deg, transparent, #fff 40%, #ffd84a 60%, transparent); box-shadow: 0 0 3cqh #ffd84a; }
+/* 侍の会心「火の島一文字」（2026-10-28 ユーザー判断）：敵を横切る一文字の光。筆の運びのように左から右へ伸び（起筆が太く、終わりが細い）、金色ににじんで消える */
+.battle .fx-ichi::before, .battle .fx-ichi::after { width: calc(52cqh * var(--s)); margin-left: calc(-26cqh * var(--s)); }
+.battle .fx-ichi::before { height: 3.2cqh; margin-top: -1.6cqh; background: linear-gradient(90deg, #fff 0 70%, #ffe680 100%); clip-path: polygon(0 20%, 4% 0, 60% 22%, 100% 50%, 60% 78%, 4% 100%, 0 80%); filter: drop-shadow(0 0 1.2cqh #ffd84a) drop-shadow(0 0 3cqh #ffb020); transform-origin: 0 50%; animation: ichi-brush .9s ease-out both; }
+.battle .fx-ichi::after { height: 9cqh; margin-top: -4.5cqh; background: radial-gradient(ellipse at 50% 50%, #fff3b0aa, transparent 70%); animation: ichi .9s ease-out .05s both; }
+@keyframes ichi { 0% { opacity: 0; } 25% { opacity: 1; } 70% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes ichi-brush { 0% { opacity: 1; transform: scaleX(0); } 25% { opacity: 1; transform: scaleX(1); } 70% { opacity: 1; transform: scaleX(1); } 100% { opacity: 0; transform: scaleX(1.04); } }
+@keyframes slash { 0% { opacity: 0; clip-path: inset(0 100% 0 0); } 30% { opacity: 1; clip-path: inset(0 0 0 0); } 100% { opacity: 0; clip-path: inset(0 0 0 0); } }
+/* 魔法使い：炎の魔法（火の玉がふくらんで、輪が広がる） */
+.battle .fx-fire::before { width: calc(30cqh * var(--s)); height: calc(30cqh * var(--s)); margin: calc(-15cqh * var(--s)) 0 0 calc(-15cqh * var(--s)); border-radius: 50%;
+  background: radial-gradient(circle, #fff6c0 0 18%, #ffb030 35%, #ff5a10 58%, transparent 70%); animation: fire .8s ease-out both; }
+.battle .fx-fire::after { width: calc(36cqh * var(--s)); height: calc(36cqh * var(--s)); margin: calc(-18cqh * var(--s)) 0 0 calc(-18cqh * var(--s)); border-radius: 50%; border: 1.2cqh solid #ff7a20; animation: ring .8s ease-out .1s both; }
+.battle .fx-fire.crit::after { border-color: #ffd84a; }
+@keyframes fire { 0% { transform: scale(.2); opacity: 0; } 25% { transform: scale(1); opacity: 1; } 100% { transform: scale(1.15); opacity: 0; } }
+@keyframes ring { 0% { transform: scale(.3); opacity: 1; } 100% { transform: scale(1.3); opacity: 0; } }
+/* 武闘家：連打の拳（星の形の当たりが、場所を変えてつぎつぎに） */
+.battle .fx-fists i { position: absolute; left: 0; top: 0; font-style: normal; font-size: calc(var(--fs-l) * 1.6 * var(--s)); color: #fff2a0; text-shadow: 0 0 1.5cqh #ffb020; opacity: 0;
+  transform: translate(-50%, -50%); animation: fist .32s ease-out both; animation-delay: calc(var(--k) * .11s); }
+.battle .fx-fists i:nth-child(1) { margin: -6cqh 0 0 -5cqh; } .battle .fx-fists i:nth-child(2) { margin: 4cqh 0 0 4cqh; } .battle .fx-fists i:nth-child(3) { margin: -2cqh 0 0 7cqh; }
+.battle .fx-fists i:nth-child(4) { margin: 6cqh 0 0 -6cqh; } .battle .fx-fists i:nth-child(5) { margin: -8cqh 0 0 3cqh; } .battle .fx-fists i:nth-child(6) { margin: 0; font-size: calc(var(--fs-l) * 2.4 * var(--s)); }
+.battle .fx-fists.crit i { color: #ffd84a; }
+@keyframes fist { 0% { opacity: 0; transform: translate(-50%, -50%) scale(.3) rotate(0); } 40% { opacity: 1; transform: translate(-50%, -50%) scale(1.2) rotate(20deg); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(.9) rotate(40deg); } }
+/* 僧侶：光の槌（上から光の柱が落ち、足もとに輪） */
+/* 僧侶：光の槌（2026-10-22 ユーザー要望：上から叩きつける重い打撃）。頭の上から槌（長い柄のメイス）が落ちて体に当たり、衝撃の輪、聖なる光の柱、足もとの地面の割れ */
+.battle .fx-hammer { --mc: #fff6d0; --mg: #ffe27a; }
+.battle .fx-hammer.crit { --mc: #ffe680; --mg: #ffc020; }
+.battle .fx-hammer .mace { position: absolute; left: 0; top: 0; width: 0; height: 0; animation: mace-drop .75s linear both; }
+.battle .fx-hammer .mace-head { position: absolute; left: calc(-6cqh * var(--s)); top: calc(-5cqh * var(--s)); width: calc(12cqh * var(--s)); height: calc(8cqh * var(--s)); border-radius: 2cqh;
+  background: radial-gradient(circle at 40% 35%, #fff 0 20%, var(--mc) 45%, var(--mg) 80%); box-shadow: 0 0 3cqh var(--mg), 0 0 1cqh #fff; }
+.battle .fx-hammer .mace-shaft { position: absolute; left: calc(-.8cqh * var(--s)); top: calc(-24cqh * var(--s)); width: calc(1.6cqh * var(--s)); height: calc(20cqh * var(--s)); background: linear-gradient(transparent, var(--mc)); box-shadow: 0 0 1.5cqh var(--mg); }
+@keyframes mace-drop { 0% { transform: translateY(-40cqh) rotate(-18deg); opacity: 0; animation-timing-function: cubic-bezier(.5, 0, 1, .6); } 10% { opacity: 1; } 43% { transform: translateY(0) rotate(0); opacity: 1; } 50% { transform: translateY(1cqh) scaleY(.88); } 58% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(0); opacity: 0; } }   /* .32秒で当たり、少しめり込んで、消える */
+.battle .fx-hammer .m-ring { position: absolute; left: calc(-14cqh * var(--s)); top: calc(-14cqh * var(--s)); width: calc(28cqh * var(--s)); height: calc(28cqh * var(--s)); border-radius: 50%;
+  border: calc(1.2cqh * var(--s)) solid var(--mc); box-shadow: 0 0 3cqh var(--mg); animation: ring .6s ease-out .32s both; }
+.battle .fx-hammer .m-pillar { position: absolute; left: calc(-7cqh * var(--s)); top: -60cqh; width: calc(14cqh * var(--s)); height: calc(60cqh + var(--feet, 10cqh)); background: linear-gradient(transparent, var(--mc) 70%, #fff); opacity: 0; mix-blend-mode: screen; animation: pillar .8s ease-out .3s both; }
+@keyframes pillar { 0% { opacity: 0; transform: scaleX(.2); } 25% { opacity: .85; transform: scaleX(1); } 100% { opacity: 0; transform: scaleX(1.3); } }
+.battle .fx-hammer .m-crack { position: absolute; left: calc(-16cqh * var(--s)); top: calc(var(--feet, 10cqh) - 1.5cqh); width: calc(32cqh * var(--s)); height: 3cqh; background: var(--mg);
+  clip-path: polygon(0 50%, 12% 30%, 20% 60%, 31% 20%, 40% 55%, 50% 0, 60% 55%, 69% 20%, 80% 60%, 88% 30%, 100% 50%, 88% 70%, 80% 45%, 69% 85%, 60% 50%, 50% 100%, 40% 50%, 31% 85%, 20% 45%, 12% 70%);
+  filter: drop-shadow(0 0 1cqh var(--mg)); opacity: 0; animation: crack .9s ease-out .33s both; }
+@keyframes crack { 0% { opacity: 0; transform: scaleX(.1); } 20% { opacity: 1; transform: scaleX(1); } 100% { opacity: 0; transform: scaleX(1.1); } }
+/* 通常攻撃が当たったとき（.mini）：必殺技の演出を小さく、短く */
+.battle .skill-fx.mini { --z: .5; }
+.battle .skill-fx.mini .m-pillar, .battle .skill-fx.mini .m-crack { display: none; }
+.battle .fx-hammer.mini .m-ring { animation-delay: 0s !important; }   /* 通常攻撃：落ちてくる槌を待たずに、打った所ですぐ輪が広がる */
+.battle .fx-slash.mini::after { display: none; }
+@keyframes beam { 0% { opacity: 0; transform: scaleY(0); transform-origin: 50% 0; } 30% { opacity: 1; transform: scaleY(1); } 100% { opacity: 0; } }
+/* 反撃：敵が飛びかかり、主人公がよろけて赤く点滅する。受けた数字は赤 */
+.battle.side .arena .hero-side.stagger img { animation: hero-stagger .7s ease-out, blink .7s steps(4); filter: brightness(1.1) sepia(.45) saturate(2) hue-rotate(-25deg) drop-shadow(0 6px 4px #0008); }   /* 赤みを帯びて点滅（前は橙一色になって、だれか分からなかった） */
+@keyframes hero-stagger { 0% { transform: none; } 30% { transform: translateX(-5cqh) rotate(-10deg); } 100% { transform: none; } }
+.dmg-bounce.hurt { color: #ff8a80; }
+/* 倒せなかった敵：最後に飛びかかってから、右へ逃げていく */
+.battle.side .arena .foes .foe.lunge { transform: translateX(-8cqh) scale(1.05); }
+.battle.side .arena .foes .foe.flee { transform: translateX(40cqh) scale(.8); opacity: 0; transition: transform 1.6s, opacity 1.6s; }
+.battle.side .arena .foes .foe.gone { opacity: 0; }
+
+/* 戦闘中に分かれ道が来たとき：矢印は小さくして、ミニマップの左の上の端へ寄せる（「○○ RPM で まわせ！」・ドラム・主人公と敵に重ならないように）。フィールドとフリーライドは今の大きさのまま */
+#screen:has(.battle) .turn { left: auto; right: 18.5%; top: 3%; bottom: auto; transform: none; gap: 1.6cqh; }
+#screen:has(.battle) .turn-side { min-width: 0; padding: .5cqh 1.4cqh; flex-direction: row; gap: 1.2cqh; align-items: center; }
+#screen:has(.battle) .turn-side b { font-size: var(--fs-m); }
+#screen:has(.battle) .turn-side small { font-size: var(--fs-s); white-space: nowrap; }
+/* 魔法使いの火の玉（2026-10-22 ユーザー要望）：杖から敵へ飛んでいく。弾かれると、敵の前ではじけて散る */
+.battle .fireball { position: absolute; z-index: 4; pointer-events: none; border-radius: 50%; transform: translate(-50%, -50%);
+  background: radial-gradient(circle, #fff6c0 0 22%, #ffb030 42%, #ff5a10 64%, transparent 72%); box-shadow: 0 0 2cqh #ff7a20; }
+.battle .fireball.gold { background: radial-gradient(circle, #fff 0 22%, #ffe680 42%, #ffb020 64%, transparent 72%); box-shadow: 0 0 3cqh #ffd84a; }
+.battle .fire-burst { position: absolute; width: 0; height: 0; z-index: 4; pointer-events: none; }
+.battle .fire-burst i { position: absolute; left: -1.2cqh; top: -1.2cqh; width: 2.4cqh; height: 2.4cqh; border-radius: 50%; background: radial-gradient(circle, #fff1a0 0 30%, #ff8a20 60%, transparent 72%);
+  animation: fire-burst .55s ease-out both; }
+@keyframes fire-burst { 0% { opacity: 1; transform: rotate(var(--a)) translateX(0) scale(1.2); } 100% { opacity: 0; transform: rotate(var(--a)) translateX(7cqh) scale(.4); } }
+/* エルフの矢（2026-10-27 ユーザー指示「敵の方まで大きく進まず、矢を打って攻撃」）：茶の柄・銀の矢じり（右）・白い羽根（左）。transform-origin は矢じり（右の端） */
+.battle .arrow-shot { position: absolute; z-index: 4; pointer-events: none; transform-origin: 100% 50%;
+  background: linear-gradient(90deg, #f2efe6 0 14%, transparent 14% 18%, #8a5a30 18% 82%, #d8dde6 82% 100%); clip-path: polygon(0 0, 14% 30%, 82% 30%, 82% 0, 100% 50%, 82% 100%, 82% 70%, 14% 70%, 0 100%); filter: drop-shadow(0 0 .3cqh rgba(0,0,0,.6)); }
+/* 敵の飛び道具（2026-10-28 ユーザー判断。battle-view.js の SHOT_LOOK）：形と色は敵ごと。島の地面に埋もれないよう、黒と白で縁取る。色の境はくっきり（ドット絵の雰囲気） */
+.battle .foe-shot { position: absolute; z-index: 4; pointer-events: none; filter: drop-shadow(0 0 .18cqh #000) drop-shadow(0 0 .45cqh #fff); }
+.battle .foe-shot.shot-stone::before, .battle .foe-shot.shot-flame::before { content: ''; position: absolute; inset: 0; }   /* 縁取り（親の filter）が切り抜いた形に沿うよう、形は ::before で切る */
+.battle .foe-shot.shot-stone::before { background: radial-gradient(circle at 35% 32%, #e2dccf 0 18%, #a39a8a 19% 52%, #6c6458 53% 100%); clip-path: polygon(18% 6%, 62% 0, 94% 22%, 100% 62%, 78% 96%, 34% 100%, 4% 74%, 0 34%); }
+.battle .foe-shot.shot-fire { border-radius: 50%; background: radial-gradient(circle at 58% 50%, #fff3a0 0 18%, #ffb030 19% 38%, #ff4a10 39% 58%, #b81c00 59% 68%, transparent 69%); box-shadow: 0 0 1.6cqh #ff3a10; animation: shot-flicker .12s steps(2) infinite; }
+.battle .foe-shot.shot-flame { animation: shot-flicker .1s steps(2) infinite; }
+.battle .foe-shot.shot-flame::before { background: linear-gradient(90deg, transparent 0, #c82800 18%, #ff6a10 42%, #ffc030 70%, #fff6c0 88%, #fff6c0 100%); clip-path: polygon(0 50%, 14% 30%, 26% 44%, 40% 14%, 56% 34%, 70% 4%, 88% 10%, 100% 50%, 88% 90%, 70% 96%, 56% 66%, 40% 86%, 26% 56%, 14% 70%); }
+.battle .foe-shot.shot-ash { border-radius: 50%; background: radial-gradient(circle at 40% 38%, #eeebe4 0 20%, #b4aea4 21% 50%, #7c766c 51% 66%, transparent 67%); }
+.battle .foe-shot.shot-ash::before, .battle .foe-shot.shot-ash::after { content: ''; position: absolute; border-radius: 50%; background: radial-gradient(circle at 40% 38%, #e2ded6 0 24%, #9c968c 25% 60%, transparent 62%); }
+.battle .foe-shot.shot-ash::before { width: 60%; height: 60%; left: -22%; top: 8%; } .battle .foe-shot.shot-ash::after { width: 52%; height: 52%; right: -16%; top: -10%; }
+.battle .foe-shot.shot-hex { border-radius: 50%; background: radial-gradient(circle, #fff 0 16%, #d6b4ff 17% 34%, #8a46ff 35% 52%, transparent 54%); box-shadow: 0 0 2cqh #9a5aff; }
+.battle .foe-shot.shot-hex::after { content: ''; position: absolute; inset: 4%; border-radius: 50%; border: .5cqh solid #c49cff; border-left-color: transparent; border-right-color: transparent; }
+@keyframes shot-flicker { 0% { opacity: 1; } 100% { opacity: .82; } }
+/* 当たった所で、その色で小さくはじける */
+.battle .shot-pop { position: absolute; z-index: 4; pointer-events: none; border-radius: 50%; transform: translate(-50%, -50%); animation: shot-pop .45s ease-out forwards; }
+.battle .shot-pop.shot-stone { background: radial-gradient(circle, transparent 0 40%, #a39a8a 41% 50%, transparent 51%); }
+.battle .shot-pop.shot-fire { background: radial-gradient(circle, #fff3a0 0 20%, #ff6a10 21% 46%, transparent 48%); }
+.battle .shot-pop.shot-flame { background: radial-gradient(circle, #fff6c0 0 22%, #ffa020 23% 46%, transparent 48%); }
+.battle .shot-pop.shot-ash { background: radial-gradient(circle, #c8c2b8 0 40%, #8a847a 41% 54%, transparent 56%); }
+.battle .shot-pop.shot-hex { background: radial-gradient(circle, transparent 0 34%, #c49cff 35% 46%, transparent 48%); }
+@keyframes shot-pop { 0% { opacity: 1; transform: translate(-50%, -50%) scale(.4); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(1.3); } }
+.battle .arrow-shot.foe-arrow { filter: drop-shadow(0 0 .35cqh #fff) drop-shadow(0 0 .9cqh #ffe9b0); }   /* 敵の矢（2026-10-28）：島の地図の茶色に埋もれないよう、白く縁取る */
+.battle .arrow-shot.gold { background: linear-gradient(90deg, #fff6c0 0 14%, transparent 14% 18%, #e2b341 18% 82%, #fff 82% 100%); filter: drop-shadow(0 0 1cqh #ffd84a); }
+/* 走り終わったあとの「これで終わる／続けて走る」（2026-10-22 ユーザー要望。ui/extra-view.js）：画面のまん中に黒地の窓 */
+.end-choice { position: absolute; left: 50%; top: 42%; transform: translate(-50%, -50%); z-index: 6; padding: 3cqh 4cqh; text-align: center; min-width: 44cqh; }
+.end-choice .ec-title { font-size: var(--fs-l); margin-bottom: 1cqh; }
+.end-choice .ec-note { font-size: var(--fs-s); color: var(--dim, #bbb); margin-bottom: 1.6cqh; }
+.end-choice .ec-note[hidden] { display: none; }
+.end-choice .buttons { display: flex; gap: 3cqh; justify-content: center; margin-top: 1.6cqh; }
+#screen .end-choice button { font-size: var(--fs-m); padding: 1.2cqh 3cqh; }
+/* 続けて走る：右上（旅の「つぎの戦闘まで」と同じ所）に経過と「終える」。ERG の ◀ ▶ は下のまん中（フリーライドと同じ） */
+.extra .xplate { top: 3%; left: 50%; right: auto; transform: translateX(-50%); width: auto; padding: 1.4cqh 2cqh; display: flex; align-items: center; gap: 2cqh; }
+.extra .xplate[hidden] { display: none; }
+.extra .xinfo { font-size: var(--fs-m); white-space: nowrap; }
+#screen .extra .skip { font-size: var(--fs-s); }
+/* B：キャラクターと今日の時間を選ぶ窓（ui/extra-view.js の heroPick） */
+.end-choice.hero-pick { top: 45%; min-width: 0; width: min(92%, 120cqh); }
+.end-choice.feel { min-width: 0; width: 60%; left: 47%; }   /* 旅のあとのきつさ：HUD の左右の列に重ならない幅。ボタンは2段 */
+.end-choice.feel .buttons { display: grid; grid-template-columns: repeat(4, auto); justify-content: center; gap: 1.6cqh 2cqh; }   /* 4つを1段に（マウスを乗せて ▶ が付いても折り返さない）。選ばないは下の段 */
+.end-choice.feel .buttons .feel-skip { grid-column: 1 / -1; justify-self: center; }
+.hero-pick .hp-cards { display: flex; gap: 2cqh; justify-content: center; margin: 1.2cqh 0; }
+#screen .hero-pick .hp-card { display: flex; flex-direction: column; align-items: center; gap: .4cqh; padding: 1cqh 1.6cqh; min-width: 18cqh; border: 2px solid #555; background: #111; }
+#screen .hero-pick .hp-card.on { border-color: #ffd84a; box-shadow: 0 0 2cqh #ffd84a66; }
+.hero-pick .hp-card b { font-size: var(--fs-m); font-weight: 400; }
+.hero-pick .hp-card small { font-size: var(--fs-s); color: #ccc; }
+.hero-pick .hp-min { display: flex; flex-wrap: wrap; gap: 1cqh; justify-content: center; align-items: center; font-size: var(--fs-s); }
+.hero-pick .hp-min[hidden] { display: none; }
+#screen .hero-pick .hp-min button { font-size: var(--fs-s); padding: .5cqh 1.2cqh; }
+#screen .hero-pick .hp-min button.on { background: #ffd84a; color: #000; }
+.hero-pick .hp-pages { display: flex; gap: 1cqh; justify-content: center; } .hero-pick .hp-pages[hidden], #screen .hero-pick .hp-card[hidden] { display: none; }
+#screen .hero-pick .hp-pages button { font-size: var(--fs-s); padding: .5cqh 1.6cqh; }
+#screen .hero-pick .hp-pages button.on { background: #ffd84a; color: #000; }
+#screen .end-choice .buttons button { white-space: nowrap; }
+#screen .hero-pick .hp-card { min-width: 27cqh; }
+.hero-pick .hp-card small { white-space: nowrap; }
+/* 武闘家の打撃（2026-10-22 ユーザー要望）：拳が当たる所に、衝撃の輪と、放射状に飛び散る火花。必殺技は大きく、会心は金色 */
+.battle .punch { position: absolute; width: 0; height: 0; z-index: 4; pointer-events: none; --s: 1.35; --c: #fffbe6; --g: #ff9a2a; }
+.battle .punch.big { --s: 2.2; } .battle .punch.gold { --c: #ffe680; --g: #ffd84a; }
+.battle .punch b { position: absolute; left: calc(-4cqh * var(--s)); top: calc(-4cqh * var(--s)); width: calc(8cqh * var(--s)); height: calc(8cqh * var(--s)); border-radius: 50%;
+  border: calc(.8cqh * var(--s)) solid var(--c); box-shadow: 0 0 2cqh var(--g), inset 0 0 1.5cqh var(--g); animation: punch-ring .35s ease-out both; }
+.battle .punch i { position: absolute; left: 0; top: calc(-.35cqh * var(--s)); width: calc(4.5cqh * var(--s)); height: calc(.7cqh * var(--s)); border-radius: .4cqh;
+  background: linear-gradient(90deg, var(--c), var(--g) 60%, transparent); transform-origin: 0 50%; animation: punch-spark .4s ease-out both; }
+@keyframes punch-ring { 0% { transform: scale(.2); opacity: 1; } 100% { transform: scale(1.4); opacity: 0; } }
+@keyframes punch-spark { 0% { transform: rotate(var(--a)) translateX(.5cqh) scaleX(.3); opacity: 1; } 100% { transform: rotate(var(--a)) translateX(calc(5cqh * var(--s))) scaleX(1); opacity: 0; } }
+
+/* 女王の試練のペースメーカーのひとこと：黒い窓・顔・1字ずつ。走りながら読める短さで、数秒で自動で閉じる（左の列・主人公・右下のメーターに重ならない、左の中ほど） */
+.pacer-talk { position: absolute; left: 16%; bottom: 36%; width: 29%; display: flex; gap: 1.6cqh; align-items: center; padding: 1.2cqh 2cqh; z-index: 3; pointer-events: none; }
+.pacer-talk[hidden] { display: none; }
+.pacer-talk .pt-face { height: 10cqh; width: auto; image-rendering: pixelated; flex: none; }
+.pacer-talk .pt-who { font-size: var(--fs-s); color: #f3dc8a; margin-bottom: .4cqh; }
+.pacer-talk .pt-text { font-size: var(--fs-s); line-height: 1.4; }
+
+/* 女王が降りてきて並走するあいだ（試練のペースメーカーが女王のとき。400 W 以上）は、試練の画面の上の女王の絵とせりふの窓を消す。並走が終わる・試練が終わると戻る */
+
+/* 必殺技の前の「ため」（2026-10-23 ユーザー指摘。battle-view.js の chargeUp）：画面が少し暗くなり、足もとから職業の色の光が集まり、体が光って震える。会心は金色 */
+.battle .dim { position: absolute; inset: 0; background: #000; opacity: 0; pointer-events: none; z-index: 1; }
+.battle .dim.on { animation: dim-in var(--ms, 1000ms) ease-out forwards; }
+@keyframes dim-in { 0% { opacity: 0; } 30% { opacity: .5; } 85% { opacity: .5; } 100% { opacity: 0; } }
+.battle.side .arena { z-index: 2; }
+.battle.side .arena .hero-side.charging img { animation: charge-shake .09s linear infinite; filter: brightness(1.35) drop-shadow(0 0 .8cqh var(--cc)) drop-shadow(0 0 2cqh var(--cc)); }
+@keyframes charge-shake { 0% { transform: translateX(0); } 25% { transform: translateX(-.25cqh); } 75% { transform: translateX(.25cqh); } 100% { transform: translateX(0); } }
+.battle .charge-aura { position: absolute; width: 0; z-index: 3; pointer-events: none; }
+.battle .charge-aura b { position: absolute; left: -7cqh; bottom: 0; width: 14cqh; height: 100%; border-radius: 50% 50% 0 0;
+  background: radial-gradient(ellipse at 50% 100%, var(--cc) 0%, transparent 70%); opacity: 0; mix-blend-mode: screen; animation: aura-rise var(--ms, 1000ms) ease-in forwards; }
+.battle .charge-aura.gold b { left: -10cqh; width: 20cqh; }
+@keyframes aura-rise { 0% { opacity: 0; transform: scaleY(.2); transform-origin: 50% 100%; } 60% { opacity: .9; transform: scaleY(1); } 100% { opacity: .5; transform: scaleY(1.1); } }
+.battle .charge-aura i { position: absolute; left: var(--x); bottom: 0; width: 1cqh; height: 1cqh; background: var(--cc); box-shadow: 0 0 1.2cqh var(--cc); opacity: 0;
+  animation: mote .55s ease-in infinite; }
+.battle .charge-aura.gold i { width: 1.3cqh; height: 1.3cqh; }
+@keyframes mote { 0% { opacity: 0; transform: translate(0, 0); } 20% { opacity: 1; } 100% { opacity: 0; transform: translate(calc(var(--x) * -0.8), -14cqh); } }
+
+/* 勝ったとき、まだ並んでいる敵は勝ちの言葉と一緒に震えて薄くなり、消える（2026-10-23 ユーザー指摘） */
+.battle .foes .foe.vanish img { animation: foe-vanish 1.1s ease-in forwards; }
+/* 敵が攻撃を受けたとき（2026-10-25 ユーザー要望「微動だにしない」：前の hit-s・hit は、現れたときの .reveal の指定に負けて効いていなかった）。
+   struck＝通常攻撃：白く1回光って震え、少し後ろ（右）へのけぞる。struck-big＝必殺技：大きく。struck-crit＝会心：もっと大きく、2回光る。どれも短く（0.2〜0.75秒） */
+.battle .foes .foe.struck img, .battle .foes .foe.reveal.struck img, .battle .foes .foe.hit-s img, .battle .foes .foe.reveal.hit-s img { animation: foe-struck .38s linear both; }
+.battle .foes .foe.struck-big img, .battle .foes .foe.reveal.struck-big img, .battle .foes .foe.hit img, .battle .foes .foe.reveal.hit img { animation: foe-struck-big .6s linear both; }
+.battle .foes .foe.struck-crit img, .battle .foes .foe.reveal.struck-crit img { animation: foe-struck-crit .75s linear both; }
+@keyframes foe-struck { 0% { transform: none; filter: brightness(0) invert(1) drop-shadow(0 6px 4px #0008); } 14% { transform: translateX(2.2cqh) rotate(4deg); filter: brightness(0) invert(1) drop-shadow(0 6px 4px #0008); } 15% { transform: translateX(2.2cqh) rotate(4deg); filter: brightness(1) invert(0) drop-shadow(0 6px 4px #0008); }
+  30% { transform: translateX(1cqh) rotate(1deg); filter: brightness(1) invert(0) drop-shadow(0 6px 4px #0008); } 45% { transform: translateX(2cqh) rotate(3deg); filter: brightness(1) invert(0) drop-shadow(0 6px 4px #0008); } 65% { transform: translateX(.6cqh); filter: brightness(1) invert(0) drop-shadow(0 6px 4px #0008); } 100% { transform: none; filter: brightness(1) invert(0) drop-shadow(0 6px 4px #0008); } }
+@keyframes foe-struck-big { 0% { transform: none; filter: brightness(0) invert(1) drop-shadow(0 6px 4px #0008); } 12% { transform: translateX(5cqh) rotate(9deg); filter: brightness(0) invert(1) drop-shadow(0 6px 4px #0008); } 13% { transform: translateX(5cqh) rotate(9deg); filter: brightness(1) invert(0) drop-shadow(0 6px 4px #0008); }
+  25% { transform: translateX(3.5cqh) rotate(5deg); filter: brightness(1) invert(0) drop-shadow(0 6px 4px #0008); } 38% { transform: translateX(5cqh) rotate(8deg); filter: brightness(1) invert(0) drop-shadow(0 6px 4px #0008); } 52% { transform: translateX(3cqh) rotate(4deg); filter: brightness(1) invert(0) drop-shadow(0 6px 4px #0008); } 70% { transform: translateX(2cqh) rotate(2deg); filter: brightness(1) invert(0) drop-shadow(0 6px 4px #0008); } 100% { transform: none; filter: brightness(1) invert(0) drop-shadow(0 6px 4px #0008); } }
+@keyframes foe-struck-crit { 0% { transform: none; filter: brightness(0) invert(1) drop-shadow(0 6px 4px #0008); } 10% { transform: translateX(7cqh) rotate(12deg); filter: brightness(0) invert(1) drop-shadow(0 6px 4px #0008); } 11% { transform: translateX(7cqh) rotate(12deg); filter: brightness(1) invert(0) drop-shadow(0 6px 4px #0008); }
+  22% { transform: translateX(5cqh) rotate(7deg); filter: brightness(1) invert(0) drop-shadow(0 6px 4px #0008); } 27% { transform: translateX(6cqh) rotate(9deg); filter: brightness(1) invert(0) drop-shadow(0 6px 4px #0008); } 28% { transform: translateX(6cqh) rotate(9deg); filter: brightness(0) invert(1) drop-shadow(0 6px 4px #0008); } 32% { transform: translateX(7cqh) rotate(11deg); filter: brightness(0) invert(1) drop-shadow(0 6px 4px #0008); } 33% { transform: translateX(7cqh) rotate(11deg); filter: brightness(1.2) invert(0) drop-shadow(0 0 1.5cqh #ffd84a); }
+  48% { transform: translateX(4.5cqh) rotate(6deg); filter: brightness(1.2) invert(0) drop-shadow(0 0 1.5cqh #ffd84a); } 66% { transform: translateX(3cqh) rotate(3deg); filter: brightness(1) invert(0) drop-shadow(0 6px 4px #0008); } 100% { transform: none; filter: brightness(1) invert(0) drop-shadow(0 6px 4px #0008); } }
+/* 守りの光（敵の攻撃を弾き返したとき。主人公の前に。職業ごと） */
+.battle .guard-fx { position: absolute; z-index: 5; pointer-events: none; transform: translate(-50%, -50%); animation: guard-fx .6s steps(6) both; }
+.battle .guard-fx.g-shield { width: 13cqh; height: 20cqh; border-radius: 35% 35% 50% 50% / 18% 18% 82% 82%; border: .6cqh solid #d7ecff; background: radial-gradient(ellipse at 50% 40%, rgba(150,200,255,.75), rgba(60,130,255,.35) 60%, rgba(60,130,255,.1)); box-shadow: 0 0 3cqh #6ab8ff, inset 0 0 2cqh #e6f3ff; }
+.battle .guard-fx.g-wall { width: 7cqh; height: 32cqh; border-radius: 3.5cqh; background: linear-gradient(90deg, transparent, rgba(200,140,255,.85) 40%, rgba(255,230,255,.95) 50%, rgba(200,140,255,.85) 60%, transparent); box-shadow: 0 0 4cqh #b07cff; }
+.battle .guard-fx.g-burst { width: 18cqh; height: 18cqh; border-radius: 50%; background: radial-gradient(circle, rgba(255,240,210,.95) 0 14%, rgba(255,110,70,.8) 30%, rgba(255,60,40,.35) 55%, transparent 70%); }
+.battle .guard-fx.g-burst::before { content: ''; position: absolute; inset: -20%; background: repeating-conic-gradient(rgba(255,120,80,.9) 0 6deg, transparent 6deg 30deg); border-radius: 50%; -webkit-mask: radial-gradient(circle, transparent 38%, #000 40%, transparent 70%); mask: radial-gradient(circle, transparent 38%, #000 40%, transparent 70%); }
+.battle .guard-fx.g-halo { width: 19cqh; height: 19cqh; border-radius: 50%; border: .9cqh solid #ffe27a; background: radial-gradient(circle, rgba(255,250,210,.55), rgba(255,216,74,.15) 60%, transparent 72%); box-shadow: 0 0 4cqh #ffd84a, inset 0 0 3cqh #fff3b0; }
+@keyframes guard-fx { 0% { opacity: 0; transform: translate(-50%, -50%) scale(.55); } 20% { opacity: 1; transform: translate(-50%, -50%) scale(1.08); } 60% { opacity: .9; transform: translate(-50%, -50%) scale(1); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(1.15); } }
+@keyframes foe-vanish { 0% { transform: translateX(0); opacity: 1; filter: brightness(1.6); } 10% { transform: translateX(-.6cqh); } 20% { transform: translateX(.6cqh); } 30% { transform: translateX(-.5cqh); } 40% { transform: translateX(.5cqh); opacity: .8; }
+  50% { transform: translateX(-.3cqh); } 60% { transform: translateX(.3cqh); opacity: .5; } 100% { transform: translateX(0) scaleY(.9); opacity: 0; filter: brightness(2); } }
+
+/* 選ぶ窓（走りきったときの「これで終わる／続けて走る」・A／B・ERG／勾配・キャラと時間）が出ている間は、分かれ道の矢印を窓の下（画面のいちばん下）へよける（2026-10-23 ユーザー指摘：［旅に出る ▶］が隠れた）。
+   矢印の点灯・点滅とスペースでの切り替えはそのまま使える */
+body:has(.end-choice) .turn { bottom: 2%; }
+
+/* 言語の窓（最初の起動で1回だけ。2026-10-23 ユーザー判断）。2つの言語を並べ、選んでいる方を光らせる */
+.lang-box { text-align: center; }
+.lang-choices { display: flex; gap: 12px; justify-content: center; }
+.lang-choices button { min-width: 9em; font-size: 22px; padding: 10px 16px; }
+.lang-choices button.on { border-color: #ffd84a; color: #ffd84a; }
+
+/* どの版か（ブラウザ版だけ）：タイトルの右下の隅に小さく */
+#screen .build-tag { position: absolute; right: 1.2cqh; bottom: .8cqh; font-size: var(--fs-s); color: #ffffff99; pointer-events: none; }
+
+/* 試練が始まったら上の女王（絵と窓）は消え、終わったら出てくる（2026-10-26） */
+.trial.queen-gone .queen, .trial.queen-gone .talk { display: none; }
+
+/* 金の星3つの特別な攻撃（2026-10-27 ユーザー判断。battle-view.js の goldGlow・goldBurst）：ためで画面のふちから金色が満ち、当たると敵のところから金の光と光の筋が画面いっぱいに広がる */
+.battle .gold-glow { position: absolute; inset: 0; z-index: 4; pointer-events: none; box-shadow: inset 0 0 0 0 #ffd84a00; animation: gold-glow var(--ms, 1.9s) ease-in forwards; }
+@keyframes gold-glow { 0% { box-shadow: inset 0 0 0 0 #ffd84a00; } 100% { box-shadow: inset 0 0 14cqh 4cqh #ffd84acc; } }
+.battle .gold-burst { position: absolute; inset: 0; z-index: 6; pointer-events: none; opacity: 0; animation: gold-burst 1.6s ease-out forwards;
+  background: radial-gradient(circle at var(--x) var(--y), #fffbe6 0%, #ffe58aee 12%, #ffc83acc 30%, #ffb00055 55%, #ffb00000 80%); }
+.battle .gold-burst::before { content: ''; position: absolute; inset: 0; background: repeating-conic-gradient(from 0deg at var(--x) var(--y), #fff3b088 0deg 6deg, #fff3b000 6deg 18deg); animation: gold-rays 1.6s ease-out forwards; }
+@keyframes gold-burst { 0% { opacity: 0; } 8% { opacity: 1; } 45% { opacity: .9; } 100% { opacity: 0; } }
+@keyframes gold-rays { 0% { opacity: 1; } 60% { opacity: .7; } 100% { opacity: 0; } }
+/* 右上の地図は押せる物（指の形のカーソル。指で押す画面でも 44px 以上＝地図はそれより大きい）。押すと次の分かれ道で曲がる向きを替える
+   （2026-11-08 判断 32a「マップをタップした時の挙動はコースを変えるんじゃなくて、行き先の切り替えだけ」）。
+   コースを替える窓（2026-11-07。app.js の openCourseSwitch）は一時停止の窓の「コースを替える」から、画面いっぱいに重ねる */
+.world-map, .ride .minimap { cursor: pointer; min-width: 44px; min-height: 44px; touch-action: manipulation; }
+.world-map:hover, .ride .minimap:hover { border-color: #ffd84a; }
+.course-switch { position: absolute; inset: 0; z-index: 40; background: rgba(0,0,0,.82); }
+.course-switch .select.courses { background: transparent; }

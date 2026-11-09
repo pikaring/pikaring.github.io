@@ -1,0 +1,1112 @@
+{
+ "source": "Gemini の架空の地図のランドマークの位置の目安（格子の行・列）。名前は仮。road は最寄りの道（a→b の向きに進んで s m、脇 off m）",
+ "landmarks": [
+  {
+   "id": "obs1",
+   "kind": "observatory",
+   "name": "火見の塔",
+   "how": "sprite",
+   "r": 86.9,
+   "c": 108.0,
+   "road": {
+    "a": "寛保岳北",
+    "b": "堤防の辻",
+    "edge": 16,
+    "s": 156,
+    "off": 60,
+    "side": "right"
+   },
+   "moved": true
+  },
+  {
+   "id": "obs2",
+   "kind": "observatory",
+   "name": "風見台",
+   "how": "sprite",
+   "r": 122.0,
+   "c": 140.1,
+   "road": {
+    "a": "清部岳口",
+    "b": "トンネル西口",
+    "edge": 9,
+    "s": 334,
+    "off": 100,
+    "side": "left"
+   },
+   "moved": false
+  },
+  {
+   "id": "tower",
+   "kind": "watertower",
+   "name": "水の塔",
+   "how": "sprite",
+   "r": 176.8,
+   "c": 89.7,
+   "road": {
+    "a": "北風泊",
+    "b": "給水塔の辻",
+    "edge": 5,
+    "s": 516,
+    "off": 60,
+    "side": "left"
+   },
+   "moved": true
+  },
+  {
+   "id": "school",
+   "kind": "school",
+   "name": "島の学び舎",
+   "how": "sprite",
+   "r": 220.7,
+   "c": 103.0,
+   "road": {
+    "a": "北風泊",
+    "b": "弁天の浜",
+    "edge": 0,
+    "s": 220,
+    "off": 17,
+    "side": "right"
+   },
+   "moved": false
+  },
+  {
+   "id": "heli",
+   "kind": "heliport",
+   "name": "空の広場",
+   "how": "code",
+   "r": 166.2,
+   "c": 47.7,
+   "road": {
+    "a": "北の堤防",
+    "b": "北風泊",
+    "edge": 4,
+    "s": 3946,
+    "off": 60,
+    "side": "left"
+   },
+   "moved": true
+  },
+  {
+   "id": "wall1",
+   "kind": "breakwater",
+   "name": "北の波止",
+   "how": "code",
+   "r": 31.8,
+   "c": 163.5,
+   "road": {
+    "a": "日方泊岬",
+    "b": "北の堤防",
+    "edge": 3,
+    "s": 866,
+    "off": 54,
+    "side": "right"
+   },
+   "moved": false
+  },
+  {
+   "id": "pier1",
+   "kind": "pier",
+   "name": "日方の船着き",
+   "how": "code",
+   "r": 21.2,
+   "c": 219.2,
+   "road": {
+    "a": "日方泊岬",
+    "b": "北の堤防",
+    "edge": 3,
+    "s": 74,
+    "off": 82,
+    "side": "right"
+   },
+   "moved": false
+  },
+  {
+   "id": "ferry",
+   "kind": "ferryport",
+   "name": "東の渡し",
+   "how": "sprite+code",
+   "r": 112,
+   "c": 297,
+   "road": {
+    "a": "トリカラスノ浜",
+    "b": "日方泊岬",
+    "edge": 2,
+    "s": 262,
+    "off": 86,
+    "side": "right"
+   },
+   "moved": false
+  },
+  {
+   "id": "tunnel1",
+   "kind": "tunnel",
+   "name": "峠のトンネル",
+   "how": "code",
+   "r": 110.6,
+   "c": 190.2,
+   "road": {
+    "a": "トンネル西口",
+    "b": "トンネル東口",
+    "edge": 10,
+    "s": 333,
+    "off": 14,
+    "side": "right"
+   },
+   "moved": false
+  },
+  {
+   "id": "tunnel2",
+   "kind": "tunnel",
+   "name": "寛保岳トンネル",
+   "how": "code",
+   "r": 99.0,
+   "c": 75.0,
+   "road": {
+    "a": "寛保岳南",
+    "b": "寛保岳北",
+    "edge": 14,
+    "s": 374,
+    "off": 0,
+    "side": "right"
+   },
+   "moved": true
+  },
+  {
+   "id": "ic1",
+   "kind": "interchange",
+   "name": "東の関所",
+   "how": "code",
+   "r": 127.5,
+   "c": 251.0,
+   "road": {
+    "a": "ヒョウタン岩口",
+    "b": "トリカラスノ浜",
+    "edge": 12,
+    "s": 150,
+    "off": 11,
+    "side": "left"
+   },
+   "moved": false
+  },
+  {
+   "id": "ic2",
+   "kind": "interchange",
+   "name": "南西の関所",
+   "how": "code",
+   "r": 197.1,
+   "c": 81.7,
+   "road": {
+    "a": "北風泊",
+    "b": "給水塔の辻",
+    "edge": 5,
+    "s": 233,
+    "off": 76,
+    "side": "left"
+   },
+   "moved": false
+  },
+  {
+   "id": "parking",
+   "kind": "parking",
+   "name": "峠の休み処",
+   "how": "code",
+   "r": 94.3,
+   "c": 167.6,
+   "road": {
+    "a": "トンネル西口",
+    "b": "堤防の辻",
+    "edge": 18,
+    "s": 69,
+    "off": 64,
+    "side": "right"
+   },
+   "moved": false
+  },
+  {
+   "id": "town1",
+   "kind": "town",
+   "name": "城下町",
+   "how": "code",
+   "r": 127.5,
+   "c": 271.3,
+   "road": {
+    "a": "ヒョウタン岩口",
+    "b": "トリカラスノ浜",
+    "edge": 12,
+    "s": 441,
+    "off": 60,
+    "side": "left"
+   },
+   "moved": true
+  },
+  {
+   "id": "town2",
+   "kind": "town",
+   "name": "塔下の里",
+   "how": "code",
+   "r": 189.4,
+   "c": 83.7,
+   "road": {
+    "a": "北風泊",
+    "b": "給水塔の辻",
+    "edge": 5,
+    "s": 300,
+    "off": 60,
+    "side": "left"
+   },
+   "moved": true
+  },
+  {
+   "id": "town3",
+   "kind": "town",
+   "name": "堤の里",
+   "how": "code",
+   "r": 29.0,
+   "c": 170.0,
+   "road": {
+    "a": "日方泊岬",
+    "b": "北の堤防",
+    "edge": 3,
+    "s": 619,
+    "off": 109,
+    "side": "left"
+   },
+   "moved": true
+  },
+  {
+   "id": "birds",
+   "kind": "colony",
+   "name": "大水凪の丘",
+   "how": "sprite",
+   "r": 142.4,
+   "c": 153.8,
+   "road": {
+    "a": "清部岳口",
+    "b": "トンネル西口",
+    "edge": 9,
+    "s": 303,
+    "off": 247,
+    "side": "right"
+   },
+   "moved": false
+  },
+  {
+   "id": "fishhut1",
+   "kind": "fishhut",
+   "name": "漁師小屋",
+   "how": "sprite",
+   "r": 30.0,
+   "c": 164.0,
+   "road": {
+    "a": "北風泊",
+    "b": "弁天の浜",
+    "edge": 0,
+    "s": 575,
+    "off": 57,
+    "side": "right"
+   },
+   "moved": true,
+   "auto": true
+  },
+  {
+   "id": "netboat1",
+   "kind": "netboat",
+   "name": "網干し場",
+   "how": "sprite",
+   "r": 27.5,
+   "c": 166.0,
+   "road": {
+    "a": "北風泊",
+    "b": "弁天の浜",
+    "edge": 0,
+    "s": 640,
+    "off": 65,
+    "side": "right"
+   },
+   "moved": true,
+   "auto": true
+  },
+  {
+   "id": "fishhut2",
+   "kind": "fishhut",
+   "name": "漁師小屋",
+   "how": "sprite",
+   "r": 31.0,
+   "c": 176.0,
+   "road": {
+    "a": "北の堤防",
+    "b": "北風泊",
+    "edge": 4,
+    "s": 4297,
+    "off": 32,
+    "side": "right"
+   },
+   "moved": true,
+   "auto": true
+  },
+  {
+   "id": "netboat2",
+   "kind": "netboat",
+   "name": "網干し場",
+   "how": "sprite",
+   "r": 28.0,
+   "c": 174.0,
+   "road": {
+    "a": "北の堤防",
+    "b": "北風泊",
+    "edge": 4,
+    "s": 4264,
+    "off": 34,
+    "side": "right"
+   },
+   "moved": true,
+   "auto": true
+  },
+  {
+   "id": "fishhut3",
+   "kind": "fishhut",
+   "name": "漁師小屋",
+   "how": "sprite",
+   "r": 29.5,
+   "c": 181.0,
+   "road": {
+    "a": "トリカラスノ浜",
+    "b": "日方泊岬",
+    "edge": 2,
+    "s": 1155,
+    "off": 59,
+    "side": "right"
+   },
+   "moved": true,
+   "auto": true
+  },
+  {
+   "id": "netboat3",
+   "kind": "netboat",
+   "name": "網干し場",
+   "how": "sprite",
+   "r": 27.0,
+   "c": 179.0,
+   "road": {
+    "a": "トリカラスノ浜",
+    "b": "日方泊岬",
+    "edge": 2,
+    "s": 1211,
+    "off": 50,
+    "side": "right"
+   },
+   "moved": true,
+   "auto": true
+  },
+  {
+   "id": "wreck1",
+   "kind": "wreck",
+   "name": "難破船",
+   "how": "sprite",
+   "r": 33,
+   "c": 21,
+   "road": {
+    "a": "北の堤防",
+    "b": "北風泊",
+    "edge": 4,
+    "s": 1956,
+    "off": 119,
+    "side": "right"
+   },
+   "moved": false,
+   "auto": true
+  },
+  {
+   "id": "wreck2",
+   "kind": "wreck",
+   "name": "難破船",
+   "how": "sprite",
+   "r": 197,
+   "c": 212,
+   "road": {
+    "a": "弁天の浜",
+    "b": "トリカラスノ浜",
+    "edge": 1,
+    "s": 849,
+    "off": 29,
+    "side": "right"
+   },
+   "moved": false,
+   "auto": true
+  },
+  {
+   "id": "pierlamp_pier1_1",
+   "kind": "pierlamp",
+   "name": "桟橋の灯",
+   "how": "sprite",
+   "r": 21.2,
+   "c": 219.2,
+   "road": {
+    "a": "日方泊岬",
+    "b": "北の堤防",
+    "edge": 3,
+    "s": 74,
+    "off": 82,
+    "side": "right"
+   },
+   "moved": false,
+   "auto": true,
+   "on": "pier1",
+   "at": 12
+  },
+  {
+   "id": "pierlamp_pier1_2",
+   "kind": "pierlamp",
+   "name": "桟橋の灯",
+   "how": "sprite",
+   "r": 21.2,
+   "c": 219.2,
+   "road": {
+    "a": "日方泊岬",
+    "b": "北の堤防",
+    "edge": 3,
+    "s": 74,
+    "off": 82,
+    "side": "right"
+   },
+   "moved": false,
+   "auto": true,
+   "on": "pier1",
+   "at": 30
+  },
+  {
+   "id": "pierlamp_ferry_1",
+   "kind": "pierlamp",
+   "name": "桟橋の灯",
+   "how": "sprite",
+   "r": 112,
+   "c": 297,
+   "road": {
+    "a": "トリカラスノ浜",
+    "b": "日方泊岬",
+    "edge": 2,
+    "s": 262,
+    "off": 86,
+    "side": "right"
+   },
+   "moved": false,
+   "auto": true,
+   "on": "ferry",
+   "at": 12
+  },
+  {
+   "id": "pierlamp_ferry_2",
+   "kind": "pierlamp",
+   "name": "桟橋の灯",
+   "how": "sprite",
+   "r": 112,
+   "c": 297,
+   "road": {
+    "a": "トリカラスノ浜",
+    "b": "日方泊岬",
+    "edge": 2,
+    "s": 262,
+    "off": 86,
+    "side": "right"
+   },
+   "moved": false,
+   "auto": true,
+   "on": "ferry",
+   "at": 30
+  },
+  {
+   "id": "well2",
+   "kind": "well",
+   "name": "井戸",
+   "how": "sprite",
+   "r": 189.8,
+   "c": 86.0,
+   "road": {
+    "a": "北風泊",
+    "b": "給水塔の辻",
+    "edge": 5,
+    "s": 312,
+    "off": 30,
+    "side": "left"
+   },
+   "moved": false,
+   "auto": true
+  },
+  {
+   "id": "cart2",
+   "kind": "cart",
+   "name": "荷車",
+   "how": "sprite",
+   "r": 184.9,
+   "c": 89.5,
+   "road": {
+    "a": "北風泊",
+    "b": "給水塔の辻",
+    "edge": 5,
+    "s": 411,
+    "off": 18,
+    "side": "left"
+   },
+   "moved": false,
+   "auto": true
+  },
+  {
+   "id": "well3",
+   "kind": "well",
+   "name": "井戸",
+   "how": "sprite",
+   "r": 33.5,
+   "c": 182.2,
+   "road": {
+    "a": "日方泊岬",
+    "b": "北の堤防",
+    "edge": 3,
+    "s": 606,
+    "off": 29,
+    "side": "left"
+   },
+   "moved": false,
+   "auto": true
+  },
+  {
+   "id": "cart3",
+   "kind": "cart",
+   "name": "荷車",
+   "how": "sprite",
+   "r": 34.3,
+   "c": 178.8,
+   "road": {
+    "a": "日方泊岬",
+    "b": "北の堤防",
+    "edge": 3,
+    "s": 644,
+    "off": 12,
+    "side": "left"
+   },
+   "moved": false,
+   "auto": true
+  },
+  {
+   "id": "windmill1",
+   "kind": "windmill",
+   "name": "風車",
+   "how": "sprite",
+   "r": 187.6,
+   "c": 87.3,
+   "road": {
+    "a": "北風泊",
+    "b": "給水塔の辻",
+    "edge": 5,
+    "s": 362,
+    "off": 29,
+    "side": "left"
+   },
+   "moved": false,
+   "auto": true
+  },
+  {
+   "id": "windmill2",
+   "kind": "windmill",
+   "name": "風車",
+   "how": "sprite",
+   "r": 37.6,
+   "c": 178.6,
+   "road": {
+    "a": "日方泊岬",
+    "b": "北の堤防",
+    "edge": 3,
+    "s": 670,
+    "off": 50,
+    "side": "left"
+   },
+   "moved": false,
+   "auto": true
+  },
+  {
+   "id": "smithy1",
+   "kind": "smithy",
+   "name": "鍛冶屋の工房",
+   "how": "sprite",
+   "r": 131.7,
+   "c": 276.1,
+   "road": {
+    "a": "ヒョウタン岩口",
+    "b": "トリカラスノ浜",
+    "edge": 12,
+    "s": 505,
+    "off": 49,
+    "side": "left"
+   },
+   "moved": false,
+   "auto": true
+  },
+  {
+   "id": "signpost1",
+   "kind": "signpost",
+   "name": "道しるべ",
+   "how": "sprite",
+   "r": 132.3,
+   "c": 290.7,
+   "road": {
+    "a": "ヒョウタン岩口",
+    "b": "トリカラスノ浜",
+    "edge": 12,
+    "s": 801,
+    "off": 19,
+    "side": "left"
+   },
+   "moved": false,
+   "auto": true
+  },
+  {
+   "id": "signpost2",
+   "kind": "signpost",
+   "name": "道しるべ",
+   "how": "sprite",
+   "r": 29.5,
+   "c": 220.5,
+   "road": {
+    "a": "トリカラスノ浜",
+    "b": "日方泊岬",
+    "edge": 2,
+    "s": 2064,
+    "off": 0,
+    "side": "left"
+   },
+   "moved": false,
+   "auto": true
+  },
+  {
+   "id": "signpost3",
+   "kind": "signpost",
+   "name": "道しるべ",
+   "how": "sprite",
+   "r": 166.5,
+   "c": 100.0,
+   "road": {
+    "a": "北風泊",
+    "b": "給水塔の辻",
+    "edge": 5,
+    "s": 718,
+    "off": 0,
+    "side": "left"
+   },
+   "moved": false,
+   "auto": true
+  },
+  {
+   "id": "signpost4",
+   "kind": "signpost",
+   "name": "道しるべ",
+   "how": "sprite",
+   "r": 34.0,
+   "c": 146.7,
+   "road": {
+    "a": "日方泊岬",
+    "b": "北の堤防",
+    "edge": 3,
+    "s": 1124,
+    "off": 8,
+    "side": "left"
+   },
+   "moved": false,
+   "auto": true
+  },
+  {
+   "id": "signpost5",
+   "kind": "signpost",
+   "name": "道しるべ",
+   "how": "sprite",
+   "r": 210.0,
+   "c": 92.0,
+   "road": {
+    "a": "北風泊",
+    "b": "弁天の浜",
+    "edge": 0,
+    "s": 0,
+    "off": 0,
+    "side": "left"
+   },
+   "moved": false,
+   "auto": true
+  },
+  {
+   "id": "signpost6",
+   "kind": "signpost",
+   "name": "道しるべ",
+   "how": "sprite",
+   "r": 199.4,
+   "c": 155.2,
+   "road": {
+    "a": "弁天の浜",
+    "b": "カブト岩",
+    "edge": 19,
+    "s": 0,
+    "off": 5,
+    "side": "left"
+   },
+   "moved": false,
+   "auto": true
+  },
+  {
+   "id": "signpost7",
+   "kind": "signpost",
+   "name": "道しるべ",
+   "how": "sprite",
+   "r": 134.0,
+   "c": 124.0,
+   "road": {
+    "a": "給水塔の辻",
+    "b": "清部岳口",
+    "edge": 6,
+    "s": 607,
+    "off": 0,
+    "side": "left"
+   },
+   "moved": false,
+   "auto": true
+  },
+  {
+   "id": "signpost8",
+   "kind": "signpost",
+   "name": "道しるべ",
+   "how": "sprite",
+   "r": 163.0,
+   "c": 142.5,
+   "road": {
+    "a": "給水塔の辻",
+    "b": "カブト岩",
+    "edge": 7,
+    "s": 1187,
+    "off": 7,
+    "side": "right"
+   },
+   "moved": false,
+   "auto": true
+  },
+  {
+   "id": "shrine1",
+   "kind": "shrine",
+   "name": "道ばたの祠",
+   "how": "sprite",
+   "r": 15.8,
+   "c": 57.4,
+   "road": {
+    "a": "北の堤防",
+    "b": "北風泊",
+    "edge": 4,
+    "s": 1402,
+    "off": 13,
+    "side": "right"
+   },
+   "moved": false,
+   "auto": true
+  },
+  {
+   "id": "shrine2",
+   "kind": "shrine",
+   "name": "道ばたの祠",
+   "how": "sprite",
+   "r": 222.2,
+   "c": 53.3,
+   "road": {
+    "a": "北の堤防",
+    "b": "北風泊",
+    "edge": 4,
+    "s": 4992,
+    "off": 15,
+    "side": "right"
+   },
+   "moved": false,
+   "auto": true
+  },
+  {
+   "id": "shrine3",
+   "kind": "shrine",
+   "name": "道ばたの祠",
+   "how": "sprite",
+   "r": 186.7,
+   "c": 245.2,
+   "road": {
+    "a": "弁天の浜",
+    "b": "トリカラスノ浜",
+    "edge": 1,
+    "s": 1351,
+    "off": 10,
+    "side": "right"
+   },
+   "moved": false,
+   "auto": true
+  },
+  {
+   "id": "camp1",
+   "kind": "camp",
+   "name": "野営の跡",
+   "how": "sprite",
+   "r": 103.7,
+   "c": 23.4,
+   "road": {
+    "a": "北の堤防",
+    "b": "北風泊",
+    "edge": 4,
+    "s": 2976,
+    "off": 16,
+    "side": "right"
+   },
+   "moved": false,
+   "auto": true
+  },
+  {
+   "id": "camp2",
+   "kind": "camp",
+   "name": "野営の跡",
+   "how": "sprite",
+   "r": 164.9,
+   "c": 271.8,
+   "road": {
+    "a": "弁天の浜",
+    "b": "トリカラスノ浜",
+    "edge": 1,
+    "s": 1846,
+    "off": 15,
+    "side": "right"
+   },
+   "moved": false,
+   "auto": true
+  },
+  {
+   "id": "camp3",
+   "kind": "camp",
+   "name": "野営の跡",
+   "how": "sprite",
+   "r": 60.5,
+   "c": 215.8,
+   "road": {
+    "a": "トンネル東口",
+    "b": "日方泊岬",
+    "edge": 20,
+    "s": 1179,
+    "off": 14,
+    "side": "right"
+   },
+   "moved": false,
+   "auto": true
+  },
+  {
+   "id": "watchtower1",
+   "kind": "watchtower",
+   "name": "見張りの塔",
+   "how": "sprite",
+   "r": 30.9,
+   "c": 99.2,
+   "road": {
+    "a": "北の堤防",
+    "b": "北風泊",
+    "edge": 4,
+    "s": 706,
+    "off": 45,
+    "side": "right"
+   },
+   "moved": false,
+   "auto": true
+  },
+  {
+   "id": "deadtree1",
+   "kind": "deadtree",
+   "name": "焼けた枯れ木",
+   "how": "sprite",
+   "r": 157.7,
+   "c": 193.2,
+   "road": {
+    "a": "カブト岩",
+    "b": "ヒョウタン岩口",
+    "edge": 8,
+    "s": 666,
+    "off": 25,
+    "side": "left"
+   },
+   "moved": false,
+   "auto": true
+  },
+  {
+   "id": "deadtree2",
+   "kind": "deadtree",
+   "name": "焼けた枯れ木",
+   "how": "sprite",
+   "r": 68.5,
+   "c": 144.5,
+   "road": {
+    "a": "寛保岳北",
+    "b": "堤防の辻",
+    "edge": 16,
+    "s": 1140,
+    "off": 11,
+    "side": "left"
+   },
+   "moved": false,
+   "auto": true
+  },
+  {
+   "id": "deadtree3",
+   "kind": "deadtree",
+   "name": "焼けた枯れ木",
+   "how": "sprite",
+   "r": 184.81,
+   "c": 154.15,
+   "road": {
+    "a": "弁天の浜",
+    "b": "カブト岩",
+    "edge": 19,
+    "s": 600,
+    "off": 20,
+    "side": "right"
+   },
+   "moved": false,
+   "auto": true,
+   "note": "九十九折りの坂を引き直したので、新しい道の 600 m の右へ（2026-10-28）"
+  },
+  {
+   "id": "deadtree4",
+   "kind": "deadtree",
+   "name": "焼けた枯れ木",
+   "how": "sprite",
+   "r": 28.2,
+   "c": 75.8,
+   "road": {
+    "a": "北の堤防",
+    "b": "北風泊",
+    "edge": 4,
+    "s": 1065,
+    "off": 14,
+    "side": "left"
+   },
+   "moved": false,
+   "auto": true
+  },
+  {
+   "id": "ruinpillar1",
+   "kind": "ruinpillar",
+   "name": "苔むした石柱",
+   "how": "sprite",
+   "r": 73.5,
+   "c": 17.6,
+   "road": {
+    "a": "北の堤防",
+    "b": "北風泊",
+    "edge": 4,
+    "s": 2512,
+    "off": 30,
+    "side": "left"
+   },
+   "moved": false,
+   "auto": true
+  },
+  {
+   "id": "ruinpillar2",
+   "kind": "ruinpillar",
+   "name": "苔むした石柱",
+   "how": "sprite",
+   "r": 88.9,
+   "c": 277.7,
+   "road": {
+    "a": "トリカラスノ浜",
+    "b": "日方泊岬",
+    "edge": 2,
+    "s": 694,
+    "off": 32,
+    "side": "left"
+   },
+   "moved": false,
+   "auto": true
+  },
+  {
+   "id": "lavarock1",
+   "kind": "lavarock",
+   "name": "溶岩の奇岩",
+   "how": "sprite",
+   "r": 90.0,
+   "c": 211.4,
+   "road": {
+    "a": "トンネル東口",
+    "b": "日方泊岬",
+    "edge": 20,
+    "s": 619,
+    "off": 33,
+    "side": "right"
+   },
+   "moved": false,
+   "auto": true
+  },
+  {
+   "id": "lavarock2",
+   "kind": "lavarock",
+   "name": "溶岩の奇岩",
+   "how": "sprite",
+   "r": 115.1,
+   "c": 104.9,
+   "road": {
+    "a": "寛保岳南",
+    "b": "寛保岳北",
+    "edge": 15,
+    "s": 313,
+    "off": 38,
+    "side": "right"
+   },
+   "moved": false,
+   "auto": true
+  },
+  {
+   "id": "lavarock3",
+   "kind": "lavarock",
+   "name": "溶岩の奇岩",
+   "how": "sprite",
+   "r": 114.6,
+   "c": 160.8,
+   "road": {
+    "a": "清部岳口",
+    "b": "トンネル西口",
+    "edge": 9,
+    "s": 632,
+    "off": 28,
+    "side": "right"
+   },
+   "moved": false,
+   "auto": true
+  },
+  {
+   "id": "onifort1",
+   "kind": "onifort",
+   "name": "鬼の砦",
+   "how": "sprite",
+   "r": 150.1,
+   "c": 215.1,
+   "road": {
+    "a": "カブト岩",
+    "b": "ヒョウタン岩口",
+    "edge": 8,
+    "s": 1065,
+    "off": 48,
+    "side": "left"
+   },
+   "moved": false,
+   "auto": true
+  },
+  {
+   "id": "palace1",
+   "kind": "palace",
+   "name": "白妙城",
+   "how": "sprite",
+   "r": 124.0,
+   "c": 286.0,
+   "road": {
+    "a": "トリカラスノ浜",
+    "b": "日方泊の海岸",
+    "edge": 1,
+    "s": 0,
+    "off": 30,
+    "side": "left"
+   },
+   "moved": true
+  }
+ ]
+}

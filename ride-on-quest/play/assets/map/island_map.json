@@ -1,0 +1,15 @@
+{
+ "w": 2476,
+ "h": 2052,
+ "k": 8,
+ "off": 4.0,
+ "hash": "5e0e1396cf4a67e6",
+ "inputs": [
+  "assets/map/island.json",
+  "assets/map/features.json",
+  "assets/map/landmarks.json",
+  "assets/map/trails.json",
+  "renderer/game/groundclass.js",
+  "tools/build_map_code.py"
+ ]
+}

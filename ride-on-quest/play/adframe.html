@@ -1,0 +1,47 @@
+<!doctype html>
+<!-- 広告の試し（adtest）の、広告だけのページ。ゲームの画面から iframe で読む（?ad=...,iframe）。
+     このページには CSP を付けない（AdSense が使うドメインは変わっていくため）。ゲームのページの CSP は 'self' のまま＋frame-src 'self'。
+     いまの様子を親（ゲームの画面）へ postMessage で知らせる。docs/impl-web.md §11 -->
+<html><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow"><title>ad</title>
+<style>html,body{margin:0;padding:0;background:transparent;overflow:hidden}</style></head>
+<body>
+<script>
+(function () {
+  var q = new URLSearchParams(location.search), client = q.get('client') || '', slot = q.get('slot') || '';
+  var w = +q.get('w') || 300, h = +q.get('h') || 250, resp = q.get('r') === '1';
+  // resp：レスポンシブの広告ユニット（bandPhone）を決まった大きさで出す（AdSense ヘルプ「レスポンシブ広告コードを修正する方法」https://support.google.com/adsense/answer/9183363?hl=ja を 2026-11-08 に読んだ：
+     許可されている変更として、ins の幅と高さを決めて出せる。コードを変えるときは data-ad-format="auto" と data-full-width-responsive="true" を消す。例は display:block。
+     外のスタイルシートで大きさを決めるのは正式には対応していないので、ins の style に直接書く）。
+  // 決まった大きさの広告ユニット（帯の 728×90 など）は、AdSense のコードのとおり display:inline-block
+  function say(s, st) { try { parent.postMessage({ adtest: s, adStatus: st || '' }, location.origin); } catch (e) {} }   // adStatus：filled／unfilled／blocked（本番の帯は unfilled・blocked なら畳む）
+  if (!client) return say('client が空');
+  var s = document.createElement('script');
+  s.async = true; s.crossOrigin = 'anonymous';
+  s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' + encodeURIComponent(client);
+  s.onerror = function () { say('止められた（iframe の中でスクリプトが読めない。広告ブロック・ネットワーク）', 'blocked'); };
+  s.onload = function () {
+    if (!slot) return say('iframe の中で読み込んだ（slot 無し：自動広告だけ。この枠には出ない）');
+    say('iframe の中で読み込んだ（枠を頼んだ）');
+    var ins = document.createElement('ins');
+    ins.className = 'adsbygoogle';
+    ins.style.display = resp ? 'block' : 'inline-block'; ins.style.width = w + 'px'; ins.style.height = h + 'px';
+    ins.setAttribute('data-ad-client', client); ins.setAttribute('data-ad-slot', slot);
+    document.body.appendChild(ins);
+    // 自動広告（55a：切る）：こちらが置いていない ins が出たら、親（お試し版の状態の表示）に知らせる
+    var autoMo = new MutationObserver(checkAuto);
+    function checkAuto() {
+      var all = document.querySelectorAll('ins.adsbygoogle');
+      for (var i = 0; i < all.length; i++) if (all[i] !== ins) { autoMo.disconnect(); try { parent.postMessage({ autoAds: true }, location.origin); } catch (e) {} return; }
+    }
+    autoMo.observe(document.body, { childList: true, subtree: true });
+    checkAuto();
+    new MutationObserver(function () {
+      var st = ins.getAttribute('data-ad-status');
+      if (st === 'filled') say('iframe の中で出た', 'filled'); else if (st === 'unfilled') say('iframe の中で空（no fill）', 'unfilled');
+    }).observe(ins, { attributes: true, attributeFilter: ['data-ad-status'] });
+    try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch (e) { say('iframe の中で止められた（' + e.message + '）'); }
+  };
+  document.head.appendChild(s);
+})();
+</script>
+</body></html>

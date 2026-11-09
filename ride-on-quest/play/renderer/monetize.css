@@ -1,0 +1,19 @@
+/* ブラウザ版（本番）の広告とアフィリエイトの見た目（webonly/monetize.js）。build_web.js --prod の版にだけ入る */
+/* AdSense の帯：ゲームの画面（#stage）の外、下に。ウォームアップの間だけ */
+.ad-band { flex: none; height: 98px; display: flex; align-items: center; justify-content: center; background: #000; border-top: 1px solid #333; }
+.ad-band[hidden] { display: none; }
+.ad-band { box-sizing: border-box; z-index: 30; }
+/* まとめの画面の Amazon のリンク：文字のリンクだけ。開示の一文をすぐ下に */
+.affil { margin-top: 1.2em; padding: .6em .9em; border: 1px solid var(--line); border-radius: 6px; font-size: 14px; }
+.affil[hidden] { display: none; }
+.affil-head { color: var(--dim); margin-bottom: .3em; }
+.affil-links { display: flex; flex-wrap: wrap; gap: .3em 1.4em; }
+.affil-links a { color: #8fc1ff; }
+.affil-note { margin-top: .4em; color: var(--text); font-size: 13px; }
+/* 有料版（itch.io でログイン。webonly/itch.js）：設定の窓の上の方 */
+.itch-box { margin: .4em 0 1em; padding: .6em .9em; border: 1px solid var(--line); border-radius: 6px; }
+.itch-box h2 { margin-top: 0; }
+.itch-box button[hidden], .itch-box a[hidden] { display: none; }
+.itch-buy { display: inline-block; margin-left: 1em; color: #8fc1ff; }
+/* スマホの横で広告を右に置いている間：スライダーの帯が 2 段にならないよう、つまみを細く（webonly/adsize.js の place） */
+html.ad-side .sim input[type=range] { width: 17vw; }
