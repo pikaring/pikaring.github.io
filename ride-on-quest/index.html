@@ -325,5 +325,13 @@ footer p { margin: 4px 0; }
     set(lang);
   })();
 </script>
+<script>
+// アクセスカウンター（ride-on-qc などと同じ GAS。page 名でサイトごとに別に数える。数を知るだけで、画面には出さない。2026-11-09 ユーザー判断）
+(function () {
+  var page = location.pathname.replace(/index\.html$/, '');
+  if (/\.pages\.dev$/.test(location.hostname)) page = '/' + location.hostname + page;   // 本番 ride-on-quest.pages.dev は github.io と分けて数える
+  try { fetch('https://script.google.com/macros/s/AKfycbxkQLZXNAFXkT7zhIO0TmMDGU3A0TQ234Lf-yhw5J7lvFAjCi3KLNLRd_LKd_xlOxPd/exec?page=' + encodeURIComponent(page)).catch(function () {}); } catch (e) {}
+})();
+</script>
 </body>
 </html>
