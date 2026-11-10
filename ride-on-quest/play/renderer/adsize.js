@@ -9,6 +9,9 @@
    phone.css と同じ境目（幅 600px 以下か、高さ 500px 以下）。bandSize は純粋な関数なので node のテストで確かめる（tests/monetize.test.js）。 */
 (function (root) {
   const PAD = 4;   // 帯の余白（px）
+  // ゲームの画面と広告の間の空き（px。帯の外の何もない黒）。押す所のすぐ隣に広告を置かない（AdSense の誤クリックの決まり。2026-11-10 窓口）。
+  // 30px あけると、広告から押せる物まで：スマホの横の地図（タップで U ターン）46px〜・縦のスライダー（つながずに試す）41px・ボタンは 140px 以上
+  const GAP = 30;
   function bandSize(vw, vh) {
     if (vw <= 600) return { w: 320, h: 50, unit: 'bandPhone', side: false };
     if (vh <= 500) return { w: 120, h: 240, unit: 'bandPhone', side: true };
@@ -21,15 +24,19 @@
     if (side) {
       const bar = doc.getElementById('bar');
       s.position = 'fixed'; s.right = '0'; s.bottom = '0'; s.top = `${bar ? Math.round(bar.getBoundingClientRect().bottom) : 0}px`;
-      s.width = `${W}px`; s.height = 'auto'; s.borderTop = '0'; s.borderLeft = '1px solid #333';
+      s.width = `${W}px`; s.height = 'auto'; s.borderTop = '0'; s.borderLeft = '1px solid #333'; s.marginTop = '';
     } else {
       s.position = s.right = s.bottom = s.top = s.width = s.borderTop = s.borderLeft = '';
-      s.height = `${size.h + PAD * 2}px`;
+      s.height = `${size.h + PAD * 2}px`; s.marginTop = `${GAP}px`;
     }
-    for (const el of [doc.getElementById('stage'), doc.getElementById('web-note'), doc.querySelector('.sim')]) if (el) el.style.marginRight = show && side ? `${W + 1}px` : '';
+    for (const el of [doc.getElementById('stage'), doc.getElementById('web-note'), doc.querySelector('.sim')]) if (el) el.style.marginRight = show && side ? `${W + 1 + GAP}px` : '';
     doc.documentElement.classList.toggle('ad-side', show && side);   // スライダーの帯を 1 段のまま細く（monetize.css・adtest.css）
   }
-  const api = { bandSize, place, PAD };
+  // 帯を出す画面：旅のウォームアップ（フィールドの .field[data-phase="warmup"]）と、女王の試練の間ずっと（.trial。2026-11-10 ユーザー判断 84B
+  // 「むしろ画面に余裕があるので常時出していてもいいが、他のアプリに切り替わった時にフリーズされるのは困る。」）
+  const SHOW = '#screen .field[data-phase="warmup"], #screen .trial';
+  const showing = doc => !!doc.querySelector(SHOW);
+  const api = { bandSize, place, showing, SHOW, PAD, GAP };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else (root.RQ = root.RQ || {}).adSize = api;
 })(typeof window !== 'undefined' ? window : globalThis);

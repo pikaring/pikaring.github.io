@@ -210,6 +210,16 @@
     });
   }
   const retry = () => { blocked.forEach(a => { if (a.__want) play(a); }); blocked.clear(); unlockAll(); };
+  /* 裏に回ったあとに音を戻す（2026-11-10 試走、iPhone の Bluefy：ユーザー「間違って他のアプリが起動してしまうと、元にブルーファイをもう一度開いても音楽が鳴らない」
+     「設定から BGM をオフからオンに切り替えても、やっぱり音は鳴らない。一旦画面がバックグラウンドに回ると音が復帰しない。」）。
+     iOS（WebKit）は、ほかのアプリに切り替わると AudioContext を interrupted・suspended にし、鳴らしていた <audio> も止める。
+     前は最初の操作で一度動いたら、もう動かし直さなかった。ここで AudioContext を再開し、鳴らしたいのに止まっている <audio> を鳴らし直す。
+     操作の外では断られることがあるので、そのときは次の操作（下の retry と music.js の unlock）で鳴らす。返り値：再開できたら true */
+  function revive() {
+    if (!ctx) return Promise.resolve(false);
+    slots.forEach(s => s.els.forEach(a => { if (a.__want && a.paused) play(a); }));
+    return resume();
+  }
   // WebKit で再生の操作と数えるのは touchend・click・keydown（pointerdown は数えない。https://webkit.org/blog/6784/new-video-policies-for-ios/）。どれでも呼ぶ
   if (root.addEventListener) for (const k of ['pointerdown', 'touchend', 'click', 'keydown']) root.addEventListener(k, retry, true);
 
@@ -373,5 +383,5 @@
     if (!as) return false;
     try { const want = bgm ? 'auto' : 'ambient'; if (as.type !== want) as.type = want; return true; } catch (_) { return false; }
   }
-  (root.RQ = root.RQ || {}).synth = { resume, state, ready, now, setBus, makeGain, fade, kill, note, recVoice, preload, prepare, unlockAll, bufferMode, setMix, made: () => made, slots: () => slots.size, pcmCount: () => pcm.size };
+  (root.RQ = root.RQ || {}).synth = { resume, revive, state, ready, now, setBus, makeGain, fade, kill, note, recVoice, preload, prepare, unlockAll, bufferMode, setMix, made: () => made, slots: () => slots.size, pcmCount: () => pcm.size };
 })(window);

@@ -170,6 +170,9 @@
 
   async function connect(want = null) {   // want：つなぐ機器の id（「つなぐ」の窓で選んだもの）。無ければ選ぶ窓を出す
     if (!navigator.bluetooth) { setConn(t('tr.noBluetooth'), 'ng'); return; }
+    // つながっている間に「つなぐ」をもう一度押して、選ぶ窓を閉じた・つなげなかったときは、つながっている知らせのまま
+    // （2026-11-10 試走：iPhone の縦で心拍ベルトのボタンが見えず「つなぐ」を押し直すと「つなげませんでした」になり、横にすると、つながっているのにその知らせが見えた）
+    const was = S.conn, wasDev = trDev, still = () => S.src === 'ble' && trDev === wasDev && !!(wasDev && wasDev.gatt && wasDev.gatt.connected);
     try {
       const opts = FIND.trainer;
       let dev = null;
@@ -192,6 +195,7 @@
       });
       await openTrainer(dev);
     } catch (e) {
+      if (wasDev && still()) { setConn(was.msg, was.cls); return; }
       setConn(t('tr.failed', { msg: e.message }), 'ng');
     }
   }

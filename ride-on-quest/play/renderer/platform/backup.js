@@ -14,12 +14,13 @@
   const isObj = o => !!o && typeof o === 'object' && !Array.isArray(o);
   const goodGhost = g => isObj(g) && g.v === 1 && Array.isArray(g.pts) && Array.isArray(g.route);
 
-  // localStorage（または同じ形のもの：length・key(i)・getItem(k)）から rq.* を集める。合言葉は別に持つので除く
+  // localStorage（または同じ形のもの：length・key(i)・getItem(k)）から rq.* を集める。合言葉は別に持つので除く。
+  // 走っている途中の控え（rq.resume*。renderer/game/resume.js）も除く（大きく、ほかの機械で続きを走るものではない）
   function collectLs(storage) {
     const out = {};
     for (let i = 0; i < storage.length; i++) {
       const k = storage.key(i);
-      if (k && k.startsWith(PREFIX) && k !== SHARE_LS) out[k] = storage.getItem(k);
+      if (k && k.startsWith(PREFIX) && k !== SHARE_LS && !k.startsWith('rq.resume')) out[k] = storage.getItem(k);
     }
     return out;
   }

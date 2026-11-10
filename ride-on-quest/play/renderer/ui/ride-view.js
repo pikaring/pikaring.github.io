@@ -48,12 +48,16 @@
       const [who, text] = talk.x.lines[talk.line], name = who === 'npc' ? root.RQ.i18n.cap((TK.NPCS[talk.x.char] || { n: '' }).n) : who === 'hero' && o.heroId ? D.HEROES[o.heroId].n : '';
       q('.talk .who').textContent = name; q('.talk .who').hidden = !name;
       if (stopType) stopType();
-      stopType = U.typeText(q('.talk .text'), who === 'sys' ? text : t('talk.quote', { text }));
+      // スマホの縦では話の窓を 3 行までずつ、次の窓に送る（2026-11-09 試走 指摘 7・判断 67A。U.talkPages。窓 1 つにつき TALK_LINE_SEC 秒）
+      talk.pages = U.talkPages(q('.talk .text'), who === 'sys' ? text : t('talk.quote', { text }));
+      stopType = U.typeText(q('.talk .text'), talk.pages[Math.min(talk.page || 0, talk.pages.length - 1)]);
       q('.talk').className = 'win talk by-' + who;
       heroFace.hidden = who !== 'hero'; face.classList.toggle('quiet', who !== 'npc');
     }
     function nextLine() {
       if (!talk) return;
+      if ((talk.page || 0) < (talk.pages || [0]).length - 1) { talk.page = (talk.page || 0) + 1; talk.t = 0; showLine(); return; }
+      talk.page = 0;
       if (talk.line < talk.x.lines.length - 1) { talk.line++; talk.t = 0; showLine(); return; }
       talk = null; q('.talk').hidden = true; heroFace.hidden = true;
     }

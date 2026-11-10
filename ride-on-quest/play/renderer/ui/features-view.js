@@ -42,6 +42,20 @@
       const g = new T.BufferGeometry(); g.setAttribute('position', new T.Float32BufferAttribute(pos, 3)); g.setIndex(idx); g.computeVertexNormals();
       const m = new T.Mesh(g, water(0x3a7a90, 1)); m.material.side = T.DoubleSide; m.material.polygonOffset = true; m.material.polygonOffsetFactor = -1; scene.add(m);
     }
+    // 道（net の道。格子の点）と川（features の rivers）の交点のうち、(x, z) にいちばん近いもの → { x, z, tx, tz（その道の線分の向き）}。20 m より遠ければ null
+    const RIV = (F.rivers || []).map(rv => rv.pts.map(xz));
+    function crossAt(rd, x, z) {
+      if (!rd || !rd.grid) return null;
+      const R = rd.grid.map(xz); let best = null, bd = 20;
+      for (let i = 1; i < R.length; i++) for (const V of RIV) for (let j = 1; j < V.length; j++) {
+        const p1 = R[i - 1], p2 = R[i], p3 = V[j - 1], p4 = V[j], d = (p2[0] - p1[0]) * (p4[1] - p3[1]) - (p2[1] - p1[1]) * (p4[0] - p3[0]); if (Math.abs(d) < 1e-9) continue;
+        const t = ((p3[0] - p1[0]) * (p4[1] - p3[1]) - (p3[1] - p1[1]) * (p4[0] - p3[0])) / d, u = ((p3[0] - p1[0]) * (p2[1] - p1[1]) - (p3[1] - p1[1]) * (p2[0] - p1[0])) / d;
+        if (t < 0 || t > 1 || u < 0 || u > 1) continue;
+        const cx = p1[0] + t * (p2[0] - p1[0]), cz = p1[1] + t * (p2[1] - p1[1]), dd = Math.hypot(cx - x, cz - z);
+        if (dd < bd) { const l = Math.hypot(p2[0] - p1[0], p2[1] - p1[1]) || 1; bd = dd; best = { x: cx, z: cz, tx: (p2[0] - p1[0]) / l, tz: (p2[1] - p1[1]) / l }; }
+      }
+      return best;
+    }
     // 橋：川と道が交わる所。道の向きに、板と両側の手すり
     for (const b of F.bridges || []) {
       // 川と道が交わる点（features.json の at）に、道の向き（dir。格子の (行, 列) の向き）で置く（2026-10-24：前は、いちばん近い 10 m ごとの道の点に置いていたので、川からずれて、角度も変だった）
@@ -55,6 +69,9 @@
       }
       const dl = Math.hypot(dv[0], dv[1]) || 1;
       const near = { x: bx, z: bz, tx: dv[1] / dl, tz: dv[0] / dl };
+      // 橋は、その道と川の本当の交点に置き、向きは交点での道の向き（2026-11-09 試走・判断 76A：ユーザー「候補1だ！」。堤防の辻のすぐ南の橋で、
+      // features.json の at が交点から 2 m ずれ、板が道の横へはみ出し、川が板の端をかすめていた）。交点が at から 20 m 以内に無ければ、前の決め方のまま
+      { const rd = net && net.byName && net.roads[net.byName.get(b.road)], X = crossAt(rd, bx, bz); if (X) { near.x = X.x; near.z = X.z; near.tx = X.tx; near.tz = X.tz; } }
       // 橋の長さは、そこの川幅＋両岸の溝のふち（川幅 + 4.6 m）。features.json の length_m（14 m）は長すぎて、曲がった道で欄干が道の中へはみ出した（2026-10-27 ユーザー指摘）
       let L = b.length_m || 14;
       { let bd = 1e9, wv = null; for (const rv of F.rivers || []) rv.pts.forEach((q, i) => { const d = (q[0] - b.at[0]) ** 2 + (q[1] - b.at[1]) ** 2; if (d < bd) { bd = d; wv = (rv.widths || [])[i] || rv.width_m; } });

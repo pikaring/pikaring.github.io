@@ -415,6 +415,7 @@
 
   /* ---------- 挑戦者と時間を選ぶ ---------- */
   function showSelect() {
+    if (!resumeAsk) clearResume();   // 選ぶ画面に戻った＝その走りは終わった（読み直したあと、続きを聞いている間は残す）
     run = null; rec = null; trialOn = false; rideS = null; outing = null; freeSeg = null; swap(null); endWorld(); U.setBg('islandMap');
     screen.innerHTML = '';
     const wrap = el('div', 'select');
@@ -1281,7 +1282,7 @@
     const samples = rec.samples, dist = rec.dist, startMs = rec.t0, stravaText = o.stravaText(tr) + '\n' + t('sum.stravaLink');   // 説明の終わりに紹介ページ（2026-10-25 ユーザー要望）
     const storyP = askStory(o, tr, samples, dist).then(story => (story ? RQ.storyFacts.withStory(stravaText, story) : null));   // 冒険記入りの文（届かなければ null）
     const fitDesc = text => text.split('\n').slice(2).filter(Boolean).join(' / ');
-    run = null; rec = null; rideS = null; outing = null; freeSeg = null; swap(null); endWorld();
+    run = null; rec = null; rideS = null; outing = null; freeSeg = null; swap(null); endWorld(); clearResume();   // まとめを出した＝控えはいらない
     const fitness = { series: RQ.fitness.series(recs), weekly: RQ.fitness.weekly(recs), now: RQ.fitness.now(recs) };   // 体力の推移（今日の旅も入れて）
     swap(RQ.views.summary(screen, { stravaText, title: o.title, sub: o.sub(tr), samples, ftp, hrMax: settings.hrMax || 185, rider: RQ.ui.riderKg(), dist, king, game, fitness, onBack: showSelect }));
     { const sv = view; storyP.then(text => { if (text && sv.setStravaText) { sv.setStravaText(text); window.__rq.storyText = text; } }); }   // 届いたら「説明をコピー」の中身を差し替える
@@ -1403,6 +1404,7 @@
       if (view) guard('view', () => view.tick(dt, now));
       if ((run || rideS) && (talkSaveT -= real) <= 0) { talkSaveT = 10; saveTalkLog(); }
     }
+    if ((run || trialOn) && rec && (resT -= real) <= 0) { resT = RESUME_SEC; guard('record', snapshot); }   // 走っている途中の控え（一時停止の間も）
     // 走行データの表示：旅・フリーライド・1戦だけの間はいつも出す
     RQ.hud.show(!!(run || rideS || trialOn || (view && view.kind === 'battle')));
     const pb = !(run || rideS || trialOn) || paused; if ($('#b-pause').hidden !== pb) $('#b-pause').hidden = pb;
@@ -1437,11 +1439,68 @@
     if (photo && (run || rideS)) photoTick();   // 道中の写真（3D を描いた直後の、同じ処理の中で撮る）
   }
 
+  /* ---------- 走っている途中の控え（2026-11-10 試走「間違ってリロードを押してしまったら、それまでの走りはどうなるのか」→ 判断 85B。renderer/game/resume.js） ----------
+     旅・女王の試練の間、RESUME_SEC 秒ごとに、記録と旅の進みを localStorage に書く。読み直して開いたら「続きから走る（旅の途中だけ）／ここまでを保存する／捨てる」。
+     まとめを出したら・選ぶ画面に戻ったら消す。続きからは、同じ位置・同じ旅の進み・残り時間から（戦闘の途中なら、その戦闘をはじめから。ゴーストは出さない）。
+     読み直すまでの時間は、一時停止と同じく記録のすき間（FIT は 1 つ）。 */
+  const RES = RQ.resume, RESUME_SEC = 5, LS = (() => { try { return window.localStorage || null; } catch (e) { return null; } })();
+  let resW = {}, resT = RESUME_SEC, resumeAsk = null;
+  function snapshot() {
+    if (!LS || !rec || !(run || trialOn) || !outing) return;
+    resumeAsk = null;   // 新しい走りが始まった（聞いていた控えは、これで上書き）
+    const ex = world && world.extras();
+    RES.save(LS, { kind: trialOn || (run && run.trial) ? 'trial' : 'quest', at: Date.now(), rec, run,
+      pos: ex ? { road: ex.road, s: ex.s, dir: ex.dir } : null, ghost: questGhost, planned: !!(run && !run.cont && questGhost),
+      outing, freeSeg, tod: RQ.tod.sec, talkLog, heroId: run ? run.heroId : trialHero, trialHero, trialInfo, trialStart }, resW);
+  }
+  function clearResume() { resumeAsk = null; resW = {}; if (LS) RES.clear(LS); }
+  function askResume(snap) {
+    resumeAsk = snap;
+    const hero = D.HEROES[snap.heroId] || D.HEROES[D.HERO_ORDER[0]], go = RES.canContinue(snap);
+    const ago = t('resume.ago', { n: Math.max(0, Math.round((Date.now() - snap.at) / 60000)) });
+    const note = t(snap.kind === 'trial' ? 'resume.trial' : 'resume.quest', { hero: hero.n, m: Math.round(snap.rec.samples.length / 60), km: RQ.units.dist((snap.rec.dist || 0) / 1000, 2), ago })
+      + (go && snap.run.seg.type === 'battle' ? ' ' + t('resume.goNote') : '');
+    const buttons = [...(go ? [[t('resume.go'), () => resumeGo(snap)]] : []), [t('resume.save'), () => resumeSave(snap)], [t('resume.drop'), clearResume]];
+    U.pickWin(screen, { title: t('resume.title'), note, buttons, cls: 'resume-ask' });
+  }
+  // 控えの中身を、今の走りに戻す（画面はまだ作らない）
+  function restoreResume(snap) {
+    leaveRun(); resumeAsk = null;
+    rec = RES.bridgeGap(snap.rec); outing = snap.outing || { parts: [], hero: snap.heroId, course: snap.ghost ? snap.ghost.course : 'trial' }; freeSeg = snap.freeSeg || null;
+    questGhost = snap.ghost || null; RQ.tod.sec = snap.tod || 0; hourReset();
+    if (snap.talkLog && typeof snap.talkLog === 'object') Object.assign(talkLog, snap.talkLog);
+    trialHero = snap.trialHero || null; trialInfo = snap.trialInfo || null; trialStart = snap.trialStart || null;
+    run = snap.run ? RES.unpackRun(snap.run, { talkLog, areaNow: areaNow(snap.pos) }) : null;
+  }
+  // ここまでを保存する：一時停止の「終わる」と同じ道（まとめ・FIT・写真は無し・キャラの進み）
+  function resumeSave(snap) {
+    try {
+      restoreResume(snap);
+      if (snap.kind === 'trial' && !run) { trialOn = true; return finishTrial(); }
+      if (run && run.trial && !run.closed) return finishTrial();
+      finishOuting(run ? !!run.done : true);
+    } catch (e) { console.error('控えからまとめを出せなかった', e); clearResume(); showSelect(); }
+  }
+  // 続きから走る：同じ位置・同じ向きの 3D の島で、旅の進みのまま
+  function resumeGo(snap) {
+    try {
+      restoreResume(snap);
+      const g = questGhost, course = g ? courseOf(g.course) : courseOf(settings.courseId), side = g ? g.side : 'right';
+      const start = snap.pos || RQ.roadnet.courseStart(net, course, side);
+      photo = newPhoto('quest', `${course.name}-${D.HEROES[run.heroId].n}`);
+      screen.innerHTML = '';
+      world = RQ.world.create(screen, { net, start, plan: snap.planned ? RQ.roadnet.coursePlan(net, course, side) : null, heroId: run.heroId, dots: dotsNow(), ghosts: [],
+        encounters: RQ.encounters.create({ net, ghosts: [], seed: (Date.now() % 2147483647) | 0 }) });
+      nextSegment();
+    } catch (e) { console.error('控えから続きを走れなかった', e); clearResume(); showSelect(); }
+  }
+  window.__rq.resume = { snapshot, load: () => (LS ? RES.load(LS) : null), ask: () => resumeAsk };   // テスト用
+
   Object.assign(window.__rq, { trialHero: () => trialHero, showSelect, startRun, practice, showTrial, showSummary, showCourses, startRide, showCollection, showBadges, showRace, startRace });
   window.__rq.runHero = () => (run ? run.heroId : null);
   window.__rq.autoPaused = () => autoPaused;   // テスト用   // テスト用：今の旅のキャラクター（続けて走る B で替わるか）
   Object.defineProperty(window.__rq, 'run', { get: () => run });
   Object.defineProperty(window.__rq, 'ghostList', { get: () => (world && world.ghostList) || (view && view.ghostList) || null });   // テスト用：ゴーストの配列（足すと出る）
   Object.defineProperty(window.__rq, 'ghosts', { get: () => (world && world.ghostsNow && world.ghostsNow()) || (view && view.ghostsNow && view.ghostsNow()) || [] });   // テスト用：いまのゴーストの出方
-  showSelect();
+  { const snap = LS ? RES.load(LS) : null; if (RES.worthAsking(snap)) resumeAsk = snap; showSelect(); if (resumeAsk) askResume(resumeAsk); }   // 前の走りが途中なら聞く（短すぎる・古い控えは showSelect が消す）
 })();

@@ -147,6 +147,8 @@
         ids.forEach(id => { if (isRec(id) && tracks[id.slice(4)]) synth.preload(recs.base + tracks[id.slice(4)].file); });
       },
       pump,
+      // 裏から戻って AudioContext を再開したあと：録音の曲を今の位置から鳴らし直す（止まったままの音源を作り直す。一時停止の間はそのまま）
+      revive() { if (!paused && cur && cur.rec) { cur.h.pause(); cur.h.resume(); } pump(); },
       current: () => (cur ? cur.id : null),
       wanted: () => want,
       // 今の曲名（画面に出す。SHOW_TITLE）。鳴っていなければ ''
@@ -178,10 +180,23 @@
   }, 250);
   // 最初の操作：AudioContext を動かし、場面の曲をすべて読んで、音を出さずに一度鳴らしておく（iOS で、戦闘のあとなど操作の外でも曲が鳴るように。2026-11-07）。
   // WebKit で再生の操作と数えるのは touchend・click・keydown（pointerdown は数えない）ので、どれでも呼ぶ
+  // 2026-11-10：裏に回ったあと（iOS は AudioContext が止まる）も、操作のたびに、止まっていれば再開する（前は最初に動いたら外していた。synth.js の revive）
   const UNLOCK = ['pointerdown', 'touchend', 'click', 'keydown'];
+  let first = true;
   const unlock = () => {
-    RQ.music.preloadAll(); if (RQ.synth.unlockAll) RQ.synth.unlockAll();   // 操作の中で（同期で）
-    RQ.synth.resume().then(ok => { if (ok) { UNLOCK.forEach(k => removeEventListener(k, unlock, true)); RQ.music.pump(); } });
+    if (!first && RQ.synth.ready()) return;
+    if (first) { RQ.music.preloadAll(); if (RQ.synth.unlockAll) RQ.synth.unlockAll(); }   // 操作の中で（同期で）
+    const was = first; first = false;
+    (was ? RQ.synth.resume() : RQ.synth.revive()).then(ok => { if (ok) { if (was) RQ.music.pump(); else RQ.music.revive(); } else if (was) first = true; });
   };
   UNLOCK.forEach(k => addEventListener(k, unlock, true));
+  // 画面に戻ったとき（ほかのアプリ・タブから）：AudioContext を再開して、曲を鳴らし直す。操作の外で断られたら、次に画面に触ったとき（上の unlock）
+  const wake = () => {
+    if (first || (root.document && root.document.visibilityState === 'hidden')) return;
+    const was = RQ.synth.ready();
+    RQ.synth.revive().then(ok => { if (ok && !was) RQ.music.revive(); });
+  };
+  if (root.document && root.document.addEventListener) root.document.addEventListener('visibilitychange', wake);
+  addEventListener('pageshow', wake); addEventListener('focus', wake);
+  setInterval(() => { if (!first && !RQ.synth.ready()) wake(); }, 2000);   // 戻ったのに知らせが来ない・再開が遅れたときの見回り
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -45,11 +45,17 @@
   const mmss = s => { s = Math.max(0, Math.round(s)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; };
 
   // ドット絵を img に出す（renderer/ui/sprites.js）。unit：絵の1ドットの高さ（画面の高さの %、cqh）。大きな敵は scale で大きく
-  function setSprite(img, id, view = 'front', frame = 0, unit) {
-    const s = root.RQ.sprites.get(id, view, frame);
+  function setSprite(img, id, view = 'front', frame = 0, unit, variant = 0) {   // variant：主人公の正面の色違い 1〜3（sprites.get）
+    const s = root.RQ.sprites.get(id, view, frame, variant);
     if (img.getAttribute('src') !== s.url) img.src = s.url;
     img.classList.add('pixel');
-    if (unit) img.style.height = `${(s.h * unit * s.scale).toFixed(2)}cqh`;
+    if (unit) {
+      img.style.height = `${(s.h * unit * s.scale).toFixed(2)}cqh`;
+      // スマホの縦（phone.css）が、絵の箱を絵と同じ形のまま縮めるのに使う：--h0＝決めた高さ、--ar＝幅÷高さ（2026-11-09 試走 指摘 8：
+      // object-fit で縮めると、iPhone〔WebKit〕で絵の箱のまわりに薄い黄色の四角い枠が出た。箱を絵と同じ形にして object-fit を使わない）
+      img.style.setProperty('--h0', img.style.height);
+      if (s.w && s.h) img.style.setProperty('--ar', (s.w / s.h).toFixed(4));
+    }
     return s;
   }
 
@@ -160,6 +166,37 @@
     return done;
   }
 
+  // 話の窓の文を、窓に 3 行までで入る分ずつに分ける（スマホの縦だけ。ほかは 1 つのまま）。
+  // 2026-11-09 試走 指摘 7・判断 67A（ユーザー「縦画面はだいぶ（良い）が、セリフが多いと黒枠が総距離に被るから3行までにした方がいい。」）：
+  // 3 行を超える文は次の窓に送る。切るのは句読点（。、！？…）の後ろ。句読点で 3 行に入らないときだけ、字の途中で切る。
+  // el：文を出す要素（.talk .text。幅と字の大きさを測る）。text：出す文（＊「……」の形のまま）。open・close：かぎかっこ（最初の窓は閉じず、続きの窓は開けない）
+  const PAGE_LINES = 3, pageCache = new Map();
+  function talkPages(el, text, maxLines = PAGE_LINES) {
+    const phone = root.matchMedia && root.matchMedia('(max-width: 600px)').matches;
+    if (!phone || !el || !el.parentNode || !text) return [text];
+    const w = el.clientWidth; if (!w) return [text];
+    const key = `${w}|${text}`; if (pageCache.has(key)) return pageCache.get(key);
+    const probe = el.cloneNode(false); probe.removeAttribute('id');
+    probe.style.cssText += `;position:absolute;visibility:hidden;left:-9999px;top:0;width:${w}px;height:auto;min-height:0;max-height:none`;
+    el.parentNode.appendChild(probe);
+    const cs = getComputedStyle(probe), lh = parseFloat(cs.lineHeight) || parseFloat(cs.fontSize) * 1.5;
+    const fits = s => { probe.textContent = s; return probe.scrollHeight <= lh * maxLines + lh * 0.4; };
+    const pages = [];
+    let rest = text;
+    while (rest && !fits(rest)) {
+      // 句読点の後ろで、3 行に入るいちばん長い所。無ければ字で（入る所まで）
+      let cut = -1;
+      for (let i = 1; i < rest.length; i++) if (/[。、！？!?,.…」』]/.test(rest[i - 1]) && !/[。、！？!?,.…」』]/.test(rest[i]) && fits(rest.slice(0, i))) cut = i;
+      if (cut < 0) { let i = 1; while (i < rest.length && fits(rest.slice(0, i + 1))) i++; cut = Math.max(1, i); }
+      pages.push(rest.slice(0, cut).trimEnd()); rest = rest.slice(cut).trimStart();
+    }
+    if (rest) pages.push(rest);
+    probe.remove();
+    if (pageCache.size > 200) pageCache.clear();
+    pageCache.set(key, pages);
+    return pages;
+  }
+
   function popAt(screen, target, text, cls) {
     const r = target.getBoundingClientRect(), sr = screen.getBoundingClientRect();
     const p = el('div', 'pop ' + (cls || '')); p.textContent = text;
@@ -181,5 +218,5 @@
       else node.appendChild(document.createTextNode(part));
     }
   };
-  root.RQ.ui = { LINKS, setLinkedText, mapImage, A, $, el, pick, ICON, setSprite, typeText, minimap, drawMap, mapXY, setBg, ftp, light, difficulty, load, setLoadMode, ergOn, mmss, popAt };
+  root.RQ.ui = { LINKS, setLinkedText, talkPages, mapImage, A, $, el, pick, ICON, setSprite, typeText, minimap, drawMap, mapXY, setBg, ftp, light, difficulty, load, setLoadMode, ergOn, mmss, popAt };
 })(window);

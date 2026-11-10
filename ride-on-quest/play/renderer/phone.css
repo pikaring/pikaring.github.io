@@ -37,11 +37,18 @@ html { background: #000; }
 @media (max-width: 600px), (max-height: 500px) {
   /* 「だれと旅に出る」の窓の間は、走行データ・FTP・地図・速度計を隠す（窓の上に重なって、カードやボタンが押せなかった。2026-11-08 試走 指摘 7） */
   #stage:has(.hero-pick) .hud-col, #stage:has(.hero-pick) .hud-speed, #stage:has(.hero-pick) .topleft, #stage:has(.hero-pick) .minimap, #stage:has(.hero-pick) .place, #stage:has(.hero-pick) .hud-note { visibility: hidden; }
+  /* ほかの選ぶ窓（旅のあとのきつさ・これで終わる／続けて走る）も同じ。旅の案内の窓（ウォームアップ…）も隠す
+     （2026-11-09 試走 指摘 6：FTP の箱・地名・総距離が、きつさの窓とボタンの上に重なっていた） */
+  #stage:has(.end-choice) .hud-col, #stage:has(.end-choice) .hud-speed, #stage:has(.end-choice) .topleft, #stage:has(.end-choice) .minimap, #stage:has(.end-choice) .place, #stage:has(.end-choice) .hud-note, #stage:has(.end-choice) .fnext, #stage:has(.end-choice) .world-place { visibility: hidden; }
   #bar { flex-wrap: wrap; gap: 4px 6px; padding: 4px 6px; }
   #bar h1, #bar .mini, #bar #now-playing, #bar .grow { display: none; }
   #bar .conn { flex: 1 1 0; min-width: 0; font-size: 11px; }
   #bar button { font-size: 12px; padding: 4px 8px; }
-  #bar:has(#b-pause:not([hidden])) :is(#b-hr, #b-pm) { display: none; }
+  /* トレーナーにつながったら、「つなぐ」の代わりに「♥ 心拍ベルトもつなぐ」を出す（2026-11-10 試走 ユーザー「つなぐでスマートトレーナーをつないだ後、心拍計をつなげない。
+     またつなぐのボタンじゃなくて、心拍計をつなぐのボタンが出るんじゃなかったっけ？」・判断 83A。前は旅の間、心拍ベルトのボタンも隠していた）。
+     旅の間は、帯を 1 行に収めるため、パワーメーターのボタンだけ隠す（選ぶ画面では出る） */
+  #bar:has(#b-hr:not([hidden])) #b-connect { display: none; }
+  #bar:has(#b-pause:not([hidden])) #b-pm { display: none; }
   /* 「つながずに試す」は、トレーナーにつながっている間（#conn.ok）だけ隠す。未接続のまま旅に出ても、上の帯から 1 回で試すモードに入れる */
   #bar:has(#b-pause:not([hidden])):has(#conn.ok) #b-sim { display: none; }
   /* つながずに試すのパネル（試すときだけ） */
@@ -65,6 +72,9 @@ html { background: #000; }
   #bar #b-sim { font-size: 0; }
   #bar #b-sim::after { content: '🎚 試す'; font-size: 12px; }
   html:not([lang="ja"]) #bar #b-sim::after { content: '🎚 Try'; }
+  #bar #b-hr { font-size: 0; }
+  #bar #b-hr::after { content: '♥ 心拍'; font-size: 12px; }
+  html:not([lang="ja"]) #bar #b-hr::after { content: '♥ HR'; }
 }
 
 /* ---- 縦向き（2026-11-07 ユーザー「縦画面でもだいたい遊べるね。好きに選択させたほうがいいかも。」：縦でも横でも遊べる）。
@@ -119,7 +129,9 @@ html { background: #000; }
   .battle .slots { left: 2%; right: 2%; bottom: 1.5%; height: 30cqw; gap: 2cqw; }
   .battle .slots .reel { border-width: 1cqw; border-radius: 2cqw; }
   .battle .slots .reel .num { font-size: 15cqw; }
-  .battle .slots .reel .num small { font-size: 4cqw; margin: 0 0 4cqw .6cqw; }
+  .battle .slots .reel .num small { font-size: 4cqw; margin: 0 0 7cqw .6cqw; }
+  /* 右下の残りの秒は小さく、下の端に。前は「%」と半分ほど重なっていた（2026-11-09 試走の画像。ユーザー「43の重なりはスクショだけの可能性」→ 遊んでいる画面でも重なっていたので直す） */
+  .battle .slots .reel .left { font-size: 3.4cqw; right: 3%; bottom: 1.5%; }
   .battle .slots .reel .pace { font-size: 6cqw; }
   .battle .slots .reel .attr { width: 7cqw; height: 7cqw; }
   .battle .slots .reel .crit { width: 22cqw; height: 22cqw; margin: -11cqw 0 0 -11cqw; }
@@ -130,14 +142,16 @@ html { background: #000; }
   /* 敵の並ぶ場所は、速度計（右下）より上に（3 体の右の敵が速度計にかかっていた。2026-11-08） */
   .battle.side .arena { left: 2%; right: 2%; bottom: calc(4% + 58cqw); height: 34cqw; }
   /* 主人公と敵を小さくして、間をあける（2026-11-08 試走 指摘 3・判断 31a ユーザー「iPhone 版だと敵が縦型だと敵が近すぎるので、敵と主人公が重なって見える。全般的に小さくした方がいいんじゃないか。」）。
-     横に広い敵（鷲など）は幅でも抑える（絵の高さは battle-view.js が決めるので、object-fit でつぶさずに縮める） */
+     横に広い敵（鷲など）は幅でも抑える。絵の箱は絵と同じ形のまま縮める（高さ＝決めた高さ --h0・空いている高さ・幅の上限÷形 --ar のいちばん小さいもの。--h0・--ar は setSprite が入れる）。
+     2026-11-09 試走 指摘 8（ユーザー「スクリーンショットで敵が黄色い枠で囲まれる不具合がある。」・判断 68A）：前は object-fit で縮めていて、絵の箱が絵より横に広くなり、
+     iPhone（Bluefy・WebKit）で、その箱のまわりに薄い黄色の四角い枠が出た（art_src/trial_feedback/20261109/enemy_frame.jpg）。object-fit をやめ、箱を絵と同じ形にする */
   /* 高さは、上の数字の行（回転数・パワー。上から 1%＋30cqw、約 13cqw の高さ）の下から、並ぶ場所の下（下から 4%＋58cqw）までに収める。
      画面が低いとき（つなげない案内・戦闘をスキップのボタンが出ている 375×667 など）に、敵の上の端が数字の行にかかっていた（2026-11-08 疾風伝の画面の担当の知らせ） */
   .battle { --arena-room: max(14cqw, calc(95cqh - 104cqw)); }
-  .battle.side .arena .foes .foe img, .battle .foe img { max-height: min(30cqw, var(--arena-room)); max-width: 44cqw; object-fit: contain; object-position: 50% 100%; }
-  .battle.side .arena .foes.trio .foe img { max-height: min(16cqw, var(--arena-room)); max-width: 17cqw; }
+  .battle.side .arena .foes .foe img, .battle .foe img { height: min(var(--h0, 30cqw), 30cqw, var(--arena-room), calc(44cqw / var(--ar, 1))) !important; width: auto; max-height: none; max-width: none; }
+  .battle.side .arena .foes.trio .foe img { height: min(var(--h0, 16cqw), 16cqw, var(--arena-room), calc(17cqw / var(--ar, 1))) !important; }
   .battle.side .arena .foes { gap: 1cqw; }
-  .battle.side .arena .hero-side img { max-height: min(26cqw, var(--arena-room)); max-width: 26cqw; object-fit: contain; object-position: 50% 100%; }
+  .battle.side .arena .hero-side img { height: min(var(--h0, 26cqw), 26cqw, var(--arena-room), calc(26cqw / var(--ar, 1))) !important; width: auto; max-height: none; max-width: none; }
   /* 「○○ RPMで まわせ！」を大きく（2026-11-08 試走 指摘 10） */
   .battle .say.win.go { font-size: 6.2cqw; }
 
@@ -148,6 +162,22 @@ html { background: #000; }
   #screen .hero-pick .hp-card { min-width: 0; padding: 1.4cqw; }
   .hero-pick .hp-card img { height: 16cqw !important; width: auto; }
   .hero-pick .hp-min { gap: 1.4cqw; }
+
+  /* 旅のあとのきつさ（楽だった・ちょうどよかった・きつかった・無理だった）の窓（2026-11-09 試走 指摘 6・判断 66A ユーザー「旅が終わった後のちょうどいいとかを選ぶマスが文字がはみ出ているから修正が必要。」）：
+     縦では 4 つを 1 段に並べると、ボタンが細くなって字がはみ出した。窓を横いっぱいにし、ボタンは 2 つずつ 2 段、字は 1 行に収める */
+  .end-choice.feel { left: 2%; right: 2%; width: auto; top: 50%; transform: translateY(-50%); padding: 3cqw 3cqw; }
+  .end-choice.feel .ec-title { font-size: 5.2cqw; }
+  .end-choice.feel .ec-note { font-size: 3.4cqw; line-height: 1.5; }
+  .end-choice.feel .buttons { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2.4cqw; justify-content: stretch; }
+  #screen .end-choice.feel button { font-size: 4.2cqw; padding: 2.4cqw 1cqw; min-width: 0; }
+  #screen .end-choice.feel .buttons .feel-skip { min-width: 40%; }
+
+  /* 読み直したあとの「さっきの走りが途中です」（2026-11-10 判断 85B）：縦では、ボタン 3 つを 1 つずつ縦に並べる（横に並べると画面からはみ出した） */
+  .end-choice.resume-ask { left: 3%; right: 3%; width: auto; min-width: 0; top: 50%; transform: translateY(-50%); padding: 3.4cqw 3.4cqw; }
+  .end-choice.resume-ask .ec-title { font-size: 5.4cqw; }
+  .end-choice.resume-ask .ec-note { font-size: 3.6cqw; line-height: 1.5; }
+  .end-choice.resume-ask .buttons { display: grid; grid-template-columns: 1fr; gap: 2.4cqw; }
+  #screen .end-choice.resume-ask button { font-size: 4.4cqw; padding: 2.6cqw 1cqw; min-width: 0; width: 100%; }
 
   /* 女王の試練：窓は地図の左。走行データはその下。ペースメーカーの話は女王の話の上 */
   .trial-panel { left: 2%; right: calc(4% + 24cqw); top: 1%; transform: none; width: auto; min-width: 0; padding: 1.6cqw 2.4cqw; }
@@ -186,6 +216,13 @@ html { background: #000; }
   /* ペースメーカーの話が出ている間だけ、村人・女王の話は右へずらす（ぶつからないように） */
   #stage:has(.pacer-talk:not([hidden])) .talk { left: 44%; right: calc(3% + 30cqh); width: auto; transform: none; }
   #stage:has(.trial-panel) .place { display: none; }
+  /* 旅のあとのきつさの窓（2026-11-09 試走 指摘 6）：画面に収め（はみ出す分は縦にずらす）、4 つを 1 段のまま、字と余白を詰める */
+  .end-choice.feel { left: 50%; width: min(94%, 640px); top: 50%; transform: translate(-50%, -50%); max-height: 98%; overflow-y: auto; padding: 1.4cqh 2.4cqh; }
+  .end-choice.feel .ec-title { margin-bottom: .4cqh; }
+  .end-choice.feel .ec-note { margin-bottom: .8cqh; line-height: 1.4; }
+  .end-choice.feel .buttons { margin-top: .8cqh; gap: 1.2cqh 1.6cqh; }
+  #screen .end-choice.feel button { padding: .8cqh 1.6cqh; }
+
   /* 「○○ RPMで まわせ！」を大きく（2026-11-08 試走 指摘 10 ユーザー「横型だと90RPM で回せの字が小さくて、どのぐらいのケイデンスで回せばいいのか分かりにくい。」） */
   .battle .say.win.go { font-size: max(8cqh, 20px); padding: .6cqh 2.4cqh; }
   /* 「だれと旅に出る」：4 人を 1 段、時間も 1 段に詰め、窓は画面に収めて縦にずらす（2026-11-08 試走 指摘 7） */

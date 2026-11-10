@@ -10,8 +10,8 @@
   var q = new URLSearchParams(location.search), client = q.get('client') || '', slot = q.get('slot') || '';
   var w = +q.get('w') || 300, h = +q.get('h') || 250, resp = q.get('r') === '1';
   // resp：レスポンシブの広告ユニット（bandPhone）を決まった大きさで出す（AdSense ヘルプ「レスポンシブ広告コードを修正する方法」https://support.google.com/adsense/answer/9183363?hl=ja を 2026-11-08 に読んだ：
-     許可されている変更として、ins の幅と高さを決めて出せる。コードを変えるときは data-ad-format="auto" と data-full-width-responsive="true" を消す。例は display:block。
-     外のスタイルシートで大きさを決めるのは正式には対応していないので、ins の style に直接書く）。
+  //   許可されている変更として、ins の幅と高さを決めて出せる。コードを変えるときは data-ad-format="auto" と data-full-width-responsive="true" を消す。例は display:block。
+  //   外のスタイルシートで大きさを決めるのは正式には対応していないので、ins の style に直接書く）。
   // 決まった大きさの広告ユニット（帯の 728×90 など）は、AdSense のコードのとおり display:inline-block
   function say(s, st) { try { parent.postMessage({ adtest: s, adStatus: st || '' }, location.origin); } catch (e) {} }   // adStatus：filled／unfilled／blocked（本番の帯は unfilled・blocked なら畳む）
   if (!client) return say('client が空');

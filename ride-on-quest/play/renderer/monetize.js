@@ -2,10 +2,10 @@
    docs/monetize-browser.md の決まり（2026-11-06 ユーザー判断）：
    - Amazon アソシエイト（39a）：まとめの画面に文字のリンクだけ（価格・商品の絵は出さない）。すぐそばに開示の一文。重ねる・ポップアップにしない（参加要件 第5条(o)）。
      日本語の画面だけ（48b）。設定の tag が空、または url の入った商品が無ければ、何も出さない。まとめの画像（snapshot）には入れない（data-noshot）。
-   - AdSense（44a・45a・46a）：旅のウォームアップの間だけ、ゲームの画面（#stage）の外の下に帯を足し、ゲームの画面をその分縮める。
+   - AdSense（44a・45a・46a・84B）：旅のウォームアップの間と、女王の試練の間ずっと、ゲームの画面（#stage）の外の下に帯を足し、ゲームの画面をその分縮める。
      帯の大きさと置き方は画面で選ぶ（webonly/adsize.js：パソコン・タブレット 728×90 を下、スマホの縦 320×50 を下、横 120×240 を右。2026-11-08）。
      スマホの大きさは広告ユニット bandPhone（レスポンシブ）を使い、その slot が空なら、スマホでは帯を出さない（728×90 は入らないため）。
-     戦闘・クールダウン・女王の試練（ウォームアップも）・まとめでは出さない。広告は別のページ（adframe.html）に入れて iframe で出す（ゲームの CSP は 'self' のまま＋frame-src 'self'）。
+     戦闘・クールダウン・まとめでは出さない（試練は 2026-11-10 判断 84B から出す。webonly/adsize.js の showing）。広告は別のページ（adframe.html）に入れて iframe で出す（ゲームの CSP は 'self' のまま＋frame-src 'self'）。
      slot が空なら出さない。広告が来なかった（no fill）・読めなかったときは帯を畳む（その回はもう出さない）。
    - 有料版（2026-11-07 ユーザー判断 28a）：itch.io でログインしてアプリ版を買った人（webonly/itch.js の adFree）には、帯の iframe を作らず（最初から読まない）、Amazon のリンクも出さない。
    純粋な部分（amazonLinks・adframeSrc）は node のテストで確かめる（tests/monetize.test.js）。 */
@@ -52,7 +52,7 @@
     el.hidden = false;
   };
 
-  // ウォームアップの間だけの AdSense の帯（大きさはウォームアップが始まるときの画面で選ぶ。向きを変えて大きさが変わったら作り直す）
+  // ウォームアップと試練の間だけの AdSense の帯（大きさはウォームアップが始まるときの画面で選ぶ。向きを変えて大きさが変わったら作り直す）
   const sizeNow = () => RQ.adSize.bandSize(root.innerWidth, root.innerHeight);
   if (adframeSrc(cfg) || adframeSrc(cfg, undefined, { w: 320, h: 50, unit: 'bandPhone' })) {
     let band = null, bandKey = '', bandSz = null, warm = false, empty = false;
@@ -64,7 +64,7 @@
     });
     root.setInterval(() => {
       const sz = sizeNow(), src = adframeSrc(cfg, undefined, sz), key = src ? `${sz.w}x${sz.h}` : '';
-      const now = on() && !empty && !!src && !!doc.querySelector('#screen .field[data-phase="warmup"]');
+      const now = on() && !empty && !!src && RQ.adSize.showing(doc);
       if (now === warm && (!now || key === bandKey)) return;
       warm = now;
       if (now && band && key !== bandKey) { band.remove(); band = null; }   // 向きを変えて大きさが変わった

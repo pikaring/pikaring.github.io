@@ -30,7 +30,13 @@
     // 女王のポーズ（仮のドット絵には1つしかないので、今は向きを変えない）。sec 秒たったら stand に戻す（0 なら戻さない）
     const setPose = (p, sec = 0) => { U.setSprite(queen, 'queen', 'front', 0, 1.2); poseT = sec; };
     let stopType = null;
-    const say = text => { if (stopType) stopType(); stopType = U.typeText(q('.talk .text'), t('talk.quote', { text: loc(text) })); lineT = 0; };
+    // スマホの縦では話の窓を 3 行までずつ。超える分は、次に話す行として前に入れる（2026-11-09 試走 指摘 7・判断 67A。U.talkPages）
+    const say = text => {
+      if (stopType) stopType();
+      const pages = text && text.raw != null ? [text.raw] : U.talkPages(q('.talk .text'), t('talk.quote', { text: loc(text) }));
+      if (pages.length > 1) lines.unshift(...pages.slice(1).map(raw => ({ raw })));
+      stopType = U.typeText(q('.talk .text'), pages[0]); lineT = 0;
+    };
     setPose('talk');
     say(lines.shift());
 

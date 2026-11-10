@@ -44,15 +44,33 @@
       if (who === 'hero') return hero.n;
       return '';
     }
-    // せりふは「＊「……」」の形で、1字ずつ出す
+    // せりふは「＊「……」」の形で、1字ずつ出す。スマホの縦では 3 行までずつ、次の窓に送る（U.talkPages。窓の数は course.js が run.talkPages で聞く）
     let stopType = null;
+    const quoted = (who, text) => (who === 'sys' ? text : t('talk.quote', { text }));
+    run.talkPages = (who, text) => {
+      // 話の窓が隠れている間（話す時刻を決めるとき）は幅を測れないので、見えないまま一度出して測る。
+      // 次の道の区間は、戦闘の画面が出ている間（戦闘の終わり。course.js の finishBattle）に組むので、そのときこの画面の窓はもう無い。
+      // 同じ形の見えない窓を一度だけ置いて測る（2026-11-10 試走 指摘 3・4：消えた窓を読んで例外になり、逃げられた戦闘のあと旅に戻らず時計が止まっていた）
+      let box = q('.field .talk'), tmp = null;
+      if (!box) {
+        tmp = U.el('div', 'field' + (W ? ' on-world' : ''));
+        tmp.style.visibility = 'hidden'; tmp.style.pointerEvents = 'none'; tmp.style.background = 'transparent';
+        tmp.innerHTML = '<div class="win talk"><div class="who"></div><div class="text"></div></div>';
+        screen.appendChild(tmp); box = tmp.querySelector('.talk');
+      }
+      const was = box.hidden;
+      if (was) { box.style.visibility = 'hidden'; box.hidden = false; }
+      try { return U.talkPages(box.querySelector('.text'), quoted(who, text)).length; }
+      finally { if (tmp) tmp.remove(); else if (was) { box.hidden = true; box.style.visibility = ''; } }
+    };
     function showLine() {
       const ft = run.field && run.field.talk; if (!ft) return;   // 早送りでは、同じ回の中で回復が終わっていることがある
       const talk = C.talkOf(run, ft.id), [who, text] = talk.lines[ft.line];
       q('.talk .who').textContent = speaker(talk, who);
       q('.talk .who').hidden = !speaker(talk, who);
       if (stopType) stopType();
-      stopType = U.typeText(q('.talk .text'), who === 'sys' ? text : t('talk.quote', { text }));
+      const pages = U.talkPages(q('.talk .text'), quoted(who, text));
+      stopType = U.typeText(q('.talk .text'), pages[Math.min(ft.page || 0, pages.length - 1)]);
       q('.talk').className = 'win talk by-' + who;
       // 話している人が分かるように（2026-10-22 ユーザー要望）：主人公が話す行は、会話の窓の右上に主人公の正面の絵。NPC の絵（左上）はそのあいだ暗くする
       heroFace.hidden = who !== 'hero';

@@ -324,7 +324,7 @@
     run.segNo++;
     // 話す時刻：会話の長さ（1行 TALK_LINE_SEC 秒）を見て、回復の長さの中で話し終えるように置く（2026-10-25：会話が回復の終わりを越えて、旅が延びていた）。
     // 最後の会話（次の戦いの予告など）は回復の終わりに話し終える所、ほかは前から順に。入りきらなければ、まん中の道端の話を減らす
-    const durOf = id => { const d = run.talkDefs[id] || T.TALKS[id]; return (d && d.lines ? d.lines.length : 3) * T.TALK_LINE_SEC + 2; };
+    const durOf = id => { const d = run.talkDefs[id] || T.TALKS[id]; return (d && d.lines ? d.lines.reduce((a, l) => a + pagesOf(run, l), 0) : 3) * T.TALK_LINE_SEC + 2; };   // 1 行が窓いくつ分か（スマホの縦で 3 行を超える文は窓が増える）
     while (talks.length > 2 && talks.reduce((a, id) => a + durOf(id), 0) > sec * 0.9) {
       const k = talks.findIndex((id, i) => i > 0 && i < talks.length - 1 && String(id).startsWith('npc:'));
       talks.splice(k > 0 ? k : talks.length - 2, 1);
@@ -499,7 +499,7 @@
       if (f.soon && due) {
         const id = f.soon.id; f.soon = null; f.talkIdx++;
         run.usedTalks.push(id); run.stats.talks++;
-        f.talk = { id, line: 0, lineT: 0, result: undefined };
+        f.talk = { id, line: 0, page: 0, lineT: 0, result: undefined };
         { const ch = (talkOf(run, id) || {}).char; if (ch) run.talkLog.chars = (run.talkLog.chars || []).filter(c => c !== ch).concat(ch).slice(-NT.CHARS); }   // 話した人（直前の人は続けて出さない）
         ev.push({ type: 'talkStart', id, talk: talkOf(run, id) });
       }
@@ -533,12 +533,23 @@
     return [{ type: 'fieldEnd', home: true }];
   }
 
-  // 会話を1行進める（Enter でも呼ぶ）
+  // 1 行の文が、話の窓いくつ分か（2026-11-09 試走 指摘 7・判断 67A：スマホの縦では話の窓を 3 行までにし、超える文は次の窓に送る）。
+  // 画面の大きさは画面の側（field-view.js）だけが知っているので、run.talkPages(who, text) → 窓の数 を画面が入れる。無ければ 1（パソコン・横・node のテスト）。
+  // 窓 1 つにつき TALK_LINE_SEC 秒（行と同じ）。話す人は同じまま
+  function pagesOf(run, line) {
+    // 測れないとき（画面の窓が無い・例外）は 1 窓とみなす。窓の数は話す時刻の見積もりに使うだけで、旅を止めてはいけない
+    // （2026-11-10 試走 指摘 3・4：ここで例外になり、戦闘のあと旅に戻らず「逃げていった」が出たまま時計が止まっていた）
+    let n = 1;
+    if (run && typeof run.talkPages === 'function' && line) { try { n = run.talkPages(line[0], line[1]); } catch (_) { n = 1; } }
+    return Math.max(1, Math.floor(n) || 1);
+  }
+  // 会話を1行（窓が分かれている行は 1 窓）進める（Enter でも呼ぶ）
   function nextLine(run, ev = []) {
     const t = run.field && run.field.talk; if (!t) return ev;
     const talk = talkOf(run, t.id);
     t.lineT = 0;
-    if (t.line < talk.lines.length - 1) { t.line++; ev.push({ type: 'talkLine', line: t.line }); return ev; }
+    if (t.result === undefined && (t.page || 0) < pagesOf(run, talk.lines[t.line]) - 1) { t.page = (t.page || 0) + 1; ev.push({ type: 'talkLine', line: t.line, page: t.page }); return ev; }
+    if (t.line < talk.lines.length - 1) { t.line++; t.page = 0; ev.push({ type: 'talkLine', line: t.line, page: 0 }); return ev; }
     if (t.result === undefined && talk.effect) {   // 最後の行のあとに効果を見せる
       t.result = applyEffect(run, talk.effect);
       ev.push({ type: 'talkEffect', text: t.result });

@@ -108,7 +108,9 @@
   const kick = (kn, ph, sg, K) => K ? Math.max(kn, K * Math.pow(Math.max(0, sg * Math.sin(ph - 0.6)), 1.2)) : kn;
   const footAlong = (th, kn, ex) => { const w = Math.max(0, Math.min(1, ex != null ? ex / 0.5 : (kn - 0.5) / 0.9)), w2 = w * w * (3 - 2 * w); return -(th + kn) * 0.75 * (1 - w2) + 0.35 * w2; };   // ex：蹴り上げで深くしたぶん（あれば、それで合わせ具合を決める）
   // 靴の裏（2026-10-27 ユーザー「足の裏を別の色にすると走っている感じがより出る」）：足（foot）の中の靴の部品の、下を向いた面だけを写して、0.0005 外へ出した皮を重ねる（靴の形を問わない）
-  const SOLE = 0xe8e0c8, SOLES = { mercenary: 0xcdb88e, wizard: 0xcdb88e, priest: 0xcdb88e, samurai: 0xcdb88e };   // 人ごとの靴の裏（無ければ SOLE）。傭兵は土色の服・長靴に白い底が浮いたので、明るい革の色。魔法使い・僧侶も茶色の長靴に白い底が四角く目立ったので同じ色（2026-10-28 ユーザー判断）
+  // 'shoe'：その靴の色（少し暗く。2026-11-09 試走・判断 64：ユーザー「3D のエルフの足の裏が白いと目立つから、茶色にして」「靴の色に合わせる」。
+  // 白い SOLE だった 4 人＝エルフ・戦士・武闘家・ワルキューレを、靴の色に。傭兵・魔法使い・僧侶・侍は 2026-10-28 に決めた明るい革の色のまま）
+  const SOLE = 0xe8e0c8, SOLES = { mercenary: 0xcdb88e, wizard: 0xcdb88e, priest: 0xcdb88e, samurai: 0xcdb88e, elf: 'shoe', warrior: 'shoe', monk: 'shoe', valkyrie: 'shoe' }, SHOE_K = 0.82;   // 人ごとの靴の裏（無ければ SOLE）。傭兵は土色の服・長靴に白い底が浮いたので、明るい革の色。魔法使い・僧侶も茶色の長靴に白い底が四角く目立ったので同じ色（2026-10-28 ユーザー判断）
   function addSoles(T, parts, id) {
     const color = SOLES[id] != null ? SOLES[id] : SOLE;
     for (const n of ['L', 'R']) {
@@ -122,7 +124,7 @@
           if (nn.y > -0.6) continue; for (const v of [a, b, c]) out.push(v.x + nn.x * 0.0005, v.y + nn.y * 0.0005, v.z + nn.z * 0.0005); }
         g.dispose(); if (!out.length) continue;
         const sg = new T.BufferGeometry(); sg.setAttribute('position', new T.Float32BufferAttribute(out, 3)); sg.computeVertexNormals();
-        const mt = o.material.clone(); mt.color = new T.Color(color).multiplyScalar(mt.isMeshToonMaterial ? 0.74 : 1);
+        const mt = o.material.clone(); mt.color = color === 'shoe' ? o.material.color.clone().multiplyScalar(SHOE_K) : new T.Color(color).multiplyScalar(mt.isMeshToonMaterial ? 0.74 : 1);
         const so = new T.Mesh(sg, mt); so.name = 'shoe_sole'; grp.add(so);
       }
     }

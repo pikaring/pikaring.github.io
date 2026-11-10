@@ -29,7 +29,9 @@
     let ptStop = null, ptT = 0;
     function pacerSay(e) {
       const box = q('.pacer-talk'); box.hidden = false;
-      U.setSprite(q('.pt-face'), e.hero, 'front', 0, 0.9); q('.pt-who').textContent = e.name;
+      // 顔は 3D と同じ色違い（名前と職業で 1〜3。game/herocolors.js の pick。2026-11-10 ユーザー判断 86A）
+      const hc = root.RQ.heroColors, variant = hc ? hc.pick({ name: e.name, hero: e.hero }) : 0;
+      U.setSprite(q('.pt-face'), e.hero, 'front', 0, 0.9, variant); q('.pt-who').textContent = e.name;
       if (ptStop) ptStop(); ptStop = U.typeText(q('.pt-text'), root.RQ.i18n.t('talk.quote', { text: e.line })); ptT = 7;
     }
     const turn = U.turnArrows(screen);

@@ -278,7 +278,15 @@
   // 後ろ姿は 0＝立ち、1・2＝左右の足。右向きは立ちと歩きの2コマなので、frame 2（もう片足）は立ちを出す（歩き・立ちを交互に）
   const ART = root.RQ.enemyArt || {}, HERO = root.RQ.heroArt || {}, NPC = root.RQ.npcArt || {};
   const heroFile = (view, frame) => view === 'side' ? [0, 1, 0][frame] || 0 : view === 'front' ? 0 : frame;
-  function get(id, view = 'front', frame = 0) {
+  // variant（1〜3）：主人公の正面の色違い（assets/hero/<ID>_front_0_v<n>.png。tools/hero_variants_2d.py。2026-11-10 ユーザー判断 86A：
+  // ペースメーカー・旅人の 2D の顔を、3D の色違い〔game/herocolors.js〕とそろえる）。絵が無ければ元の色
+  const VAR = root.RQ.heroVariants || {};
+  function get(id, view = 'front', frame = 0, variant = 0) {
+    if (variant && view === 'front' && HERO[id] && HERO[id].front && variant <= (VAR[id] || 0)) {
+      const key = `${id}/front/v${variant}`;
+      if (!cache.has(key)) { const f = HERO[id].front; cache.set(key, { canvas: null, url: `../assets/hero/${id}_front_0_v${variant}.png`, w: f.w, h: f.h, scale: HERO[id].rows / (f.body || f.h) }); }
+      return cache.get(key);
+    }
     const key = `${id}/${view}/${frame}`;
     if (cache.has(key)) return cache.get(key);
     const la = view === 'left' && ART[id] && ART[id].side;   // 敵の左向き（戦闘を横から見る形）。絵が無い敵は正面の絵

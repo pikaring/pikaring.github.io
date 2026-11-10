@@ -1337,6 +1337,9 @@
       scene.traverse(o => { if (o.geometry) o.geometry.dispose(); if (Array.isArray(o.material)) o.material.forEach(free); else free(o.material); });
       if (H3) H3.dispose();
       for (const o of ghostObj.values()) if (o.h3) o.h3.dispose(); for (const p of pool3) p.h3.dispose(); pool3.length = 0;
+      // WebGL の文脈もすぐ手放す（2026-11-09 試走・判断 63A：ユーザー「2人目を始めた時から動作が少し重い」。dispose だけでは文脈がガベージコレクトまで残り、
+      // 旅のたびに 2 つずつ増えていた。iPhone では文脈の数と GPU のメモリが少ない）
+      try { renderer.forceContextLoss(); } catch (_) {}
       renderer.dispose(); renderer.domElement.remove();
     }
     // ゴースト（他のライダー）：主人公と同じドット絵の板（同じ向き＝後ろ姿、対向＝正面）を半透明で、近くにいる間だけ出す。
@@ -1455,7 +1458,9 @@
     // 道端の NPC（2026-10-22 ユーザー要望）：会話の相手が、道の左か右のふち（道の外）に正面を向いて立つ。霧の中から近づくと見えてくる。
     // o：{ char, lat, lon, hd：[東, 北]（道の向き）, side：1＝左・-1＝右 }。null で片づける。戦闘中は隠す（世界の側が片づける）
     let npcSp = null;
-    const NPC_OFF = 2.6;   // 道のまん中から（道の幅 3.2 m の半分＋1 m）
+    // 道のまん中から（2026-11-09 試走・判断 62A：ユーザー「道に立ってる村人が道の中に半分沈み込んでる場合がある。もう少し道から離れたところに立たせて」→「道の端から 1 m ほど外」）。
+    // 見える道の端は、ふちの濃い土の帯（まん中から 2.5 m）。その 1 m 外＝3.5 m。前は 2.6 m で、ふちの帯・土手の面より足が下になることがあった
+    const NPC_OFF = 3.5, ROAD_EDGE = 2.5;
     const CAMP_OFF = 7;   // 野営地のテントは、村人より道から遠く（道のまん中から m）
     function setNpc(o) {
       if (npcSp) { scene.remove(npcSp); npcSp.material.map.dispose(); npcSp.material.dispose(); npcSp = null; }
@@ -1473,8 +1478,13 @@
       }
       { const a = SPR.get(o.char, 'front', 0), r = SPR.get('elder', 'front', 0); npcSp = billboard(o.char, [['front', 0]], a.scale && r.scale ? HERO_H * (a.h * a.scale) / (r.h * r.scale) : HERO_H, true); }   // 高さは絵の行数の比（大人 26 行＝主人公の背。子ども 18 行・猫 14 行は小さく。2026-10-27 試走の指摘 No.9「子供はもうちょっと小さく」。前は全員 HERO_H で、子どもも猫も大人と同じ高さだった）
       const l = Math.hypot(o.hd[0], o.hd[1]) || 1, ox = -o.hd[1] / l * NPC_OFF * o.side, oz = -o.hd[0] / l * NPC_OFF * o.side;   // 東・北 → x・z。向きの左（side＝1）か右
-      const p = lane(at3(o.lat, o.lon), [ox, oz]);
-      npcSp.position.copy(p).add(new T.Vector3(0, 0.05, 0)); cutout();
+      const c = at3(o.lat, o.lon), p = lane(c, [ox, oz]);
+      // 足の高さ：その場所の地面と、道の土手の面（道のまん中の地面＋0.2 から、ふちの外 1.8 m で 2.4 m 下がる。roadRibbon の bank）の高いほう。
+      // 坂・段差・切り盛りの所でも、地面にも土手にも沈まない（足もとが見えるように 0.03 上げる）
+      const bankY = groundY(c.x, c.z) + 0.2 - 2.4 * Math.max(0, NPC_OFF - ROAD_EDGE) / 1.8;   // 土手の面（roadRibbon(W + 0.9, 0.2, bank)）
+      p.y = Math.max(p.y, bankY);
+      npcSp.position.copy(p).add(new T.Vector3(0, 0.03, 0)); cutout();
+      root.__rq.npcFoot = { y: p.y, ground: groundY(p.x, p.z), bank: bankY, off: NPC_OFF };   // テスト用
       if (!npcGlow) npcGlow = makeGlow(); npcGlow.userData.at = p.clone();
     }
     root.__rq.setNpc3d = setNpc; root.__rq.npcSprite = () => npcSp;   // テスト用：道端の NPC をじかに立たせる（フリーライドでも）・いま立っている NPC の板

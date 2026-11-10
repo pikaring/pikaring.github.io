@@ -917,6 +917,7 @@ html:not([lang="ja"]) .course-card .how { flex: none; -webkit-line-clamp: 1; }
 .battle .arrow-shot.gold { background: linear-gradient(90deg, #fff6c0 0 14%, transparent 14% 18%, #e2b341 18% 82%, #fff 82% 100%); filter: drop-shadow(0 0 1cqh #ffd84a); }
 /* 走り終わったあとの「これで終わる／続けて走る」（2026-10-22 ユーザー要望。ui/extra-view.js）：画面のまん中に黒地の窓 */
 .end-choice { position: absolute; left: 50%; top: 42%; transform: translate(-50%, -50%); z-index: 6; padding: 3cqh 4cqh; text-align: center; min-width: 44cqh; }
+.end-choice.resume-ask { box-shadow: 0 0 0 200vmax #000b; z-index: 20; }   /* 読み直したあとの「さっきの走りが途中です」（2026-11-10 判断 85B）：選ぶ画面を暗くして前に出す */
 .end-choice .ec-title { font-size: var(--fs-l); margin-bottom: 1cqh; }
 .end-choice .ec-note { font-size: var(--fs-s); color: var(--dim, #bbb); margin-bottom: 1.6cqh; }
 .end-choice .ec-note[hidden] { display: none; }

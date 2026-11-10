@@ -484,7 +484,7 @@
           if (cx2) { cx2.clearRect(0, 0, PXW, PXH); cx2.drawImage(pr.domElement, 0, 0); }
           tex.needsUpdate = true;
         },
-        dispose() { tex.dispose(); if (SHD) { if (--SHD.n <= 0) { if (SHD.rt) SHD.rt.dispose(); SHD.pr.dispose(); delete sharedTools[px]; } } else { if (rt) rt.dispose(); pr.dispose(); } ps.traverse(o => { if (o.geometry) o.geometry.dispose(); if (o.material) { if (o.material.gradientMap) o.material.gradientMap.dispose(); o.material.dispose(); } }); },
+        dispose() { tex.dispose(); if (SHD) { if (--SHD.n <= 0) { if (SHD.rt) SHD.rt.dispose(); try { SHD.pr.forceContextLoss(); } catch (_) {} SHD.pr.dispose(); delete sharedTools[px]; } } else { if (rt) rt.dispose(); try { pr.forceContextLoss(); } catch (_) {} pr.dispose(); } ps.traverse(o => { if (o.geometry) o.geometry.dispose(); if (o.material) { if (o.material.gradientMap) o.material.gradientMap.dispose(); o.material.dispose(); } }); },
       };
     },
   };
